@@ -1,0 +1,44 @@
+# Ignore common OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environment
+venv/
+.env/
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Ignore compiled code and binaries
+*.out
+*.o
+*.so
+*.exe
+*.dll
+
+# Ignore editor and IDE configuration files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Ignore package manager dependency folders
+node_modules/
+dist/
+build/
+
+# Ignore Git-related metadata
+.git/
+
+# Ignore personal folder
+private_files/
