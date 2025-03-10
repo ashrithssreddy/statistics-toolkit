@@ -43,3 +43,4 @@ build/
 # Ignore personal folder
 private_files/
 .DS_Store
+.DS_Store
