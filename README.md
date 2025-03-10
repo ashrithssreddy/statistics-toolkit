@@ -1,2 +1,2 @@
-# statistics_toolkit
-"A comprehensive collection of statistical code snippets, probability distributions, hypothesis testing methods, visualization techniques, and learning resources for data analysis and inference."
+# Statistics Toolkit
+A comprehensive collection of Applied Statistics code snippets, Probability Distributions and Hypothesis Testing Methods for Analysis and Inference.
