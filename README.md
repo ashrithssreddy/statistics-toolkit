@@ -31,7 +31,13 @@ Each notebook covers a complete workflow — from setup to summary — while sta
 - Simpson’s Paradox  
 - Will Rogers Phenomenon
 
-### **5. Theoretical Foundations** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Theorems.html))
+### **5. Statistical Similarity Metrics** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Similarity_Metrics.html))
+
+- Euclidean, Manhattan, Minkowski, Mahalanobis distances  
+- Cosine similarity/distance, Jaccard index, Hamming distance  
+- Pearson and Spearman correlation  
+
+### **6. Theoretical Foundations** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Theorems.html))
 
 - Law of Large Numbers (with visual convergence)  
 - Central Limit Theorem (sample mean simulation)
