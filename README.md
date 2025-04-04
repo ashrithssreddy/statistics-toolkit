@@ -41,5 +41,6 @@ Each notebook covers a complete workflow — from setup to summary — while sta
 
 - Law of Large Numbers (with visual convergence)  
 - Central Limit Theorem (sample mean simulation)
-
+- Chebyshev’s Inequality (distribution-free bounds on data spread)  
+- Bayes’ Theorem (belief updating using evidence)
 ---
