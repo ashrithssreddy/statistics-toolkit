@@ -14,5 +14,8 @@ Real-world scenario hooks Maybe a dropdown or config print block with sample bus
 📊 Test Summary
 🚀 Full Pipeline
 
+#### Causal Inference
+
+
 #### Paradoxes
 Birthday Paradoxes
