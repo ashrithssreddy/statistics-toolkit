@@ -7552,336 +7552,224 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details><summary><strong>📖 Hypothesis Testing - Assumptions &amp; Methods (Click to Expand)</strong></summary>
+<details><summary><strong>📖 Test Selection Matrix (Click to Expand)</strong></summary>
 <table>
 <thead>
 <tr>
-<th>Test Type</th>
-<th>Use Case</th>
-<th>Parametric?</th>
-<th>Assumptions</th>
-<th>Non-Parametric Alternative</th>
+<th>💼 Example Business Problem</th>
+<th>📊 Outcome Variable Type</th>
+<th>📈 Outcome Distribution</th>
+<th>👥 Group Count</th>
+<th>🔗 Groups Type</th>
+<th>✅ Recommended Test</th>
+<th>📝 Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>One-Sample t-test</td>
-<td>Compare sample mean vs. known value</td>
-<td>✅</td>
-<td>Normality of sample</td>
-<td>Sign test</td>
-</tr>
-<tr>
-<td>Two-Sample t-test</td>
-<td>Compare means of two independent groups</td>
-<td>✅</td>
-<td>- Normality (both groups)<br/>- Equal variance (if pooled)<br/>- Independence</td>
-<td>Mann-Whitney U</td>
-</tr>
-<tr>
-<td>Paired t-test</td>
-<td>Compare means of two related samples (before-after, matched)</td>
-<td>✅</td>
-<td>- Normality of *differences*<br/>- No extreme outliers</td>
-<td>Wilcoxon signed-rank</td>
-</tr>
-<tr>
-<td>Proportions z-test</td>
-<td>Compare binary rates (e.g., CTR in A vs B)</td>
-<td>✅</td>
-<td>- np &gt; 5, nq &gt; 5 (sample size rule)<br/>- Independence</td>
-<td>Fisher’s exact</td>
-</tr>
-<tr>
-<td>Chi-Square Test</td>
-<td>Categorical association (e.g., device type vs. AR adoption)</td>
-<td>✅</td>
-<td>- Expected count ≥ 5 in ≥ 80% of cells<br/>- Independence</td>
-<td>Fisher’s exact</td>
-</tr>
-<tr>
-<td>ANOVA</td>
-<td>Compare means across 3+ groups</td>
-<td>✅</td>
-<td>- Normality<br/>- Equal variance<br/>- Independence</td>
-<td>Kruskal-Wallis</td>
-</tr>
-<tr>
-<td>Mann-Whitney U</td>
-<td>Compare medians/ranks of two independent groups</td>
-<td>❌</td>
-<td>- Same shape distribution (ideally)<br/>- Ordinal or continuous data</td>
-<td>N/A</td>
-</tr>
-<tr>
-<td>Wilcoxon Signed-Rank</td>
-<td>Paired version of Mann-Whitney (for related samples)</td>
-<td>❌</td>
-<td>- Symmetry in differences<br/>- Ordinal or continuous</td>
-<td>Sign test</td>
-</tr>
-</tbody>
-</table>
-</details>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details><summary><strong>📖 Hypothesis Test Selection Matrix (Click to Expand)</strong></summary>
-<table>
-<thead>
-<tr>
-<th>Outcome Type</th>
-<th>Group Relationship</th>
-<th>Group Count</th>
-<th>Outcome Distribution</th>
-<th>Business Problem</th>
-<th>Recommended Test</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>continuous</td>
-<td>–</td>
-<td>one-sample</td>
-<td>normal</td>
 <td>Is average order value different from $50?</td>
+<td>Continuous</td>
+<td>Normal</td>
+<td>One-Sample</td>
+<td><em>Not Applicable</em></td>
 <td>One-sample t-test</td>
+<td><em>-</em></td>
 </tr>
 <tr>
-<td>binary</td>
-<td>–</td>
-<td>one-sample</td>
-<td>–</td>
-<td>Is conversion rate different from 10%?</td>
-<td>One-proportion z-test</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>normal</td>
-<td>Do users who saw the new recommendation engine spend more time on site?</td>
-<td>Two-sample t-test</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>non-normal</td>
-<td>Is there a difference in revenue between users who got coupon A vs B?</td>
-<td>Mann-Whitney U test</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>paired</td>
-<td>two-sample</td>
-<td>normal</td>
-<td>Did users spend more after homepage redesign?</td>
-<td>Paired t-test</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>paired</td>
-<td>two-sample</td>
-<td>non-normal</td>
-<td>Did time on site change after layout update (skewed)?</td>
-<td>Wilcoxon signed-rank test</td>
-</tr>
-<tr>
-<td>binary</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>–</td>
-<td>Does a new CTA improve conversions?</td>
-<td>Proportions z-test</td>
-</tr>
-<tr>
-<td>binary</td>
-<td>paired</td>
-<td>two-sample</td>
-<td>–</td>
-<td>Do users convert more after adding trust badges?</td>
-<td>McNemar’s test</td>
-</tr>
-<tr>
-<td>categorical</td>
-<td>independent</td>
-<td>multi-sample</td>
-<td>–</td>
-<td>Do plan choices differ between layout A/B/C?</td>
-<td>Chi-square test</td>
-</tr>
-</tbody>
-</table>
-</details>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details><summary><strong>📖 Hypothesis Test Selection Matrix (Click to Expand)</strong></summary>
-<table>
-<thead>
-<tr>
-<th>Outcome Type</th>
-<th>Group Relationship</th>
-<th>Group Count</th>
-<th>Outcome Distribution</th>
-<th>Business Problem</th>
-<th>Recommended Test</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>continuous</td>
-<td>–</td>
-<td>one-sample</td>
-<td>normal</td>
-<td>Is average order value different from $50?</td>
-<td>One-sample t-test</td>
-<td>Use Wilcoxon signed-rank if not normal</td>
-</tr>
-<tr>
-<td>binary</td>
-<td>–</td>
-<td>one-sample</td>
-<td>–</td>
-<td>Is conversion rate different from 10%?</td>
-<td>One-proportion z-test</td>
-<td>Use binomial exact test if n is small</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>normal</td>
 <td>Do users who saw recs spend more time on site?</td>
+<td>Continuous</td>
+<td>Normal</td>
+<td>Two-Sample</td>
+<td>Independent</td>
 <td>Two-sample t-test</td>
-<td>Use Welch’s t-test if variances unequal</td>
+<td><em>Use if variances are equal; Welch’s t-test if not</em></td>
 </tr>
 <tr>
-<td>continuous</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>non-normal</td>
-<td>Is revenue different between coupon A vs B?</td>
-<td>Mann-Whitney U test</td>
-<td>Non-parametric; tests medians</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>paired</td>
-<td>two-sample</td>
-<td>normal</td>
 <td>Did users spend more after redesign?</td>
+<td>Continuous</td>
+<td>Normal</td>
+<td>Two-Sample</td>
+<td>Paired</td>
 <td>Paired t-test</td>
-<td>Assumes differences are normal</td>
+<td><em>Use only if paired differences are roughly Normal</em></td>
 </tr>
 <tr>
-<td>continuous</td>
-<td>paired</td>
-<td>two-sample</td>
-<td>non-normal</td>
-<td>Did time on site change (skewed)?</td>
-<td>Wilcoxon signed-rank test</td>
-<td>Use for non-normal paired diffs</td>
-</tr>
-<tr>
-<td>binary</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>–</td>
-<td>Does new CTA improve conversion?</td>
-<td>Proportions z-test</td>
-<td>Chi-square for raw counts</td>
-</tr>
-<tr>
-<td>binary</td>
-<td>paired</td>
-<td>two-sample</td>
-<td>–</td>
-<td>Do users convert more after badges?</td>
-<td>McNemar’s test</td>
-<td>Use for paired binary outcomes</td>
-</tr>
-<tr>
-<td>categorical</td>
-<td>independent</td>
-<td>multi-sample</td>
-<td>–</td>
-<td>Do plan choices differ across layouts?</td>
-<td>Chi-square test</td>
-<td>Expected counts ≥5 in each cell</td>
-</tr>
-<tr>
-<td>count</td>
-<td>independent</td>
-<td>two-sample</td>
-<td>Poisson</td>
-<td>Do users add more items to cart?</td>
-<td>Poisson / NB test</td>
-<td>Use NB if overdispersion (variance &gt; mean)</td>
-</tr>
-<tr>
-<td>continuous</td>
-<td>independent</td>
-<td>multi-sample</td>
-<td>normal</td>
 <td>Does time spent differ across A/B/C?</td>
+<td>Continuous</td>
+<td>Normal</td>
+<td>Multi-Sample (3+)</td>
+<td>Independent</td>
 <td>ANOVA</td>
-<td>Welch ANOVA if variances differ</td>
+<td><em>Use Welch ANOVA if group variances differ</em></td>
 </tr>
 <tr>
-<td>continuous</td>
-<td>independent</td>
-<td>multi-sample</td>
-<td>non-normal</td>
+<td>Is average order value different from $50 (skewed)?</td>
+<td>Continuous</td>
+<td>Non-Normal</td>
+<td>One-Sample</td>
+<td><em>Not Applicable</em></td>
+<td>Wilcoxon Signed-Rank Test</td>
+<td><em>Use when normality is violated; tests median. Sign Test is an alternative with fewer assumptions</em></td>
+</tr>
+<tr>
+<td>Is revenue different between coupon A vs B?</td>
+<td>Continuous</td>
+<td>Non-Normal</td>
+<td>Two-Sample</td>
+<td>Independent</td>
+<td>Mann-Whitney U test</td>
+<td><em>Use when data is skewed or has outliers</em></td>
+</tr>
+<tr>
+<td>Did time on site change (skewed)?</td>
+<td>Continuous</td>
+<td>Non-Normal</td>
+<td>Two-Sample</td>
+<td>Paired</td>
+<td>Wilcoxon signed-rank test</td>
+<td><em>For paired non-normal distributions</em></td>
+</tr>
+<tr>
 <td>Does spend differ across segments?</td>
+<td>Continuous</td>
+<td>Non-Normal</td>
+<td>Multi-Sample (3+)</td>
+<td>Independent</td>
 <td>Kruskal-Wallis test</td>
-<td>Non-parametric alternative to ANOVA</td>
+<td><em>Non-parametric version of ANOVA</em></td>
 </tr>
 <tr>
-<td>any</td>
-<td>any</td>
-<td>any</td>
-<td>–</td>
+<td>Is conversion rate different from 10%?</td>
+<td>Binary</td>
+<td><em>Not Applicable</em></td>
+<td>One-Sample</td>
+<td><em>Not Applicable</em></td>
+<td>One-proportion z-test</td>
+<td><em>Use binomial exact test if sample size is small</em></td>
+</tr>
+<tr>
+<td>Does new CTA improve conversion?</td>
+<td>Binary</td>
+<td><em>Not Applicable</em></td>
+<td>Two-Sample</td>
+<td>Independent</td>
+<td>Proportions z-test</td>
+<td><em>Use when counts are raw; chi-square for independence. Fisher’s Exact if expected counts are low</em></td>
+</tr>
+<tr>
+<td>Do users convert more after badges?</td>
+<td>Binary</td>
+<td><em>Not Applicable</em></td>
+<td>Two-Sample</td>
+<td>Paired</td>
+<td>McNemar’s test</td>
+<td><em>Used for 2×2 paired binary outcomes</em></td>
+</tr>
+<tr>
+<td>Do plan choices differ across layout options?</td>
+<td>Categorical</td>
+<td><em>Not Applicable</em></td>
+<td>Multi-Sample (3+)</td>
+<td>Independent</td>
+<td>Chi-square test</td>
+<td><em>Requires expected frequency ≥5 in each cell. Use Fisher’s Exact if assumption fails</em></td>
+</tr>
+<tr>
+<td>Do users add more items to cart?</td>
+<td>Count</td>
+<td>Poisson</td>
+<td>Two-Sample</td>
+<td>Independent</td>
+<td>Poisson / NB test</td>
+<td><em>Use Negative Binomial if variance &gt; mean</em></td>
+</tr>
+<tr>
 <td>Is effect still significant after adjusting for device &amp; region?</td>
+<td>Any</td>
+<td><em>Not Applicable</em></td>
+<td>Any</td>
+<td>Any</td>
 <td>Regression (linear / logistic)</td>
-<td>Use when controlling for covariates</td>
+<td><em>Use to control for covariates / confounders</em></td>
 </tr>
 <tr>
-<td>any</td>
-<td>any</td>
-<td>two-sample</td>
-<td>–</td>
 <td>What’s the probability that B beats A?</td>
+<td>Any</td>
+<td><em>Not Applicable</em></td>
+<td>Two-Sample</td>
+<td>Any</td>
 <td>Bayesian A/B test</td>
-<td>Reports posterior probability instead of p-value</td>
+<td><em>Posterior probability; no p-value</em></td>
 </tr>
 <tr>
-<td>any</td>
-<td>any</td>
-<td>two-sample</td>
-<td>–</td>
 <td>Is observed lift statistically rare?</td>
+<td>Any</td>
+<td><em>Not Applicable</em></td>
+<td>Two-Sample</td>
+<td>Any</td>
 <td>Permutation / Bootstrap</td>
-<td>Use when assumptions are violated</td>
+<td><em>Use when parametric assumptions are violated</em></td>
 </tr>
 </tbody>
 </table>
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<details>
+<summary><strong>📖 Test Selection FlowChart (Click to Expand)</strong></summary>
+<pre>
+[What is your outcome variable type?]  
+  |
+  +--&gt; 📏 Continuous
+  |     |
+  |     +--&gt; Is the outcome distribution normal?
+  |           |
+  |           +--&gt; ✅ Yes
+  |           |     |
+  |           |     +--&gt; 👥 Group Count = One-Sample ----------&gt; 🧪 One-sample t-test
+  |           |     +--&gt; 👥 Group Count = Two-Sample
+  |           |     |     +--&gt; 🔗 Groups Type = Independent ---&gt; 🧪 Two-sample t-test
+  |           |     |     +--&gt; 🔗 Groups Type = Paired --------&gt; 🧪 Paired t-test
+  |           |     +--&gt; 👥 Group Count = Multi-Sample (3+) ---&gt; 🧪 ANOVA
+  |           |
+  |           +--&gt; ❌ No (Non-Normal)
+  |                 |
+  |                 +--&gt; 👥 Group Count = One-Sample ----------&gt; 🧪 Wilcoxon Signed-Rank Test
+  |                 +--&gt; 👥 Group Count = Two-Sample
+  |                 |     +--&gt; 🔗 Groups Type = Independent ---&gt; 🧪 Mann-Whitney U Test
+  |                 |     +--&gt; 🔗 Groups Type = Paired --------&gt; 🧪 Wilcoxon Signed-Rank Test
+  |                 +--&gt; 👥 Group Count = Multi-Sample (3+) ---&gt; 🧪 Kruskal-Wallis Test
+  |
+  +--&gt; ⚪ Binary
+  |     |
+  |     +--&gt; 👥 Group Count = One-Sample -----------------------&gt; 🧪 One-proportion z-test
+  |     +--&gt; 👥 Group Count = Two-Sample
+  |     |     +--&gt; 🔗 Groups Type = Independent ---------------&gt; 🧪 Proportions z-test
+  |     |     +--&gt; 🔗 Groups Type = Paired --------------------&gt; 🧪 McNemar’s Test
+  |
+  +--&gt; 🟪 Categorical
+  |     |
+  |     +--&gt; 👥 Group Count = Multi-Sample (3+) ---------------&gt; 🧪 Chi-square Test
+  |
+  +--&gt; 🔢 Count
+  |     |
+  |     +--&gt; Distribution = Poisson
+  |           +--&gt; 👥 Group Count = Two-Sample ---------------&gt; 🧪 Poisson or Negative Binomial Test
+  |
+  +--&gt; 🧠 Any
+        |
+        +--&gt; Want to control for covariates? -------------&gt; 📉 Regression (Linear or Logistic)
+        +--&gt; Prefer probability over p-values? -----------&gt; 📊 Bayesian A/B Test
+        +--&gt; Assumptions violated / custom metric? -------&gt; 🔁 Permutation or Bootstrap
+</pre>
 </details>
 </div>
 </div>
@@ -7918,11 +7806,11 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Display Settings</span>
-<span class="kn">from</span> <span class="nn">IPython.core.interactiveshell</span> <span class="kn">import</span> <span class="n">InteractiveShell</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.core.interactiveshell</span><span class="w"> </span><span class="kn">import</span> <span class="n">InteractiveShell</span>
 <span class="n">InteractiveShell</span><span class="o">.</span><span class="n">ast_node_interactivity</span> <span class="o">=</span> <span class="s2">"all"</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 <span class="n">pretty_json</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">&lt;pre style='font-size:14px; font-family:monospace;'&gt;</span>
@@ -7934,16 +7822,16 @@ a.anchor-link {
 <span class="s2">"""</span><span class="p">))</span>
 
 <span class="c1"># Data Transformation Libraries</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="n">my_seed</span><span class="o">=</span><span class="mi">1995</span>
 
 <span class="c1"># Stats Libraries</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ttest_1samp</span><span class="p">,</span> <span class="n">ttest_rel</span><span class="p">,</span> <span class="n">ttest_ind</span><span class="p">,</span> <span class="n">wilcoxon</span><span class="p">,</span> <span class="n">mannwhitneyu</span><span class="p">,</span>
     <span class="n">shapiro</span><span class="p">,</span> <span class="n">chi2_contingency</span><span class="p">,</span> <span class="n">f_oneway</span><span class="p">,</span> <span class="n">kruskal</span><span class="p">,</span> <span class="n">binom_test</span><span class="p">,</span> <span class="n">fisher_exact</span><span class="p">,</span> <span class="n">levene</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">statsmodels.stats.proportion</span> <span class="kn">import</span> <span class="n">proportions_ztest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.proportion</span><span class="w"> </span><span class="kn">import</span> <span class="n">proportions_ztest</span>
 </pre></div>
 </div>
 </div>
@@ -7969,7 +7857,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_data_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_data_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generates synthetic data based on the specified hypothesis test configuration.</span>
 
@@ -8281,8 +8169,8 @@ a.anchor-link {
 <li><p><strong>False (Non-Parametric)</strong>: Non-parametric tests don’t assume any specific distribution. These are used when the data doesn’t follow a normal distribution or when the sample size is small. Examples include <strong>Mann-Whitney U</strong> (alternative to the t-test) and <strong>Wilcoxon Signed-Rank</strong> (alternative to paired t-test).</p>
 </li>
 </ul>
-<p><strong>Why does this matter?</strong><br>
-Parametric tests tend to be more powerful because they make assumptions about the distribution of the data (e.g., normality). Non-parametric tests are more flexible and can be used when these assumptions are not met, but they may be less powerful.</br></p>
+<p><strong>Why does this matter?</strong><br/>
+Parametric tests tend to be more powerful because they make assumptions about the distribution of the data (e.g., normality). Non-parametric tests are more flexible and can be used when these assumptions are not met, but they may be less powerful.</p>
 <h3 id="%F0%9F%93%8A-Equal-Variance-(equal_variance)">📊 <strong>Equal Variance (equal_variance)</strong><a class="anchor-link" href="#%F0%9F%93%8A-Equal-Variance-(equal_variance)">¶</a></h3><p>This setting is used specifically for <strong>two-sample t-tests</strong>.</p>
 <ul>
 <li><p><strong>True</strong>: Assumes that the two groups have <strong>equal variances</strong> (i.e., the spread of data is the same in both groups). This is used for the <strong>pooled t-test</strong>.</p>
@@ -8290,8 +8178,8 @@ Parametric tests tend to be more powerful because they make assumptions about th
 <li><p><strong>False</strong>: Assumes the two groups have <strong>different variances</strong>. This is used for the <strong>Welch t-test</strong>, which is more robust when the assumption of equal variances is violated.</p>
 </li>
 </ul>
-<p><strong>Why is this important?</strong><br>
-If the variances are not equal, using a pooled t-test (which assumes equal variance) can lead to incorrect conclusions. The Welch t-test is safer when in doubt about the equality of variances.</br></p>
+<p><strong>Why is this important?</strong><br/>
+If the variances are not equal, using a pooled t-test (which assumes equal variance) can lead to incorrect conclusions. The Welch t-test is safer when in doubt about the equality of variances.</p>
 <h3 id="%F0%9F%94%91-Significance-Level-(alpha)">🔑 <strong>Significance Level (alpha)</strong><a class="anchor-link" href="#%F0%9F%94%91-Significance-Level-(alpha)">¶</a></h3><p>The <strong>alpha</strong> level is your <strong>threshold for statistical significance</strong>.</p>
 <ul>
 <li><p>Commonly set at <strong>0.05</strong>, this means that you are willing to accept a 5% chance of wrongly rejecting the null hypothesis (i.e., a 5% chance of a Type I error).</p>
@@ -8336,7 +8224,7 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 <div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Validates the hypothesis test configuration dictionary for completeness and logical consistency.</span>
 <span class="sd">    </span>
@@ -8496,7 +8384,7 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 <div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">print_config_summary</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_config_summary</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Displays a structured summary of the test configuration with visual cues for missing or inferred values.</span>
 
@@ -8517,7 +8405,7 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 <span class="sd">        Prints the formatted configuration summary directly to output</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span> <span class="nf">highlight</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">highlight</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'NA'</span><span class="p">]</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
             <span class="k">return</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[91mNone</span><span class="se">\033</span><span class="s2">[0m"</span>  <span class="c1"># Red in terminal</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -8646,8 +8534,8 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><a id="infer-distribution"></a></p>
 <h4 id="%F0%9F%94%8D-Infer-Distribution">🔍 Infer Distribution<a class="anchor-link" href="#%F0%9F%94%8D-Infer-Distribution">¶</a></h4><details><summary><strong>📖 Normality Check (Click to Expand)</strong></summary>
-<h4 id="%F0%9F%93%98-Why-Are-We-Checking-for-Normality?">📘 Why Are We Checking for Normality?<a class="anchor-link" href="#%F0%9F%93%98-Why-Are-We-Checking-for-Normality?">¶</a></h4><p>Many hypothesis tests (like the <strong>t-test</strong>) rely on the assumption that the <strong>outcome variable is normally distributed</strong>.<br>
-This is particularly important when working with <strong>continuous</strong> outcome variables in small to moderate-sized samples.</br></p>
+<h4 id="%F0%9F%93%98-Why-Are-We-Checking-for-Normality?">📘 Why Are We Checking for Normality?<a class="anchor-link" href="#%F0%9F%93%98-Why-Are-We-Checking-for-Normality?">¶</a></h4><p>Many hypothesis tests (like the <strong>t-test</strong>) rely on the assumption that the <strong>outcome variable is normally distributed</strong>.<br/>
+This is particularly important when working with <strong>continuous</strong> outcome variables in small to moderate-sized samples.</p>
 <h4 id="%F0%9F%A7%AA-Test-Used:-Shapiro-Wilk">🧪 Test Used: <strong>Shapiro-Wilk</strong><a class="anchor-link" href="#%F0%9F%A7%AA-Test-Used:-Shapiro-Wilk">¶</a></h4><p>The <strong>Shapiro-Wilk test</strong> checks whether the sample comes from a normal distribution.</p>
 <ul>
 <li><strong>Null Hypothesis (H₀)</strong>: The data follows a normal distribution</li>
@@ -8674,7 +8562,7 @@ This is particularly important when working with <strong>continuous</strong> out
 <div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">infer_distribution_from_data</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">infer_distribution_from_data</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Infers whether the outcome variable follows a normal distribution using the Shapiro-Wilk test.</span>
 
@@ -8809,7 +8697,7 @@ This is particularly important when working with <strong>continuous</strong> out
 
 • Two-sample (independent) case → testing both groups
 • Group A → Shapiro-Wilk p = 0.4534 → Fail to reject H₀ ✅ (likely a normal distribution)
-• Group B → Shapiro-Wilk p = 0.7145 → Fail to reject H₀ ✅ (likely a normal distribution)
+• Group B → Shapiro-Wilk p = 0.7146 → Fail to reject H₀ ✅ (likely a normal distribution)
 ✅ Both groups are likely drawn from normal distributions
 📦 Final Decision → config['distribution'] = `normal`
 </pre>
@@ -8878,8 +8766,8 @@ This is particularly important when working with <strong>continuous</strong> out
 <hr style="border: none; height: 1px; background-color: #ddd;"/>
 <p><a id="infer-variance"></a></p>
 <h4 id="%F0%9F%93%8F-Infer-Variance">📏 Infer Variance<a class="anchor-link" href="#%F0%9F%93%8F-Infer-Variance">¶</a></h4><details><summary><strong>📖 Equal Variance Check (Click to Expand)</strong></summary>
-<h4 id="%F0%9F%93%98-Why-Are-We-Checking-for-Equal-Variance?">📘 Why Are We Checking for Equal Variance?<a class="anchor-link" href="#%F0%9F%93%98-Why-Are-We-Checking-for-Equal-Variance?">¶</a></h4><p>When comparing <strong>two independent groups</strong> using a <strong>parametric test</strong> (like a two-sample t-test),<br>
-we assume that both groups have <strong>equal variances</strong> — this is called the <strong>homogeneity of variance</strong> assumption.</br></p>
+<h4 id="%F0%9F%93%98-Why-Are-We-Checking-for-Equal-Variance?">📘 Why Are We Checking for Equal Variance?<a class="anchor-link" href="#%F0%9F%93%98-Why-Are-We-Checking-for-Equal-Variance?">¶</a></h4><p>When comparing <strong>two independent groups</strong> using a <strong>parametric test</strong> (like a two-sample t-test),<br/>
+we assume that both groups have <strong>equal variances</strong> — this is called the <strong>homogeneity of variance</strong> assumption.</p>
 <p>Failing to meet this assumption can lead to incorrect conclusions if the wrong test is applied.</p>
 <hr/>
 <h4 id="%F0%9F%A7%AA-Test-Used:-Levene%E2%80%99s-Test">🧪 Test Used: <strong>Levene’s Test</strong><a class="anchor-link" href="#%F0%9F%A7%AA-Test-Used:-Levene%E2%80%99s-Test">¶</a></h4><p>Levene’s Test checks whether the <strong>spread (variance)</strong> of values is roughly the same in both groups.</p>
@@ -8920,7 +8808,7 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">infer_variance_equality</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">infer_variance_equality</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Infers whether the variances across two independent groups are equal using Levene's test.</span>
 
@@ -9136,7 +9024,7 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">infer_parametric_flag</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">infer_parametric_flag</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Infers whether a parametric or non-parametric test should be used based on the config.</span>
 
@@ -9306,8 +9194,8 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><a id="determine-test"></a></p>
 <h4 id="%F0%9F%A7%AD-Determine-Test">🧭 Determine Test<a class="anchor-link" href="#%F0%9F%A7%AD-Determine-Test">¶</a></h4><details><summary><strong>📖 How We Select the Right Statistical Test (Click to Expand)</strong></summary>
-<h4 id="%F0%9F%A7%A0-What-Are-We-Doing-Here?">🧠 What Are We Doing Here?<a class="anchor-link" href="#%F0%9F%A7%A0-What-Are-We-Doing-Here?">¶</a></h4><p>Based on all the configuration values you’ve either set or inferred (<code>outcome_type</code>, <code>group_relationship</code>, <code>distribution</code>, etc),<br>
-we determine <strong>which statistical test is most appropriate</strong> for your hypothesis.</br></p>
+<h4 id="%F0%9F%A7%A0-What-Are-We-Doing-Here?">🧠 What Are We Doing Here?<a class="anchor-link" href="#%F0%9F%A7%A0-What-Are-We-Doing-Here?">¶</a></h4><p>Based on all the configuration values you’ve either set or inferred (<code>outcome_type</code>, <code>group_relationship</code>, <code>distribution</code>, etc),<br/>
+we determine <strong>which statistical test is most appropriate</strong> for your hypothesis.</p>
 <p>This is the decision engine of the pipeline.</p>
 <hr/>
 <h4 id="%E2%9A%99%EF%B8%8F-How-the-Logic-Works">⚙️ How the Logic Works<a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-How-the-Logic-Works">¶</a></h4><p>We go through structured rules based on:</p>
@@ -9394,7 +9282,7 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 <div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">determine_test_to_run</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">determine_test_to_run</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Determines the appropriate statistical test based on the provided configuration.</span>
 
@@ -9612,7 +9500,7 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 <div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">print_hypothesis_statement</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_hypothesis_statement</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Prints the null and alternative hypothesis statements based on the selected test and tail type.</span>
 
@@ -9809,7 +9697,7 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 <div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">run_hypothesis_test</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_hypothesis_test</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Runs the appropriate hypothesis test based on the provided configuration and dataset.</span>
 
@@ -10099,44 +9987,6 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a id="test-summary"></a></p>
-<h1 id="%F0%9F%93%8A-Test-Summary">📊 Test Summary<a class="anchor-link" href="#%F0%9F%93%8A-Test-Summary">¶</a></h1>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a id="full-pipeline"></a></p>
-<h1 id="%F0%9F%9A%80-Full-Pipeline">🚀 Full Pipeline<a class="anchor-link" href="#%F0%9F%9A%80-Full-Pipeline">¶</a></h1>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
 </div>
 </div>
 </div>
