@@ -7575,21 +7575,12 @@ a.anchor-link {
 <li><a href="#guardrail-metrics">🚦 Guardrail Metrics</a></li>
 <li><a href="#multiple-comparisons">🧠 Correcting for Multiple Comparisons</a></li>
 <li><a href="#novelty-effects">🪄 Novelty Effects</a></li>
+<li><a href="#primacy-effect">🎯 Primacy Effect</a></li>
 <li><a href="#rollout-simulation">📦 Rollout Simulation</a></li>
+<li><a href="#ab-test-holdouts">🧪 A/B Test Holdouts</a></li>
+<li><a href="#ab-test-limits">🚫 AB Limits</a></li>
 </ul>
 <hr/>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=692c7961">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a id="data-setup"></a></p>
-<h1 id="%F0%9F%97%82%EF%B8%8F-Data-Setup">🗂️ Data Setup<a class="anchor-link" href="#%F0%9F%97%82%EF%B8%8F-Data-Setup">¶</a></h1>
 </div>
 </div>
 </div>
@@ -7869,12 +7860,36 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e5b194d1">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=692c7961">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a id="data-setup"></a></p>
+<h1 id="%F0%9F%97%82%EF%B8%8F-Data-Setup">🗂️ Data Setup<a class="anchor-link" href="#%F0%9F%97%82%EF%B8%8F-Data-Setup">¶</a></h1>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3edc9bb8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a id="sample-data"></a></p>
+<h4 id="%F0%9F%A7%BE-Sample-data">🧾 Sample data<a class="anchor-link" href="#%F0%9F%A7%BE-Sample-data">¶</a></h4>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3a07c9e1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [117]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [59]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Display Settings</span>
@@ -7913,24 +7928,12 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3edc9bb8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a id="sample-data"></a></p>
-<h4 id="%F0%9F%A7%BE-Sample-data">🧾 Sample data<a class="anchor-link" href="#%F0%9F%A7%BE-Sample-data">¶</a></h4>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f125df9a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [118]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">observations_count</span> <span class="o">=</span> <span class="mi">1000</span>
@@ -7975,7 +7978,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[118]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8188,7 +8191,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [119]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># 1. Main outcome variable you're testing</span>
@@ -8230,7 +8233,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [120]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Number of groups in the experiment (e.g., 2 for A/B test, 3 for A/B/C test)</span>
@@ -8264,7 +8267,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [121]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">test_config</span> <span class="o">=</span> <span class="p">{</span>
@@ -8380,7 +8383,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [122]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_simple_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
@@ -8436,7 +8439,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [123]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_stratified_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">stratify_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
@@ -8501,7 +8504,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [124]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_block_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">observation_id_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
@@ -8578,7 +8581,7 @@ This reduces variance and improves <strong>statistical power</strong> by ensurin
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [125]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_matched_pair_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sort_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">):</span>
@@ -8639,7 +8642,7 @@ Used when it's impractical or risky to randomize individuals within a cluster.</
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [126]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_cluster_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
@@ -8710,7 +8713,7 @@ It helps detect smaller effects without increasing sample size.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [127]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_cuped</span><span class="p">(</span>
@@ -8779,7 +8782,7 @@ It helps detect smaller effects without increasing sample size.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [128]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Apply randomization method</span>
@@ -8816,7 +8819,7 @@ It helps detect smaller effects without increasing sample size.</p>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[128]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -9145,7 +9148,7 @@ It helps detect smaller effects without increasing sample size.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [129]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_normality</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">):</span>
@@ -9165,7 +9168,7 @@ It helps detect smaller effects without increasing sample size.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [130]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">normality_results</span> <span class="o">=</span> <span class="n">test_normality</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="o">=</span><span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="s1">'group'</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">)</span>
@@ -9198,7 +9201,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [131]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Assume both groups must be normal to proceed with parametric tests</span>
@@ -9214,7 +9217,7 @@ treatment: p = 0.6053 → Normal
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[131]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>{'outcome_metric_col': 'engagement_score',
  'outcome_metric_datatype': 'continuous',
@@ -9266,7 +9269,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [132]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_equal_variance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">):</span>
@@ -9283,7 +9286,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [133]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">variance_result</span> <span class="o">=</span> <span class="n">test_equal_variance</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="o">=</span><span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="s1">'group'</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">)</span>
@@ -9298,7 +9301,7 @@ treatment: p = 0.6053 → Normal
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[133]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[17]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>{'statistic': 0.08918799756611763,
  'p_value': 0.7652741675085144,
@@ -9312,7 +9315,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [134]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Levene’s test: p = </span><span class="si">{</span><span class="n">variance_result</span><span class="p">[</span><span class="s1">'p_value'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="s1">'Equal variances'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">variance_result</span><span class="p">[</span><span class="s1">'equal_variance'</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'Unequal variances'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -9335,7 +9338,7 @@ treatment: p = 0.6053 → Normal
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[134]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>{'outcome_metric_col': 'engagement_score',
  'outcome_metric_datatype': 'continuous',
@@ -9400,7 +9403,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [135]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">determine_test_family</span><span class="p">(</span><span class="n">test_config</span><span class="p">):</span>
@@ -9449,7 +9452,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [136]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">test_config</span><span class="p">[</span><span class="s1">'family'</span><span class="p">]</span> <span class="o">=</span> <span class="n">determine_test_family</span><span class="p">(</span><span class="n">test_config</span><span class="p">)</span>
@@ -9466,7 +9469,7 @@ treatment: p = 0.6053 → Normal
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[136]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[20]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>{'outcome_metric_col': 'engagement_score',
  'outcome_metric_datatype': 'continuous',
@@ -9593,7 +9596,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [137]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_outcome_similarity_test</span><span class="p">(</span>
@@ -9778,7 +9781,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [138]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_aa_testing_generalized</span><span class="p">(</span>
@@ -9831,7 +9834,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [139]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">check_sample_ratio_mismatch</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">expected_ratios</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
@@ -9907,7 +9910,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [140]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">visualize_aa_distribution</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">metric_col</span><span class="p">,</span> <span class="n">test_family</span><span class="p">,</span> <span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="p">(</span><span class="s1">'control'</span><span class="p">,</span> <span class="s1">'treatment'</span><span class="p">)):</span>
@@ -9950,7 +9953,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [141]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">run_aa_testing_generalized</span><span class="p">(</span>
@@ -10059,7 +10062,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [142]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">simulate_aa_type1_error_rate</span><span class="p">(</span>
@@ -10137,7 +10140,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [143]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_p_value_distribution</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
@@ -10160,7 +10163,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [144]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">simulate_aa_type1_error_rate</span><span class="p">(</span>
@@ -10312,7 +10315,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [145]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Define Core Inputs</span>
@@ -10358,7 +10361,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [146]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># 🧮 Data-Driven Baseline Metric</span>
@@ -10433,7 +10436,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [147]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Minimum Detectable Effect (MDE)</span>
@@ -10468,7 +10471,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [148]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_power_sample_size</span><span class="p">(</span>
@@ -10535,7 +10538,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [149]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">required_sample_size</span> <span class="o">=</span> <span class="n">calculate_power_sample_size</span><span class="p">(</span>
@@ -10600,7 +10603,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [150]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_power_summary</span><span class="p">(</span>
@@ -10728,7 +10731,7 @@ you need 154 users per group → total 308 users.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [151]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_ab_test</span><span class="p">(</span>
@@ -10820,7 +10823,7 @@ you need 154 users per group → total 308 users.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [152]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">run_ab_test</span><span class="p">(</span>
@@ -10843,7 +10846,7 @@ you need 154 users per group → total 308 users.
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[152]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[36]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>{'test_family': 't_test',
  'variant': 'independent',
@@ -10905,7 +10908,7 @@ you need 154 users per group → total 308 users.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [153]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">summarize_ab_test_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
@@ -10984,7 +10987,7 @@ you need 154 users per group → total 308 users.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [154]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">summarize_ab_test_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -11106,7 +11109,7 @@ P-value    : 0.4657
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [155]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_ab_test_results</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
@@ -11153,7 +11156,7 @@ P-value    : 0.4657
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [156]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">plot_ab_test_results</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -11217,7 +11220,7 @@ P-value    : 0.4657
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [157]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [41]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_confidence_intervals</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">1.96</span><span class="p">):</span>
@@ -11271,7 +11274,7 @@ P-value    : 0.4657
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [158]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [42]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">plot_confidence_intervals</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -11334,7 +11337,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [159]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [43]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_lift_confidence_interval</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
@@ -11395,7 +11398,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [160]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">compute_lift_confidence_interval</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -11453,7 +11456,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [161]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [45]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_final_ab_test_summary</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
@@ -11517,7 +11520,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [162]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [46]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">print_final_ab_test_summary</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -11635,7 +11638,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [163]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">estimate_test_duration</span><span class="p">(</span>
@@ -11693,7 +11696,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [164]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [48]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">daily_eligible_users</span> <span class="o">=</span> <span class="mi">1000</span>
@@ -11734,7 +11737,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[164]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[48]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>{'test_family': 't_test',
  'per_group_days': [1.0, 1.0],
@@ -11942,7 +11945,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [165]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">visualize_segment_lift</span><span class="p">(</span><span class="n">df_segment</span><span class="p">,</span> <span class="n">segment_col</span><span class="p">):</span>
@@ -11974,7 +11977,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [166]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [50]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">analyze_segment_lift</span><span class="p">(</span>
@@ -12057,7 +12060,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [167]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [51]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">analyze_segment_lift</span><span class="p">(</span>
@@ -12468,7 +12471,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [168]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [52]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Quick average check by group</span>
@@ -12502,7 +12505,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [169]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [53]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_guardrail_metric</span><span class="p">(</span>
@@ -12559,7 +12562,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [170]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [54]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">evaluate_guardrail_metric</span><span class="p">(</span>
@@ -12721,7 +12724,7 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [171]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [55]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -12755,7 +12758,7 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[171]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[55]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -12822,7 +12825,7 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [172]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [56]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Plot p values - raw and adjusted</span>
@@ -12911,14 +12914,55 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e9328206">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=856cb045">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e57612b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a id="primacy-effect"></a></p>
+<h4>🎯 Primacy Effect &amp; Order Bias</h4>
+<details><summary><strong>📖 When First = Best (Click to Expand)</strong></summary>
+<p>Sometimes, the <strong>position</strong> of a variant or option can distort results — especially if it's shown <strong>first</strong>. This is called the <strong>primacy effect</strong>, a type of cognitive bias.</p>
+<p>It often shows up in:</p>
+<ul>
+<li>Feed ranking or content ordering experiments</li>
+<li>Option selection (e.g., first dropdown item)</li>
+<li>Surveys or in-app prompts</li>
+</ul>
+<h5 id="%F0%9F%9A%A9-Common-Indicators">🚩 Common Indicators<a class="anchor-link" href="#%F0%9F%9A%A9-Common-Indicators">¶</a></h5><ul>
+<li>Variant A always performs better <strong>regardless of content</strong></li>
+<li>Metrics drop when position is swapped</li>
+<li>Discrepancy between test and real-world usage</li>
+</ul>
+<h5 id="%F0%9F%A7%AD-What-We-Do-About-It">🧭 What We Do About It<a class="anchor-link" href="#%F0%9F%A7%AD-What-We-Do-About-It">¶</a></h5><p>To minimize primacy bias:</p>
+<ul>
+<li>✅ Randomize order of options or content</li>
+<li>✅ Use <strong>position-aware metrics</strong> (e.g., click-through by slot)</li>
+<li>✅ Validate with <strong>follow-up tests</strong> using rotated or reversed orders</li>
+</ul>
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7276965d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr style="border: none; height: 1px; background-color: #ddd;"/>
 </div>
 </div>
 </div>
@@ -12949,7 +12993,7 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [173]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [57]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">simulate_rollout_impact</span><span class="p">(</span>
@@ -13000,7 +13044,7 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [174]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [58]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Derive daily volume from actual data</span>
@@ -13037,6 +13081,73 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8575e889">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr style="border: none; height: 1px; background-color: #ddd;"/>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8c8b4d31">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a id="ab-test-holdouts"></a></p>
+<h4>🧪 A/B Test Holdouts</h4>
+<details><summary><strong>📖 Why We Sometimes Don't Ship to 100% (Click to Expand)</strong></summary>
+<h5 id="%F0%9F%A7%AA-A/B-Test-Holdouts">🧪 A/B Test Holdouts<a class="anchor-link" href="#%F0%9F%A7%AA-A/B-Test-Holdouts">¶</a></h5><p>Even after a successful A/B test, we often maintain a <strong>small holdout group</strong> during rollout.</p>
+<p>This helps us:</p>
+<ul>
+<li>Track <strong>long-term impact</strong> beyond the experiment window.</li>
+<li>Detect <strong>novelty fade</strong> or <strong>unexpected side effects</strong>.</li>
+<li>Maintain a clean “control” for system-wide benchmarking.</li>
+</ul>
+<h5 id="%F0%9F%8F%A2-Industry-Practice">🏢 Industry Practice<a class="anchor-link" href="#%F0%9F%8F%A2-Industry-Practice">¶</a></h5><ul>
+<li>Common at large orgs like <strong>Facebook</strong>, where teams share a holdout pool for all feature launches.</li>
+<li>Holdouts help leadership evaluate <strong>true impact</strong> during performance reviews and roadmap planning.</li>
+</ul>
+<h5 id="%E2%9A%A0%EF%B8%8F-When-We-Skip-Holdouts">⚠️ When We Skip Holdouts<a class="anchor-link" href="#%E2%9A%A0%EF%B8%8F-When-We-Skip-Holdouts">¶</a></h5><ul>
+<li><strong>Bug fixes</strong> or critical updates (e.g., spam, abuse, policy violations).</li>
+<li><strong>Sensitive changes</strong> like content filtering (e.g., child safety flags).</li>
+</ul>
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5e24d90d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a id="ab-test-limits"></a></p>
+<h4>🚫 Limits &amp; Alteratives</h4>
+<details><summary><strong>📉 When Not to A/B Test &amp; What to Do Instead (Click to Expand)</strong></summary>
+<h5 id="%F0%9F%99%85%E2%80%8D%E2%99%80%EF%B8%8F-When-Not-to-A/B-Test">🙅‍♀️ When Not to A/B Test<a class="anchor-link" href="#%F0%9F%99%85%E2%80%8D%E2%99%80%EF%B8%8F-When-Not-to-A/B-Test">¶</a></h5><ul>
+<li><strong>Lack of infrastructure</strong> → No tracking, engineering, or experiment setup.</li>
+<li><strong>Lack of impact</strong> → Not worth the effort if the feature has minimal upside, shipping features has downstream implications (support, bugs, operations)..</li>
+<li><strong>Lack of traffic</strong> → Can’t reach stat sig in a reasonable time.</li>
+<li><strong>Lack of conviction</strong> → No strong hypothesis; testing dozens of variants blindly.</li>
+<li><strong>Lack of isolation</strong> → Hard to contain exposure (e.g., testing a new logo everyone sees).</li>
+</ul>
+<h5 id="%F0%9F%A7%AA-Alternatives-&amp;-Edge-Cases">🧪 Alternatives &amp; Edge Cases<a class="anchor-link" href="#%F0%9F%A7%AA-Alternatives-&amp;-Edge-Cases">¶</a></h5><ul>
+<li>Use <strong>user interviews or logs</strong> to gather directional signals.</li>
+<li>Leverage <strong>retrospective data</strong> for pre/post comparisons.</li>
+<li>Consider <strong>sequential testing</strong> or <strong>soft rollouts</strong> for low-risk changes.</li>
+<li>Use <strong>design experiments</strong> (e.g., multivariate, observational) when randomization isn't feasible.</li>
+</ul>
+</details>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf87d394">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -13045,6 +13156,16 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><a href="#table-of-contents">Back to the top</a></p>
 <hr/>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8109d9b9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 </div>
 </div>
 </div>
