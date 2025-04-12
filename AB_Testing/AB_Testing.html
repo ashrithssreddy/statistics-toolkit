@@ -7312,7 +7312,6 @@ a.anchor-link {
                     processEnvironments: true
                 },
                 displayAlign: 'center',
-                messageStyle: 'none',
                 CommonHTML: {
                     linebreaks: {
                     automatic: true
@@ -7518,6 +7517,10 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><a id="table-of-contents"></a></p>
+<p><img alt="Status: Complete" src="https://img.shields.io/badge/status-complete-brightgreen"/>
+<img alt="Python" src="https://img.shields.io/badge/python-3.10-blue"/>
+<img alt="Coverage" src="https://img.shields.io/badge/coverage-95%25-yellowgreen"/>
+<img alt="License" src="https://img.shields.io/badge/license-MIT-green"/></p>
 <h1 id="%F0%9F%93%96-Table-of-Contents">📖 Table of Contents<a class="anchor-link" href="#%F0%9F%93%96-Table-of-Contents">¶</a></h1><p><a href="#data-setup">🗂️ Data Setup</a></p>
 <ul>
 <li><a href="#sample-data">🧾 Sample Data</a></li>
@@ -7585,282 +7588,6 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5371d6a0">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details>
-<summary><strong>📖 A/B Test - Decision Flow (Click to Expand)</strong></summary>
-<pre>
-[What is your outcome type?]  
-   |  
-   +--&gt; Binary (e.g., converted = 1 or 0, clicked or not)  
-   |     |  
-   |     +--&gt; What are you comparing?  
-   |           |  
-   |           +--&gt; Proportions (e.g., 10% vs 12% conversion rate)  
-   |           |     |  
-   |           |     +--&gt; Comparing 2 groups ---------&gt; Use Z-test  
-   |           |     |                                 Compares success rates (proportions) between 2 groups  
-   |           |     +--&gt; Comparing 3+ groups --------&gt; Use Chi-Square Test  
-   |           |                                       Tests whether at least one group’s success rate differs; follow with pairwise Z-tests  
-   |           +--&gt; Counts (e.g., number of users who converted)  
-   |                 +--&gt; Comparing 2 groups ---------&gt; Use Chi-Square Test  
-   |                 +--&gt; Comparing 3+ groups --------&gt; Use Chi-Square Test  
-   |  
-   +--&gt; Continuous (e.g., revenue, time spent, items bought)  
-   |     +--&gt; Comparing 2 groups  
-   |     |     +--&gt; Are the groups made of different users?  
-   |     |           +--&gt; Yes  
-   |     |           |     +--&gt; Is the outcome roughly normal?  
-   |     |           |           +--&gt; Yes ------------&gt; Use Independent T-test  
-   |     |           |           +--&gt; No -------------&gt; Use Mann-Whitney U Test  
-   |     |           +--&gt; No (same users before/after)  
-   |     |                 +--&gt; Is the outcome roughly normal?  
-   |     |                       +--&gt; Yes ------------&gt; Use Paired T-test  
-   |     |                       +--&gt; No -------------&gt; Use Wilcoxon Signed-Rank Test  
-   |     +--&gt; Comparing 3+ groups --------------------&gt; Use ANOVA  
-   |  
-   +--&gt; Categorical (e.g., selected A/B/C option)  
-         +--&gt; Comparing 2 or more groups -------------&gt; Use Chi-Square Test  
-
-[Other Scenarios]  
-   +--&gt; Want to control for other variables? ---------&gt; Use Regression (Linear or Logistic)  
-   +--&gt; Prefer probability over p-values? ------------&gt; Use Bayesian A/B Testing
-</pre>
-</details>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f74073bc">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details><summary><strong>📖 A/B Test - Decision Flow Flattened Table (Click to Expand)</strong></summary>
-<table>
-<thead>
-<tr>
-<th>Outcome Type</th>
-<th>What Are You Comparing?</th>
-<th>Group Count</th>
-<th>Group Structure</th>
-<th>Outcome Distribution</th>
-<th>Statistical Test</th>
-<th>What It Does</th>
-<th>Example Problem Statement</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Binary</td>
-<td>Proportions (% converted)</td>
-<td>2</td>
-<td>Independent</td>
-<td>N/A</td>
-<td>Z-test</td>
-<td>Compares proportions between 2 groups</td>
-<td>Does the new homepage increase conversion from 10% to 12%?</td>
-</tr>
-<tr>
-<td>Binary</td>
-<td>Proportions</td>
-<td>3+</td>
-<td>Independent</td>
-<td>N/A</td>
-<td>Chi-Square</td>
-<td>Tests if at least one group’s conversion rate differs</td>
-<td>Is there a significant difference in conversion across blue/orange/green CTA?</td>
-</tr>
-<tr>
-<td>Binary</td>
-<td>Counts (e.g., #converted users)</td>
-<td>2</td>
-<td>Independent</td>
-<td>N/A</td>
-<td>Chi-Square</td>
-<td>Compares success/failure counts between groups</td>
-<td>Did 120 out of 1000 in group A convert vs 150 out of 1000 in group B?</td>
-</tr>
-<tr>
-<td>Binary</td>
-<td>Counts</td>
-<td>3+</td>
-<td>Independent</td>
-<td>N/A</td>
-<td>Chi-Square</td>
-<td>Compares categorical counts across multiple groups</td>
-<td>Do different signup flows lead to different conversion counts?</td>
-</tr>
-<tr>
-<td>Continuous</td>
-<td>Mean of a metric (e.g., revenue)</td>
-<td>2</td>
-<td>Independent</td>
-<td>Normal</td>
-<td>Independent T-test</td>
-<td>Compares average outcome across 2 independent groups</td>
-<td>Does average order value differ between control and treatment?</td>
-</tr>
-<tr>
-<td>Continuous</td>
-<td>Mean of a metric</td>
-<td>2</td>
-<td>Independent</td>
-<td>Not normal</td>
-<td>Mann-Whitney U</td>
-<td>Compares ranks/distributions between 2 independent groups</td>
-<td>Is time-on-site higher in treatment group (skewed data)?</td>
-</tr>
-<tr>
-<td>Continuous</td>
-<td>Before vs After (same users)</td>
-<td>2</td>
-<td>Paired</td>
-<td>Normal</td>
-<td>Paired T-test</td>
-<td>Compares mean change for same users before and after</td>
-<td>Did users spend more on their second visit after UI update?</td>
-</tr>
-<tr>
-<td>Continuous</td>
-<td>Before vs After (same users)</td>
-<td>2</td>
-<td>Paired</td>
-<td>Not normal</td>
-<td>Wilcoxon Signed-Rank</td>
-<td>Compares paired non-normal outcomes</td>
-<td>Did session duration increase for the same users post-change?</td>
-</tr>
-<tr>
-<td>Continuous</td>
-<td>Mean outcome</td>
-<td>3+</td>
-<td>Independent</td>
-<td>Any</td>
-<td>ANOVA</td>
-<td>Compares means across 3 or more groups</td>
-<td>Does average basket size differ across A/B/C pricing variants?</td>
-</tr>
-<tr>
-<td>Categorical</td>
-<td>User-selected categories</td>
-<td>2+</td>
-<td>Independent</td>
-<td>N/A</td>
-<td>Chi-Square</td>
-<td>Tests distribution of categories across groups</td>
-<td>Do users pick different plans (Basic, Pro, Premium) across test groups?</td>
-</tr>
-<tr>
-<td>Any</td>
-<td>Adjusting for other variables</td>
-<td>Any</td>
-<td>Any</td>
-<td>N/A</td>
-<td>Regression (Linear/Logistic)</td>
-<td>Measures treatment effect while controlling for covariates</td>
-<td>Is treatment still effective after accounting for device and region?</td>
-</tr>
-<tr>
-<td>Any</td>
-<td>Prefer probability &gt; p-value</td>
-<td>Any</td>
-<td>Any</td>
-<td>N/A</td>
-<td>Bayesian A/B Test</td>
-<td>Returns probability one group is better than the other</td>
-<td>What’s the probability green button outperforms blue?</td>
-</tr>
-<tr>
-<td>Binary (Paired)</td>
-<td>Conversion before vs after (same users)</td>
-<td>2</td>
-<td>Paired</td>
-<td>N/A</td>
-<td>McNemar’s Test</td>
-<td>Tests change in conversion for same users</td>
-<td>Did logged-in users convert more after design change?</td>
-</tr>
-</tbody>
-</table>
-</details>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=873b6875">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details><summary><strong>📖 Statistical Test to Choose (Click to Expand) </strong></summary>
-<h4>🧪 When to Use Which Statistical Test in A/B Testing</h4>
-<table>
-<thead>
-<tr>
-<th><strong>Metric Type</strong></th>
-<th><strong>Example</strong></th>
-<th><strong>Recommended Test</strong></th>
-<th><strong>Why</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Continuous</td>
-<td>Revenue, time on site, scores</td>
-<td><code>scipy.stats.ttest_ind</code> (T-test)</td>
-<td>Compares means of two independent groups</td>
-</tr>
-<tr>
-<td>Continuous (unequal variance)</td>
-<td>Same as above</td>
-<td><code>ttest_ind(..., equal_var=False)</code></td>
-<td>Welch’s T-test — safer when variances differ</td>
-</tr>
-<tr>
-<td>Binary (0/1 outcomes)</td>
-<td>Conversion, click, purchase</td>
-<td><code>statsmodels.stats.proportions_ztest</code></td>
-<td>Compares proportions between two groups</td>
-</tr>
-<tr>
-<td>Count data</td>
-<td># pageviews, # items bought</td>
-<td>Poisson or Negative Binomial test</td>
-<td>For skewed count distributions</td>
-</tr>
-<tr>
-<td>Non-parametric</td>
-<td>Ordinal/skewed data, NPS scores</td>
-<td>Mann-Whitney U test</td>
-<td>No assumption of normality</td>
-</tr>
-<tr>
-<td>Multiple groups (A/B/C)</td>
-<td>Multi-variant tests</td>
-<td>ANOVA (continuous), Chi-squared (binary)</td>
-<td>Tests across 3+ groups</td>
-</tr>
-</tbody>
-</table>
-<h4>✅ Quick Rules of Thumb:</h4>
-<ul>
-<li>If your metric is <strong>continuous + normal-ish</strong> → Use <strong>T-test</strong></li>
-<li>If it’s <strong>binary (e.g., clicked or not)</strong> → Use <strong>Z-test</strong></li>
-<li>If it’s <strong>non-normal or skewed</strong> → Use <strong>Mann-Whitney U test</strong></li>
-<li>If testing <strong>3 or more variants</strong> → Use <strong>ANOVA</strong> or <strong>Chi-squared</strong></li>
-</ul>
-</details>
-</div>
-</div>
-</div>
-</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=692c7961">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -7889,25 +7616,25 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [59]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Display Settings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.core.interactiveshell</span><span class="w"> </span><span class="kn">import</span> <span class="n">InteractiveShell</span>
+<span class="kn">from</span> <span class="nn">IPython.core.interactiveshell</span> <span class="kn">import</span> <span class="n">InteractiveShell</span>
 <span class="n">InteractiveShell</span><span class="o">.</span><span class="n">ast_node_interactivity</span> <span class="o">=</span> <span class="s2">"all"</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
 
 <span class="c1"># Set Seed </span>
 <span class="n">my_seed</span><span class="o">=</span><span class="mi">1995</span>
 
 <span class="c1"># Libraries</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ttest_ind</span><span class="p">,</span>
     <span class="n">ttest_rel</span><span class="p">,</span>
     <span class="n">chi2_contingency</span><span class="p">,</span>
@@ -7915,14 +7642,14 @@ a.anchor-link {
     <span class="n">levene</span><span class="p">,</span>
     <span class="n">shapiro</span>
 <span class="p">)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.power</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.power</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TTestIndPower</span><span class="p">,</span>
     <span class="n">TTestPower</span><span class="p">,</span>
     <span class="n">FTestAnovaPower</span><span class="p">,</span>
     <span class="n">NormalIndPower</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 </pre></div>
 </div>
 </div>
@@ -8286,7 +8013,7 @@ a.anchor-link {
     <span class="s1">'family'</span>                 <span class="p">:</span> <span class="kc">None</span>   <span class="c1"># Test family → 'z_test', 't_test', 'anova', 'chi_square', etc.</span>
 <span class="p">}</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
 <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;pre style='color:teal; font-size:14px;'&gt;</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">test_config</span><span class="p">,</span><span class="w"> </span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/pre&gt;"</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -8326,8 +8053,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -8386,7 +8113,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_simple_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">apply_simple_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Randomly assigns each row to one of the specified groups.</span>
 
@@ -8442,7 +8169,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_stratified_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">stratify_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">apply_stratified_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">stratify_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Performs stratified randomization to assign rows into multiple groups while maintaining balance across strata.</span>
 
@@ -8507,7 +8234,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_block_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">observation_id_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">apply_block_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">observation_id_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Assigns group labels using block randomization to ensure balance within fixed-size blocks.</span>
 
@@ -8584,7 +8311,7 @@ This reduces variance and improves <strong>statistical power</strong> by ensurin
 <div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_matched_pair_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sort_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">apply_matched_pair_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sort_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Assigns groups using matched-pair randomization based on a sorting variable.</span>
 
@@ -8645,7 +8372,7 @@ Used when it's impractical or risky to randomize individuals within a cluster.</
 <div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_cluster_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">apply_cluster_randomization</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="n">group_labels</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Assigns groups using cluster-level randomization — all observations in a cluster</span>
 <span class="sd">    receive the same group assignment.</span>
@@ -8716,7 +8443,7 @@ It helps detect smaller effects without increasing sample size.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">apply_cuped</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">apply_cuped</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">pre_metric</span><span class="p">,</span>
     <span class="n">outcome_metric_col</span><span class="p">,</span>  <span class="c1"># observed outcome column (e.g., engagement_score)</span>
@@ -9106,8 +8833,8 @@ It helps detect smaller effects without increasing sample size.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -9151,7 +8878,7 @@ It helps detect smaller effects without increasing sample size.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_normality</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">test_normality</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">):</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">group_labels</span><span class="p">:</span>
         <span class="n">group_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span><span class="p">][</span><span class="n">outcome_metric_col</span><span class="p">]</span>
@@ -9272,7 +8999,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_equal_variance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">test_equal_variance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">outcome_metric_col</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">):</span>
     <span class="n">group_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">label</span><span class="p">][</span><span class="n">outcome_metric_col</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">group_labels</span><span class="p">]</span>
     <span class="n">stat</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">levene</span><span class="p">(</span><span class="o">*</span><span class="n">group_data</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">'statistic'</span><span class="p">:</span> <span class="n">stat</span><span class="p">,</span> <span class="s1">'p_value'</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s1">'equal_variance'</span><span class="p">:</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">}</span>
@@ -9406,7 +9133,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">determine_test_family</span><span class="p">(</span><span class="n">test_config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">determine_test_family</span><span class="p">(</span><span class="n">test_config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Decide which family of statistical test to use based on:</span>
 <span class="sd">    - outcome data type: binary / continuous / categorical</span>
@@ -9499,8 +9226,8 @@ treatment: p = 0.6053 → Normal
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -9599,7 +9326,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_outcome_similarity_test</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">run_outcome_similarity_test</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">group_col</span><span class="p">,</span>
     <span class="n">metric_col</span><span class="p">,</span>
@@ -9784,7 +9511,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_aa_testing_generalized</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">run_aa_testing_generalized</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">group_col</span><span class="p">,</span>
     <span class="n">metric_col</span><span class="p">,</span>
@@ -9837,7 +9564,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">check_sample_ratio_mismatch</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">expected_ratios</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">check_sample_ratio_mismatch</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">expected_ratios</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Checks for Sample Ratio Mismatch (SRM) using a Chi-Square test.</span>
 
@@ -9913,7 +9640,7 @@ treatment: p = 0.6053 → Normal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">visualize_aa_distribution</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">metric_col</span><span class="p">,</span> <span class="n">test_family</span><span class="p">,</span> <span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="p">(</span><span class="s1">'control'</span><span class="p">,</span> <span class="s1">'treatment'</span><span class="p">)):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">visualize_aa_distribution</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">group_col</span><span class="p">,</span> <span class="n">metric_col</span><span class="p">,</span> <span class="n">test_family</span><span class="p">,</span> <span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_labels</span><span class="o">=</span><span class="p">(</span><span class="s1">'control'</span><span class="p">,</span> <span class="s1">'treatment'</span><span class="p">)):</span>
     <span class="k">if</span> <span class="n">test_family</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'t_test'</span><span class="p">,</span> <span class="s1">'anova'</span><span class="p">,</span> <span class="s1">'non_parametric'</span><span class="p">]:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">group_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">group2</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">group_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -10065,7 +9792,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">simulate_aa_type1_error_rate</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">simulate_aa_type1_error_rate</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">metric_col</span><span class="p">,</span>
     <span class="n">group_labels</span><span class="p">,</span>
@@ -10143,7 +9870,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_p_value_distribution</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">plot_p_value_distribution</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"α = </span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -10221,8 +9948,8 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -10474,7 +10201,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_power_sample_size</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">calculate_power_sample_size</span><span class="p">(</span>
     <span class="n">test_family</span><span class="p">,</span>
     <span class="n">variant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
@@ -10606,7 +10333,7 @@ To gain confidence in your randomization method, we simulate <strong>multiple A/
 <div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_power_summary</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">print_power_summary</span><span class="p">(</span>
     <span class="n">test_family</span><span class="p">,</span>
     <span class="n">variant</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">,</span>
@@ -10681,8 +10408,20 @@ you need 154 users per group → total 308 users.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd295e97">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a id="ab-testing"></a></p>
+<h1>🧪 A/B Testing</h1>
 </div>
 </div>
 </div>
@@ -10693,8 +10432,7 @@ you need 154 users per group → total 308 users.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a id="ab-testing"></a></p>
-<h1>🧪 A/B Testing</h1>
+<p>🔗 For test selection (e.g., Z-test, t-test), refer to <a href="https://ashrithssreddy.github.io/statistics-toolkit/Hypothesis_Testing/Hypothesis_Testing.html">📖 Hypothesis Testing Notebook</a></p>
 <details><summary><strong>📖 Click to Expand </strong></summary>
 <h5>🧪 A/B Testing - Outcome Comparison</h5>
 <p>This section compares the outcome metric between control and treatment groups using the appropriate statistical test based on the experiment type.</p>
@@ -10734,7 +10472,7 @@ you need 154 users per group → total 308 users.
 <div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_ab_test</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">run_ab_test</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">group_col</span><span class="p">,</span>
     <span class="n">metric_col</span><span class="p">,</span>
@@ -10874,8 +10612,8 @@ you need 154 users per group → total 308 users.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -10911,7 +10649,7 @@ you need 154 users per group → total 308 users.
 <div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">summarize_ab_test_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">summarize_ab_test_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Prints A/B test results summary with statistical test outputs and lift analysis.</span>
 <span class="sd">    """</span>
@@ -11112,7 +10850,7 @@ P-value    : 0.4657
 <div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_ab_test_results</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">plot_ab_test_results</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Plots A/B test results by group mean or distribution depending on test family.</span>
 <span class="sd">    """</span>
@@ -11223,7 +10961,7 @@ P-value    : 0.4657
 <div class="jp-InputPrompt jp-InputArea-prompt">In [41]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_confidence_intervals</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">1.96</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">plot_confidence_intervals</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">1.96</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Plot 95% confidence intervals for group means (conversion rate or continuous).</span>
 <span class="sd">    """</span>
@@ -11340,7 +11078,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-InputPrompt jp-InputArea-prompt">In [43]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_lift_confidence_interval</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_lift_confidence_interval</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute CI for lift in binary or continuous-independent tests.</span>
 <span class="sd">    """</span>
@@ -11459,7 +11197,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-InputPrompt jp-InputArea-prompt">In [45]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_final_ab_test_summary</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">print_final_ab_test_summary</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Final wrap-up of results with summary stats and verdict.</span>
 <span class="sd">    """</span>
@@ -11560,8 +11298,8 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -11641,7 +11379,7 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 <div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">estimate_test_duration</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">estimate_test_duration</span><span class="p">(</span>
     <span class="n">required_sample_size_per_group</span><span class="p">,</span>
     <span class="n">daily_eligible_users</span><span class="p">,</span>
     <span class="n">allocation_ratios</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
@@ -11818,8 +11556,8 @@ This complements the p-value — while p-values tell us <em>if</em> the differen
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -11948,7 +11686,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">visualize_segment_lift</span><span class="p">(</span><span class="n">df_segment</span><span class="p">,</span> <span class="n">segment_col</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">visualize_segment_lift</span><span class="p">(</span><span class="n">df_segment</span><span class="p">,</span> <span class="n">segment_col</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Plots horizontal bar chart of mean lift per segment (Treatment - Control).</span>
 <span class="sd">    """</span>
@@ -11980,7 +11718,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-InputPrompt jp-InputArea-prompt">In [50]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">analyze_segment_lift</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">analyze_segment_lift</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">test_config</span><span class="p">,</span>
     <span class="n">segment_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">'platform'</span><span class="p">,</span> <span class="s1">'device_type'</span><span class="p">,</span> <span class="s1">'user_tier'</span><span class="p">,</span> <span class="s1">'region'</span><span class="p">],</span>
@@ -12508,7 +12246,7 @@ Post-hoc analysis is where <strong>statistical rigor meets product judgment</str
 <div class="jp-InputPrompt jp-InputArea-prompt">In [53]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_guardrail_metric</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">evaluate_guardrail_metric</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">test_config</span><span class="p">,</span>
     <span class="n">guardrail_metric_col</span><span class="o">=</span><span class="s1">'bounce_rate'</span><span class="p">,</span>
@@ -12678,7 +12416,6 @@ This is known as the <strong>Multiple Comparisons Problem</strong> — and it’
 <summary><strong>📖 FWER Control (Click to Expand)</strong></summary>
 Bonferroni is the most **conservative** correction method.  
 It adjusts the p-value threshold by dividing it by the number of comparisons.
-
 <ul>
 <li>Formula: <code>adjusted_alpha = alpha / num_tests</code></li>
 <li>Or: <code>adjusted_p = p * num_tests</code></li>
@@ -12727,8 +12464,8 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 <div class="jp-InputPrompt jp-InputArea-prompt">In [55]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.multitest</span><span class="w"> </span><span class="kn">import</span> <span class="n">multipletests</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
 
 <span class="c1"># Original inputs</span>
 <span class="n">segment_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'North'</span><span class="p">,</span> <span class="s1">'South'</span><span class="p">,</span> <span class="s1">'East'</span><span class="p">,</span> <span class="s1">'West'</span><span class="p">]</span>
@@ -12996,7 +12733,7 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 <div class="jp-InputPrompt jp-InputArea-prompt">In [57]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">simulate_rollout_impact</span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">simulate_rollout_impact</span><span class="p">(</span>
     <span class="n">experiment_result</span><span class="p">,</span>
     <span class="n">daily_eligible_observations</span><span class="p">,</span>
     <span class="n">metric_unit</span><span class="o">=</span><span class="s1">'conversions'</span>
@@ -13154,18 +12891,8 @@ It adjusts the p-value threshold by dividing it by the number of comparisons.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8109d9b9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>

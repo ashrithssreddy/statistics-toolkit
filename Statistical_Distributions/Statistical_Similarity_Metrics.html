@@ -7312,7 +7312,6 @@ a.anchor-link {
                     processEnvironments: true
                 },
                 displayAlign: 'center',
-                messageStyle: 'none',
                 CommonHTML: {
                     linebreaks: {
                     automatic: true
@@ -7517,31 +7516,33 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="Status: Complete" src="https://img.shields.io/badge/status-complete-brightgreen"/>
+<img alt="Python" src="https://img.shields.io/badge/python-3.10-blue"/>
+<img alt="Coverage" src="https://img.shields.io/badge/coverage-95%25-green"/>
+<img alt="License" src="https://img.shields.io/badge/license-MIT-green"/></p>
 <p><a id="table-of-contents"></a></p>
-<h1 id="%F0%9F%93%96-Table-of-Contents">📖 Table of Contents<a class="anchor-link" href="#%F0%9F%93%96-Table-of-Contents">¶</a></h1><ol>
-<li><a href="#overview">🧭 Overview</a></li>
-<li><a href="#distance-metrics-for-numeric-data">📏 Distance Metrics for Numeric Data</a><ul>
+<h1 id="%F0%9F%93%96-Table-of-Contents">📖 Table of Contents<a class="anchor-link" href="#%F0%9F%93%96-Table-of-Contents">¶</a></h1><p><a href="#overview">🧭 Overview</a></p>
+<p><a href="#distance-metrics-for-numeric-data">📏 Distance Metrics for Numeric Data</a></p>
+<ul>
 <li><a href="#euclidean-distance">📌 Euclidean Distance</a></li>
 <li><a href="#manhattan-distance">📌 Manhattan Distance</a></li>
 <li><a href="#minkowski-distance">📌 Minkowski Distance</a></li>
 <li><a href="#mahalanobis-distance">📌 Mahalanobis Distance</a></li>
 </ul>
-</li>
-<li><a href="#distance-metrics-for-vectors-and-angles">🧮 Distance Metrics for Vectors and Angles</a><ul>
+<p><a href="#distance-metrics-for-vectors-and-angles">🧮 Distance Metrics for Vectors and Angles</a></p>
+<ul>
 <li><a href="#cosine-similarity--distance">📌 Cosine Similarity / Distance</a></li>
 </ul>
-</li>
-<li><a href="#distance-metrics-for-categorical-or-binary-data">🔤 Distance Metrics for Categorical or Binary Data</a><ul>
+<p><a href="#distance-metrics-for-categorical-or-binary-data">🔤 Distance Metrics for Categorical or Binary Data</a></p>
+<ul>
 <li><a href="#hamming-distance">📌 Hamming Distance</a></li>
 <li><a href="#jaccard-similarity--distance">📌 Jaccard Similarity / Distance</a></li>
 </ul>
-</li>
-<li><a href="#similarity-measures-for-continuous-data">📊 Similarity Measures for Continuous Data</a><ul>
+<p><a href="#similarity-measures-for-continuous-data">📊 Similarity Measures for Continuous Data</a></p>
+<ul>
 <li><a href="#pearson-correlation">📌 Pearson Correlation</a></li>
 <li><a href="#spearman-rank-correlation">📌 Spearman Rank Correlation</a></li>
 </ul>
-</li>
-</ol>
 <hr/>
 </div>
 </div>
@@ -7587,8 +7588,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -7622,11 +7623,11 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">minkowski</span><span class="p">,</span>
     <span class="n">mahalanobis</span><span class="p">,</span>
     <span class="n">cosine</span><span class="p">,</span>
@@ -7635,8 +7636,8 @@ a.anchor-link {
     <span class="n">euclidean</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">pearsonr</span><span class="p">,</span> <span class="n">spearmanr</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">pearsonr</span><span class="p">,</span> <span class="n">spearmanr</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
 </pre></div>
 </div>
 </div>
@@ -7654,10 +7655,9 @@ a.anchor-link {
 <p>🧠 <strong>Intuition</strong><br/>
 The straight-line (as-the-crow-flies) distance between two points in space. Think of it like using a ruler to measure distance on a map.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 d(x, y) = \sqrt{ \sum_{i=1}^{n} (x_i - y_i)^2 }
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Sensitive to scale differences between features</li>
 <li>Highly affected by outliers</li>
@@ -7698,7 +7698,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_euclidean_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_euclidean_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the Euclidean distance between two vectors using manual and/or library methods.</span>
 
@@ -7840,10 +7840,9 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 Measures distance by summing absolute differences across dimensions. Like navigating a city grid—no diagonal shortcuts, only vertical and horizontal movement.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 d(x, y) = \sum_{i=1}^{n} |x_i - y_i|
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Less sensitive to outliers than Euclidean</li>
 <li>Still scale-dependent—normalization is recommended</li>
@@ -7873,11 +7872,11 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cityblock</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cityblock</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_manhattan_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">compute_manhattan_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the Manhattan (L1) distance between two vectors using manual and/or library methods.</span>
 
@@ -8028,10 +8027,9 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 A generalization of both Euclidean and Manhattan distances. By adjusting the parameter ( p ), it morphs into different distance metrics. Think of it as a flexible distance formula with a sensitivity dial.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 d(x, y) = \left( \sum_{i=1}^{n} |x_i - y_i|^p \right)^{1/p}
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Sensitive to the choice of ( p ):<ul>
 <li>( p = 1 ): Manhattan Distance</li>
@@ -8065,7 +8063,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_minkowski_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_minkowski_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the Minkowski distance between two vectors using manual and/or library methods.</span>
 
@@ -8209,10 +8207,9 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 Measures distance between a point and a distribution, not just another point. It accounts for the variance and correlation in the data, effectively "whitening" the space before measuring distance.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 d(x, y) = \sqrt{(x - y)^T S^{-1} (x - y)}
-$$</p>
-<p>Where ( S ) is the covariance matrix of the data.</p>
+$$<p>Where ( S ) is the covariance matrix of the data.</p>
 <p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Not scale-sensitive—handles feature scaling internally via covariance</li>
@@ -8243,7 +8240,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_mahalanobis_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cov_matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_mahalanobis_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cov_matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the Mahalanobis distance between two vectors using manual and/or library methods.</span>
 
@@ -8362,8 +8359,8 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -8401,13 +8398,11 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 Measures the angle between two vectors, not their magnitude. It captures how aligned two directions are—perfect for understanding similarity in high-dimensional, sparse spaces.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 \text{Cosine Similarity} = \frac{\vec{x} \cdot \vec{y}}{||\vec{x}|| \cdot ||\vec{y}||}
-$$</p>
-<p>$$
+$$$$
 \text{Cosine Distance} = 1 - \text{Cosine Similarity}
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Ignores magnitude, focuses only on orientation</li>
 <li>Not affected by vector scaling (e.g., multiplying a vector by 10 doesn’t change similarity)</li>
@@ -8437,7 +8432,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_cosine_similarity_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_cosine_similarity_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">visualize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -8564,8 +8559,8 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -8608,15 +8603,14 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 Counts how many positions two strings (or binary vectors) differ in. Imagine comparing two passwords or binary sequences and marking the mismatches.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 d(x, y) = \sum_{i=1}^{n} \mathbf{1}(x_i \ne y_i) \\
 \text{where } \mathbf{1}(x_i \ne y_i) = 
 \begin{cases}
 1, &amp; \text{if } x_i \ne y_i \\
 0, &amp; \text{otherwise}
 \end{cases}
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Only works on equal-length vectors</li>
 <li>Binary/categorical only—makes no sense for continuous values</li>
@@ -8646,7 +8640,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_hamming_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_hamming_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the Hamming distance between two equal-length vectors using manual and/or library methods.</span>
 
@@ -8761,11 +8755,10 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 Measures the overlap between two sets relative to their union. It tells you <em>how similar two binary vectors or sets are</em>, ignoring what they don't share.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 \text{Jaccard Similarity} = \frac{|A \cap B|}{|A \cup B|} \\
 \text{Jaccard Distance} = 1 - \text{Jaccard Similarity}
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Only works on binary/categorical data or sets</li>
 <li>Ignores true negatives (things both sets don't have)</li>
@@ -8795,7 +8788,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_jaccard_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_jaccard_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute Jaccard Similarity and Jaccard Distance between two inputs.</span>
 
@@ -8912,8 +8905,8 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -8956,11 +8949,10 @@ $$</p>
 <p>🧠 <strong>Intuition</strong><br/>
 Measures the strength and direction of a <strong>linear relationship</strong> between two continuous variables. A value of +1 means perfect positive linear correlation, -1 means perfect negative, and 0 means no linear relationship.</p>
 <p>🧮 <strong>Formula</strong></p>
-<p>$$
+$$
 r = \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}
          {\sqrt{\sum_{i=1}^{n} (x_i - \bar{x})^2} \cdot \sqrt{\sum_{i=1}^{n} (y_i - \bar{y})^2}}
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Extremely sensitive to <strong>outliers</strong></li>
 <li>Assumes <strong>linearity</strong></li>
@@ -8990,7 +8982,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_pearson_correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_pearson_correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute Pearson Correlation between two vectors.</span>
 
@@ -9141,11 +9133,10 @@ $$</p>
 Measures the <strong>monotonic relationship</strong> between two variables using their ranks instead of raw values. It tells you whether the relationship is consistently increasing or decreasing, even if not linear.</p>
 <p>🧮 <strong>Formula</strong></p>
 <p>If there are no tied ranks:</p>
-<p>$$
+$$
 \rho = 1 - \frac{6 \sum d_i^2}{n(n^2 - 1)} \\
 \text{where } d_i = \text{rank}(x_i) - \text{rank}(y_i)
-$$</p>
-<p>⚠️ <strong>Sensitivity</strong></p>
+$$<p>⚠️ <strong>Sensitivity</strong></p>
 <ul>
 <li>Robust to <strong>outliers</strong></li>
 <li>Captures <strong>monotonic</strong> (not just linear) trends</li>
@@ -9175,7 +9166,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_spearman_correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">compute_spearman_correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"both"</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute Spearman Rank Correlation between two vectors.</span>
 
@@ -9281,8 +9272,8 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>

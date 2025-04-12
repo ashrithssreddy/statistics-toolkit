@@ -7312,7 +7312,6 @@ a.anchor-link {
                     processEnvironments: true
                 },
                 displayAlign: 'center',
-                messageStyle: 'none',
                 CommonHTML: {
                     linebreaks: {
                     automatic: true
@@ -7518,6 +7517,10 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><a id="table-of-contents"></a></p>
+<p><img alt="Status: Complete" src="https://img.shields.io/badge/status-complete-brightgreen"/>
+<img alt="Python" src="https://img.shields.io/badge/python-3.10-blue"/>
+<img alt="Coverage" src="https://img.shields.io/badge/coverage-80%25-orange"/>
+<img alt="License" src="https://img.shields.io/badge/license-MIT-green"/></p>
 <h1 id="%F0%9F%93%96-Table-of-Contents">📖 Table of Contents<a class="anchor-link" href="#%F0%9F%93%96-Table-of-Contents">¶</a></h1><p><a href="#data-setup">🗂️ Data Setup</a></p>
 <ul>
 <li><a href="#generate-data">🔍 Generate Data</a></li>
@@ -7557,6 +7560,7 @@ a.anchor-link {
 <table>
 <thead>
 <tr>
+<th>#</th>
 <th>💼 Example Business Problem</th>
 <th>📊 Outcome Variable Type</th>
 <th>📈 Outcome Distribution</th>
@@ -7568,6 +7572,7 @@ a.anchor-link {
 </thead>
 <tbody>
 <tr>
+<td>1</td>
 <td>Is average order value different from $50?</td>
 <td>Continuous</td>
 <td>Normal</td>
@@ -7577,6 +7582,7 @@ a.anchor-link {
 <td><em>-</em></td>
 </tr>
 <tr>
+<td>2</td>
 <td>Do users who saw recs spend more time on site?</td>
 <td>Continuous</td>
 <td>Normal</td>
@@ -7586,6 +7592,7 @@ a.anchor-link {
 <td><em>Use if variances are equal; Welch’s t-test if not</em></td>
 </tr>
 <tr>
+<td>3</td>
 <td>Did users spend more after redesign?</td>
 <td>Continuous</td>
 <td>Normal</td>
@@ -7595,6 +7602,7 @@ a.anchor-link {
 <td><em>Use only if paired differences are roughly Normal</em></td>
 </tr>
 <tr>
+<td>4</td>
 <td>Does time spent differ across A/B/C?</td>
 <td>Continuous</td>
 <td>Normal</td>
@@ -7604,6 +7612,7 @@ a.anchor-link {
 <td><em>Use Welch ANOVA if group variances differ</em></td>
 </tr>
 <tr>
+<td>5</td>
 <td>Is average order value different from $50 (skewed)?</td>
 <td>Continuous</td>
 <td>Non-Normal</td>
@@ -7613,6 +7622,7 @@ a.anchor-link {
 <td><em>Use when normality is violated; tests median. Sign Test is an alternative with fewer assumptions</em></td>
 </tr>
 <tr>
+<td>6</td>
 <td>Is revenue different between coupon A vs B?</td>
 <td>Continuous</td>
 <td>Non-Normal</td>
@@ -7622,6 +7632,7 @@ a.anchor-link {
 <td><em>Use when data is skewed or has outliers</em></td>
 </tr>
 <tr>
+<td>7</td>
 <td>Did time on site change (skewed)?</td>
 <td>Continuous</td>
 <td>Non-Normal</td>
@@ -7631,6 +7642,7 @@ a.anchor-link {
 <td><em>For paired non-normal distributions</em></td>
 </tr>
 <tr>
+<td>8</td>
 <td>Does spend differ across segments?</td>
 <td>Continuous</td>
 <td>Non-Normal</td>
@@ -7640,6 +7652,7 @@ a.anchor-link {
 <td><em>Non-parametric version of ANOVA</em></td>
 </tr>
 <tr>
+<td>9</td>
 <td>Is conversion rate different from 10%?</td>
 <td>Binary</td>
 <td><em>Not Applicable</em></td>
@@ -7649,6 +7662,7 @@ a.anchor-link {
 <td><em>Use binomial exact test if sample size is small</em></td>
 </tr>
 <tr>
+<td>10</td>
 <td>Does new CTA improve conversion?</td>
 <td>Binary</td>
 <td><em>Not Applicable</em></td>
@@ -7658,6 +7672,7 @@ a.anchor-link {
 <td><em>Use when counts are raw; chi-square for independence. Fisher’s Exact if expected counts are low</em></td>
 </tr>
 <tr>
+<td>11</td>
 <td>Do users convert more after badges?</td>
 <td>Binary</td>
 <td><em>Not Applicable</em></td>
@@ -7667,6 +7682,7 @@ a.anchor-link {
 <td><em>Used for 2×2 paired binary outcomes</em></td>
 </tr>
 <tr>
+<td>12</td>
 <td>Do plan choices differ across layout options?</td>
 <td>Categorical</td>
 <td><em>Not Applicable</em></td>
@@ -7676,6 +7692,7 @@ a.anchor-link {
 <td><em>Requires expected frequency ≥5 in each cell. Use Fisher’s Exact if assumption fails</em></td>
 </tr>
 <tr>
+<td>13</td>
 <td>Do users add more items to cart?</td>
 <td>Count</td>
 <td>Poisson</td>
@@ -7685,6 +7702,7 @@ a.anchor-link {
 <td><em>Use Negative Binomial if variance &gt; mean</em></td>
 </tr>
 <tr>
+<td>14</td>
 <td>Is effect still significant after adjusting for device &amp; region?</td>
 <td>Any</td>
 <td><em>Not Applicable</em></td>
@@ -7694,6 +7712,7 @@ a.anchor-link {
 <td><em>Use to control for covariates / confounders</em></td>
 </tr>
 <tr>
+<td>15</td>
 <td>What’s the probability that B beats A?</td>
 <td>Any</td>
 <td><em>Not Applicable</em></td>
@@ -7703,6 +7722,7 @@ a.anchor-link {
 <td><em>Posterior probability; no p-value</em></td>
 </tr>
 <tr>
+<td>16</td>
 <td>Is observed lift statistically rare?</td>
 <td>Any</td>
 <td><em>Not Applicable</em></td>
@@ -7807,11 +7827,11 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Display Settings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.core.interactiveshell</span><span class="w"> </span><span class="kn">import</span> <span class="n">InteractiveShell</span>
+<span class="kn">from</span> <span class="nn">IPython.core.interactiveshell</span> <span class="kn">import</span> <span class="n">InteractiveShell</span>
 <span class="n">InteractiveShell</span><span class="o">.</span><span class="n">ast_node_interactivity</span> <span class="o">=</span> <span class="s2">"all"</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="n">pretty_json</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">&lt;pre style='font-size:14px; font-family:monospace;'&gt;</span>
@@ -7823,16 +7843,16 @@ a.anchor-link {
 <span class="s2">"""</span><span class="p">))</span>
 
 <span class="c1"># Data Transformation Libraries</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="n">my_seed</span><span class="o">=</span><span class="mi">1995</span>
 
 <span class="c1"># Stats Libraries</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ttest_1samp</span><span class="p">,</span> <span class="n">ttest_rel</span><span class="p">,</span> <span class="n">ttest_ind</span><span class="p">,</span> <span class="n">wilcoxon</span><span class="p">,</span> <span class="n">mannwhitneyu</span><span class="p">,</span>
     <span class="n">shapiro</span><span class="p">,</span> <span class="n">chi2_contingency</span><span class="p">,</span> <span class="n">f_oneway</span><span class="p">,</span> <span class="n">kruskal</span><span class="p">,</span> <span class="n">binom_test</span><span class="p">,</span> <span class="n">fisher_exact</span><span class="p">,</span> <span class="n">levene</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.proportion</span><span class="w"> </span><span class="kn">import</span> <span class="n">proportions_ztest</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.proportion</span> <span class="kn">import</span> <span class="n">proportions_ztest</span>
 </pre></div>
 </div>
 </div>
@@ -7858,7 +7878,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_data_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_data_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">my_seed</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generates synthetic data based on the specified hypothesis test configuration.</span>
 
@@ -8131,8 +8151,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -8225,7 +8245,7 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 <div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Validates the hypothesis test configuration dictionary for completeness and logical consistency.</span>
 <span class="sd">    </span>
@@ -8385,7 +8405,7 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 <div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_config_summary</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">print_config_summary</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Displays a structured summary of the test configuration with visual cues for missing or inferred values.</span>
 
@@ -8406,7 +8426,7 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 <span class="sd">        Prints the formatted configuration summary directly to output</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">highlight</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">highlight</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">'NA'</span><span class="p">]</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
             <span class="k">return</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[91mNone</span><span class="se">\033</span><span class="s2">[0m"</span>  <span class="c1"># Red in terminal</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -8509,8 +8529,8 @@ If the variances are not equal, using a pooled t-test (which assumes equal varia
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -8563,7 +8583,7 @@ This is particularly important when working with <strong>continuous</strong> out
 <div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">infer_distribution_from_data</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">infer_distribution_from_data</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Infers whether the outcome variable follows a normal distribution using the Shapiro-Wilk test.</span>
 
@@ -8809,7 +8829,7 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">infer_variance_equality</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">infer_variance_equality</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Infers whether the variances across two independent groups are equal using Levene's test.</span>
 
@@ -8982,29 +9002,12 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 <p>When those assumptions are met, parametric tests are <strong>more powerful</strong> (i.e., they detect real effects more easily).</p>
 <hr/>
 <h3 id="%F0%9F%94%81-What-Happens-If-Assumptions-Don%E2%80%99t-Hold?">🔁 What Happens If Assumptions Don’t Hold?<a class="anchor-link" href="#%F0%9F%94%81-What-Happens-If-Assumptions-Don%E2%80%99t-Hold?">¶</a></h3><p>You should use a <strong>non-parametric test</strong> — these don’t rely on strong distributional assumptions and are more robust, especially for small sample sizes or skewed data.</p>
-<p>Examples:</p>
-<table>
-<thead>
-<tr>
-<th>Parametric Test</th>
-<th>Non-Parametric Alternative</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Two-sample t-test</td>
-<td>Mann-Whitney U test</td>
-</tr>
-<tr>
-<td>Paired t-test</td>
-<td>Wilcoxon Signed-Rank test</td>
-</tr>
-<tr>
-<td>ANOVA</td>
-<td>Kruskal-Wallis test</td>
-</tr>
-</tbody>
-</table>
+<p>Examples:
+| Parametric Test          | Non-Parametric Alternative       |
+|--------------------------|----------------------------------|
+| Two-sample t-test        | Mann-Whitney U test              |
+| Paired t-test            | Wilcoxon Signed-Rank test        |
+| ANOVA                    | Kruskal-Wallis test              |</p>
 <hr/>
 <h3 id="%F0%9F%A7%A0-How-We-Decide-Here">🧠 How We Decide Here<a class="anchor-link" href="#%F0%9F%A7%A0-How-We-Decide-Here">¶</a></h3><p>In our pipeline, a test is <strong>parametric</strong> only if:</p>
 <ul>
@@ -9025,7 +9028,7 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 <div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">infer_parametric_flag</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">infer_parametric_flag</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Infers whether a parametric or non-parametric test should be used based on the config.</span>
 
@@ -9169,8 +9172,8 @@ we assume that both groups have <strong>equal variances</strong> — this is cal
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>
@@ -9283,7 +9286,7 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 <div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">determine_test_to_run</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">determine_test_to_run</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Determines the appropriate statistical test based on the provided configuration.</span>
 
@@ -9501,7 +9504,7 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 <div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_hypothesis_statement</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">print_hypothesis_statement</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Prints the null and alternative hypothesis statements based on the selected test and tail type.</span>
 
@@ -9698,7 +9701,7 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 <div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_hypothesis_test</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">run_hypothesis_test</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Runs the appropriate hypothesis test based on the provided configuration and dataset.</span>
 
@@ -9976,8 +9979,8 @@ we determine <strong>which statistical test is most appropriate</strong> for you
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="#table-of-contents">Back to the top</a></p>
-<hr/>
+<p><a href="#table-of-contents">Back to the top</a>
+___</p>
 </div>
 </div>
 </div>

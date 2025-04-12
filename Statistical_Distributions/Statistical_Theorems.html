@@ -7312,7 +7312,6 @@ a.anchor-link {
                     processEnvironments: true
                 },
                 displayAlign: 'center',
-                messageStyle: 'none',
                 CommonHTML: {
                     linebreaks: {
                     automatic: true
@@ -7517,6 +7516,10 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="Status: In Progress" src="https://img.shields.io/badge/status-in%20progress-yellow"/>
+<img alt="Python" src="https://img.shields.io/badge/python-3.10-blue"/>
+<img alt="Coverage" src="https://img.shields.io/badge/coverage-60%25-yellow"/>
+<img alt="License" src="https://img.shields.io/badge/license-MIT-green"/></p>
 <p><a id="table-of-contents"></a></p>
 <h1 id="%F0%9F%93%96-Table-of-Contents">📖 Table of Contents<a class="anchor-link" href="#%F0%9F%93%96-Table-of-Contents">¶</a></h1><p><a href="#law-of-large-numbers">📊 Law of Large Numbers</a><br/>
 <a href="#central-limit-theorem">📈 Central Limit Theorem</a><br/>
@@ -7570,8 +7573,8 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
 </div>
@@ -7785,10 +7788,9 @@ a.anchor-link {
 </ol>
 <h5>📐 Formula for Standard Error of the Mean</h5>
 <p>The standard deviation of the sampling distribution of the sample mean, known as the <strong>Standard Error (SE)</strong>, is given by:</p>
-<p>$$
+$$
 SE = \frac{\sigma}{\sqrt{n}}
-$$</p>
-<p>Where:</p>
+$$<p>Where:</p>
 <ul>
 <li>\(\sigma\): The standard deviation of the population.</li>
 <li>\(n\): The sample size.</li>
@@ -7924,14 +7926,12 @@ $$</p>
 <details><summary><strong>📖 Click to Expand</strong></summary>
 <p>Chebyshev’s Inequality provides a lower bound on how much of the data lies within a certain number of standard deviations from the mean—<strong>regardless of the distribution</strong>.</p>
 <h5 id="%F0%9F%A7%A0-Theorem">🧠 Theorem<a class="anchor-link" href="#%F0%9F%A7%A0-Theorem">¶</a></h5><p>For any random variable with finite mean $\mu$ and standard deviation $\sigma$:</p>
-<p>$$
+$$
 P(|X - \mu| \geq k\sigma) \leq \frac{1}{k^2}
-$$</p>
-<p>Equivalently:</p>
-<p>$$
+$$<p>Equivalently:</p>
+$$
 P(|X - \mu| &lt; k\sigma) \geq 1 - \frac{1}{k^2}
-$$</p>
-<h5 id="%F0%9F%92%A1-Why-It-Matters-in-Data-Science">💡 Why It Matters in Data Science<a class="anchor-link" href="#%F0%9F%92%A1-Why-It-Matters-in-Data-Science">¶</a></h5><ul>
+$$<h5 id="%F0%9F%92%A1-Why-It-Matters-in-Data-Science">💡 Why It Matters in Data Science<a class="anchor-link" href="#%F0%9F%92%A1-Why-It-Matters-in-Data-Science">¶</a></h5><ul>
 <li><strong>Distribution-free</strong>: Works without assuming normality</li>
 <li><strong>Conservative bound</strong>: Guarantees a minimum % of data near the mean</li>
 <li><strong>Use cases</strong>:<ul>
@@ -8140,10 +8140,9 @@ k     Empirical Proportion      Chebyshev Bound
 <blockquote>
 <p>"Given what I already believe, and this new info I just saw, what should I believe now?"</p>
 </blockquote>
-<h5 id="%F0%9F%A7%A0-Theorem">🧠 Theorem<a class="anchor-link" href="#%F0%9F%A7%A0-Theorem">¶</a></h5><p>$$
+<h5 id="%F0%9F%A7%A0-Theorem">🧠 Theorem<a class="anchor-link" href="#%F0%9F%A7%A0-Theorem">¶</a></h5>$$
 P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}
-$$</p>
-<p>Where:</p>
+$$<p>Where:</p>
 <ul>
 <li><code>P(A)</code>: Prior — what you believed before</li>
 <li><code>P(B | A)</code>: Likelihood — how likely the evidence is if A is true</li>
@@ -8255,7 +8254,7 @@ Chance of actually having disease after positive test: 15.38%
 <div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">bayes_update</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">sensitivity</span><span class="p">,</span> <span class="n">specificity</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">bayes_update</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">sensitivity</span><span class="p">,</span> <span class="n">specificity</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute posterior probability using Bayes' Theorem.</span>
 <span class="sd">    </span>
@@ -8359,7 +8358,7 @@ Prior      Posterior       Interpretation
 <div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1"># Prepare data</span>
 <span class="n">priors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
