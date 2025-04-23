@@ -20,24 +20,31 @@ Each notebook covers a complete workflow — from setup to summary — while sta
 - Paired vs unpaired logic  
 - Significance interpretation and output labeling
 
-### **3. Statistical Distributions** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Distributions.html))
+### **3. Causal Inference** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Causal_Inference/Causal_Inference.html))
+
+- Estimating treatment effects from observational data
+- Potential outcomes framework (ATE, ATT)
+- Propensity score matching, stratification, weighting
+- Supports integration with experimental pipelines
+
+### **4. Statistical Distributions** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Distributions.html))
 
 - Continuous: Uniform, Normal, Exponential, Chi-Square, Student t  
 - Discrete: Poisson, Bernoulli, Binomial  
 - Visualizations, sampling, parameter estimation
 
-### **4. Statistical Paradoxes** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Paradoxes.html))
+### **5. Statistical Paradoxes** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Paradoxes.html))
 
 - Simpson’s Paradox  
 - Will Rogers Phenomenon
 
-### **5. Statistical Similarity Metrics** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Similarity_Metrics.html))
+### **6. Statistical Similarity Metrics** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Similarity_Metrics.html))
 
 - Euclidean, Manhattan, Minkowski, Mahalanobis distances  
 - Cosine similarity/distance, Jaccard index, Hamming distance  
 - Pearson and Spearman correlation  
 
-### **6. Theoretical Foundations** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Theorems.html))
+### **7. Theoretical Foundations** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Theorems.html))
 
 - Law of Large Numbers (with visual convergence)  
 - Central Limit Theorem (sample mean simulation)
