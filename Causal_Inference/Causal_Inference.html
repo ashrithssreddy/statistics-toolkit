@@ -14701,15 +14701,18 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-##### 🧠 Why this Notebook
-Causal inference gives us the tools to answer "what if" questions — not just "what is." In product, policy, medicine, and science, we often need to **act**, and actions require understanding their consequences.
+<h5>🧠 Why this Notebook</h5>
 
-This field helps us:
-- Understand **how** and **why** outcomes change.
-- Move from data *descriptions* to data-*driven interventions*.
-- Avoid the trap of chasing noisy correlations.
+<p>Causal inference gives us the tools to answer "what if" questions — not just "what is." In product, policy, medicine, and science, we often need to <strong>act</strong>, and actions require understanding their consequences.</p>
 
-This notebook is a build-up from first principles to practical methods — with enough grounding to reason about experiments, models, and their assumptions clearly.
+<p>This field helps us:</p>
+<ul>
+  <li>Understand <strong>how</strong> and <strong>why</strong> outcomes change.</li>
+  <li>Move from data <em>descriptions</em> to data-<em>driven interventions</em>.</li>
+  <li>Avoid the trap of chasing noisy correlations.</li>
+</ul>
+
+<p>This notebook is a build-up from first principles to practical methods — with enough grounding to reason about experiments, models, and their assumptions clearly.</p>
 
 </details>
 </div>
@@ -14736,17 +14739,23 @@ This notebook is a build-up from first principles to practical methods — with 
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-##### 🎓 Causal inference is the process of estimating the **effect** of one variable (the treatment) on another (the outcome), holding all else constant. The core idea is to estimate:
-> What would the outcome have been if the treatment had (or had not) occurred?
+<h5>🎓 Causal inference is the process of estimating the <strong>effect</strong> of one variable (the treatment) on another (the outcome), holding all else constant.</h5>
 
-Unlike correlation or predictive modeling:
-- It asks **counterfactual** questions — what *would* have happened under different scenarios.
-- It requires **assumptions**, **design**, and often **randomization** or clever statistical tricks.
+<p>The core idea is to estimate:</p>
+<blockquote>What would the outcome have been if the treatment had (or had not) occurred?</blockquote>
 
-At its heart, causal inference is about:
-- Designing better **interventions**
-- Estimating **treatment effects**
-- Avoiding misleading **associational patterns**
+<p>Unlike correlation or predictive modeling:</p>
+<ul>
+  <li>It asks <strong>counterfactual</strong> questions — what <em>would</em> have happened under different scenarios.</li>
+  <li>It requires <strong>assumptions</strong>, <strong>design</strong>, and often <strong>randomization</strong> or clever statistical tricks.</li>
+</ul>
+
+<p>At its heart, causal inference is about:</p>
+<ul>
+  <li>Designing better <strong>interventions</strong></li>
+  <li>Estimating <strong>treatment effects</strong></li>
+  <li>Avoiding misleading <strong>associational patterns</strong></li>
+</ul>
 
 </details>
 </div>
@@ -14773,20 +14782,24 @@ At its heart, causal inference is about:
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-##### 📌 Correlation can be dangerous when used as a proxy for causation.
+<h5>📌 Correlation can be dangerous when used as a proxy for causation.</h5>
 
-Example: Ice cream sales are correlated with shark attacks. Should we ban dessert?  
-Clearly not — they’re both caused by heatwaves (a confounder).
+<p>Example: Ice cream sales are correlated with shark attacks. Should we ban dessert?  
+Clearly not — they’re both caused by heatwaves (a confounder).</p>
 
-Correlation fails because it:
-- Ignores **confounders** (common causes of both variables)
-- Misses **directionality** (what affects what)
-- Can be driven by **reverse causation** or **coincidence**
+<p>Correlation fails because it:</p>
+<ul>
+  <li>Ignores <strong>confounders</strong> (common causes of both variables)</li>
+  <li>Misses <strong>directionality</strong> (what affects what)</li>
+  <li>Can be driven by <strong>reverse causation</strong> or <strong>coincidence</strong></li>
+</ul>
 
-Causal inference gives tools to:
-- **Identify** confounding
-- **Design** better studies (randomized or observational)
-- **Interpret** results in terms of actionable causes
+<p>Causal inference gives tools to:</p>
+<ul>
+  <li><strong>Identify</strong> confounding</li>
+  <li><strong>Design</strong> better studies (randomized or observational)</li>
+  <li><strong>Interpret</strong> results in terms of actionable causes</li>
+</ul>
 
 </details>
 </div>
@@ -14813,15 +14826,17 @@ Causal inference gives tools to:
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-##### 🧭 Correlation might be fine for dashboards. But when making **decisions**, causality is non-negotiable.
+<h5>🧭 Correlation might be fine for dashboards. But when making <strong>decisions</strong>, causality is non-negotiable.</h5>
 
-Examples:
-- **Product**: Did that new button placement increase checkout, or was it a seasonal effect?
-- **Marketing**: Did the email nudge lead to purchases, or did loyal users open it anyway?
-- **Policy**: Did a tax cut help the economy, or was it already improving?
-- **Health**: Does a drug reduce disease, or do healthier people tend to take it?
+<p>Examples:</p>
+<ul>
+  <li><strong>Product</strong>: Did that new button placement increase checkout, or was it a seasonal effect?</li>
+  <li><strong>Marketing</strong>: Did the email nudge lead to purchases, or did loyal users open it anyway?</li>
+  <li><strong>Policy</strong>: Did a tax cut help the economy, or was it already improving?</li>
+  <li><strong>Health</strong>: Does a drug reduce disease, or do healthier people tend to take it?</li>
+</ul>
 
-These questions involve **interventions**, and only causal methods can tell us what would’ve happened under a different choice.
+<p>These questions involve <strong>interventions</strong>, and only causal methods can tell us what would’ve happened under a different choice.</p>
 
 </details>
 </div>
@@ -14873,13 +14888,15 @@ These questions involve **interventions**, and only causal methods can tell us w
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-- **Treatment (`T`)**: The intervention or condition being tested (e.g., new design, drug, policy).
-- **Outcome (`Y`)**: The result or metric affected by the treatment (e.g., click, recovery, score).
-- **Units (`i`)**: The entities receiving treatment and producing outcomes (e.g., users, patients, schools).
+<ul>
+  <li><strong>Treatment (<code>T</code>)</strong>: The intervention or condition being tested (e.g., new design, drug, policy).</li>
+  <li><strong>Outcome (<code>Y</code>)</strong>: The result or metric affected by the treatment (e.g., click, recovery, score).</li>
+  <li><strong>Units (<code>i</code>)</strong>: The entities receiving treatment and producing outcomes (e.g., users, patients, schools).</li>
+</ul>
 
-Each unit can receive a treatment or control, and we observe only one outcome — not both.
+<p>Each unit can receive a treatment or control, and we observe only one outcome — not both.</p>
 
-This framing is universal and applies whether you're testing emails, ads, or vaccines.
+<p>This framing is universal and applies whether you're testing emails, ads, or vaccines.</p>
 
 </details>
 </div>
@@ -14906,21 +14923,29 @@ This framing is universal and applies whether you're testing emails, ads, or vac
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-The **Potential Outcomes framework** (aka Rubin Causal Model) imagines two parallel worlds for each unit:
+<p>The <strong>Potential Outcomes framework</strong> (aka Rubin Causal Model) imagines two parallel worlds for each unit:</p>
 
-- `Y(1)`: Outcome if treated  
-- `Y(0)`: Outcome if not treated  
+<ul>
+  <li><code>Y(1)</code>: Outcome if treated</li>
+  <li><code>Y(0)</code>: Outcome if not treated</li>
+</ul>
 
-We define **Individual Treatment Effect (ITE)** as:  
-`ITE = Y(1) - Y(0)`
+<p>We define <strong>Individual Treatment Effect (ITE)</strong> as:</p>
 
-**Key idea:**  
-Each unit has both potential outcomes — but we can only observe one. The other is **counterfactual**.
+<blockquote>ITE = Y(1) - Y(0)</blockquote>
 
-This framework allows us to define:
-- ATE (Average Treatment Effect)
-- CATE (Conditional ATE, for subgroups)
-- And formalizes why causal inference is hard: we never see both outcomes.
+<p><strong>Key idea:</strong></p>
+
+<p>Each unit has both potential outcomes — but we can only observe one. The other is <strong>counterfactual</strong>.</p>
+
+<p>This framework allows us to define:</p>
+
+<ul>
+  <li>ATE (Average Treatment Effect)</li>
+  <li>CATE (Conditional ATE, for subgroups)</li>
+</ul>
+
+<p>And formalizes why causal inference is hard: we never see both outcomes.</p>
 
 </details>
 </div>
@@ -14947,21 +14972,26 @@ This framework allows us to define:
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-The **Fundamental Problem of Causal Inference**:  
-> For any individual, we can observe only one potential outcome — never both.
+<h5>The <strong>Fundamental Problem of Causal Inference</strong>:</h5>
 
-Example:
-- A user sees version A → you observe `Y(0)`
-- You’ll never know what `Y(1)` would have been for that exact user
+<blockquote>For any individual, we can observe only one potential outcome — never both.</blockquote>
 
-This creates a missing data problem: the counterfactual is unobservable.
+<p>Example:</p>
+<ul>
+  <li>A user sees version A → you observe <code>Y(0)</code></li>
+  <li>You’ll never know what <code>Y(1)</code> would have been for that exact user</li>
+</ul>
 
-To solve this, we rely on:
-- **Randomization**
-- **Modeling + assumptions**
-- **Matching or weighting approaches**
+<p>This creates a missing data problem: the counterfactual is unobservable.</p>
 
-All causal methods are, in some way, trying to **approximate the missing counterfactual**.
+<p>To solve this, we rely on:</p>
+<ul>
+  <li><strong>Randomization</strong></li>
+  <li><strong>Modeling + assumptions</strong></li>
+  <li><strong>Matching or weighting approaches</strong></li>
+</ul>
+
+<p>All causal methods are, in some way, trying to <strong>approximate the missing counterfactual</strong>.</p>
 
 </details>
 </div>
@@ -14988,23 +15018,25 @@ All causal methods are, in some way, trying to **approximate the missing counter
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-Causal inference relies heavily on assumptions — even when you don’t randomize.
+<p>Causal inference relies heavily on assumptions — even when you don’t randomize.</p>
 
-Three core ones:
+<h5>Three core ones:</h5>
 
-- **SUTVA (Stable Unit Treatment Value Assumption)**  
-  → Your treatment doesn’t affect someone else’s outcome.  
-  → No interference across units.
+<ul>
+  <li><strong>SUTVA (Stable Unit Treatment Value Assumption)</strong><br>
+  → Your treatment doesn’t affect someone else’s outcome.<br>
+  → No interference across units.</li>
 
-- **Ignorability (a.k.a. Unconfoundedness)**  
-  → Given the observed covariates, treatment assignment is as good as random.  
-  → This lets you use observed data for estimation.
+  <li><strong>Ignorability (a.k.a. Unconfoundedness)</strong><br>
+  → Given the observed covariates, treatment assignment is as good as random.<br>
+  → This lets you use observed data for estimation.</li>
 
-- **Overlap (a.k.a. Positivity)**  
-  → Every unit has a non-zero probability of receiving either treatment.  
-  → You can’t learn effects where there’s no variation.
+  <li><strong>Overlap (a.k.a. Positivity)</strong><br>
+  → Every unit has a non-zero probability of receiving either treatment.<br>
+  → You can’t learn effects where there’s no variation.</li>
+</ul>
 
-Without these, causal estimates can be biased or undefined. Always question whether they hold before trusting results.
+<p>Without these, causal estimates can be biased or undefined. Always question whether they hold before trusting results.</p>
 
 </details>
 </div>
@@ -15044,14 +15076,16 @@ Without these, causal estimates can be biased or undefined. Always question whet
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-Simulating data is the best way to *control the truth* when learning causal inference.
+<p>Simulating data is the best way to <em>control the truth</em> when learning causal inference.</p>
 
-Here’s why we simulate:
-- You get full knowledge of ground-truth treatment effects.
-- You can deliberately create **confounding**, **bias**, **non-randomness**.
-- You can practice recovering the true causal effect using different methods.
+<p>Here’s why we simulate:</p>
+<ul>
+  <li>You get full knowledge of ground-truth treatment effects.</li>
+  <li>You can deliberately create <strong>confounding</strong>, <strong>bias</strong>, <strong>non-randomness</strong>.</li>
+  <li>You can practice recovering the true causal effect using different methods.</li>
+</ul>
 
-In real-world observational data, the "truth" is hidden. Simulating lets you debug your causal intuition safely before dealing with messy production datasets.
+<p>In real-world observational data, the "truth" is hidden. Simulating lets you debug your causal intuition safely before dealing with messy production datasets.</p>
 
 </details>
 </div>
@@ -15100,15 +15134,19 @@ In real-world observational data, the "truth" is hidden. Simulating lets you deb
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-To simulate treatment realistically:
-- Treatment should **depend** on observed features.
-- Treatment **should not** be random — otherwise, no confounding to deal with.
+<p>To simulate treatment realistically:</p>
+<ul>
+  <li>Treatment should <strong>depend</strong> on observed features.</li>
+  <li>Treatment <strong>should not</strong> be random — otherwise, no confounding to deal with.</li>
+</ul>
 
-For example:
-- Wealthier users might be more likely to receive a premium offer.
-- Healthier patients might be less likely to receive intensive care.
+<p>For example:</p>
+<ul>
+  <li>Wealthier users might be more likely to receive a premium offer.</li>
+  <li>Healthier patients might be less likely to receive intensive care.</li>
+</ul>
 
-We’ll simulate a **non-random treatment assignment** based on a few covariates to mimic real-world biases.
+<p>We’ll simulate a <strong>non-random treatment assignment</strong> based on a few covariates to mimic real-world biases.</p>
 
 </details>
 </div>
@@ -15168,13 +15206,15 @@ We’ll simulate a **non-random treatment assignment** based on a few covariates
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-In real-world datasets, treatment assignment is **not random** — it’s confounded by covariates.
+<p>In real-world datasets, treatment assignment is <strong>not random</strong> — it’s confounded by covariates.</p>
 
-We deliberately inject confounding so that:
-- Covariates (age, income, engagement) affect both **treatment** and **outcome**.
-- If we naively compare treated vs untreated, we'll get biased results.
+<p>We deliberately inject confounding so that:</p>
+<ul>
+  <li>Covariates (age, income, engagement) affect both <strong>treatment</strong> and <strong>outcome</strong>.</li>
+  <li>If we naively compare treated vs untreated, we'll get biased results.</li>
+</ul>
 
-Confounding creates the need for adjustment, which will be a major theme later.
+<p>Confounding creates the need for adjustment, which will be a major theme later.</p>
 
 </details>
 </div>
@@ -15224,15 +15264,19 @@ Confounding creates the need for adjustment, which will be a major theme later.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-In the Rubin Potential Outcomes framework, each unit has two outcomes:
-- `Y(1)` → If treated
-- `Y(0)` → If not treated
+<p>In the Rubin Potential Outcomes framework, each unit has two outcomes:</p>
+<ul>
+  <li><code>Y(1)</code> → If treated</li>
+  <li><code>Y(0)</code> → If not treated</li>
+</ul>
 
-We can simulate this by:
-- Applying a **true treatment effect** to `Y(1)`
-- Leaving `Y(0)` as the base outcome
+<p>We can simulate this by:</p>
+<ul>
+  <li>Applying a <strong>true treatment effect</strong> to <code>Y(1)</code></li>
+  <li>Leaving <code>Y(0)</code> as the base outcome</li>
+</ul>
 
-**Important:** We observe only one of `Y(1)` or `Y(0)`, depending on treatment assignment (`T`).
+<p><strong>Important:</strong> We observe only one of <code>Y(1)</code> or <code>Y(0)</code>, depending on treatment assignment (<code>T</code>).</p>
 
 </details>
 </div>
@@ -15411,20 +15455,25 @@ We can simulate this by:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p><details><summary><strong>📉 Click to Expand</strong></summary></p>
+<details><summary><strong>📉 Click to Expand</strong></summary>
+
 <p>Many causal questions are first attacked by simply comparing the treated vs. untreated groups.</p>
-<p><strong>Naive Approach</strong>:</p>
-<blockquote><p>Average outcome of treated - Average outcome of untreated.</p>
-</blockquote>
+
+<p><strong>Naive Approach:</strong></p>
+<blockquote>Average outcome of treated - Average outcome of untreated.</blockquote>
+
 <p>This looks simple, but in observational data:</p>
 <ul>
-<li>Treated and untreated units <strong>are not comparable</strong>.</li>
-<li>Treatment assignment was <strong>not randomized</strong>.</li>
-<li>Differences in baseline characteristics confound the simple difference.</li>
+  <li>Treated and untreated units <strong>are not comparable</strong>.</li>
+  <li>Treatment assignment was <strong>not randomized</strong>.</li>
+  <li>Differences in baseline characteristics confound the simple difference.</li>
 </ul>
+
 <p>Naive estimation <strong>almost always gives biased results</strong> unless you have perfect randomization.</p>
+
 <p>In this section, we'll see how bad the naive approach can get even on a simple synthetic dataset.</p>
 
+</details>
 </div>
 </div>
 </div>
@@ -15496,19 +15545,23 @@ True treatment effect (ground truth): 10
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-A simple difference in means is mathematically:
-> `E[Y | T=1] - E[Y | T=0]`
+<p>A simple difference in means is mathematically:</p>
+<blockquote><code>E[Y | T=1] - E[Y | T=0]</code></blockquote>
 
-If treatment assignment were random:
-- The two groups would be exchangeable.
-- Baseline covariates would balance on average.
-- The simple difference would be an unbiased estimator of ATE.
+<p>If treatment assignment were random:</p>
+<ul>
+  <li>The two groups would be exchangeable.</li>
+  <li>Baseline covariates would balance on average.</li>
+  <li>The simple difference would be an unbiased estimator of ATE.</li>
+</ul>
 
-But if treatment is **confounded**, then:
-- `T=1` units may systematically differ from `T=0` units.
-- The naive estimator picks up both **causal effect** and **selection bias**.
+<p>But if treatment is <strong>confounded</strong>, then:</p>
+<ul>
+  <li><code>T=1</code> units may systematically differ from <code>T=0</code> units.</li>
+  <li>The naive estimator picks up both <strong>causal effect</strong> and <strong>selection bias</strong>.</li>
+</ul>
 
-We’ll soon quantify how large this bias can be.
+<p>We’ll soon quantify how large this bias can be.</p>
 
 </details>
 </div>
@@ -15620,18 +15673,22 @@ We’ll soon quantify how large this bias can be.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details><summary><strong>📉 Click to Expand</strong></summary>
 
-**Bias from confounding** happens when:
-- The treated group has systematically different baseline outcomes than the control group.
+<p><strong>Bias from confounding</strong> happens when:</p>
+<ul>
+  <li>The treated group has systematically different baseline outcomes than the control group.</li>
+</ul>
 
-Mathematically:
-> Observed difference = True treatment effect + Bias from baseline differences
+<p>Mathematically:</p>
+<blockquote>Observed difference = True treatment effect + Bias from baseline differences</blockquote>
 
-In our simulation:
-- Higher income users are more likely to be treated.
-- Income also directly influences outcome.
-- Therefore, the observed difference **overstates** the real effect.
+<p>In our simulation:</p>
+<ul>
+  <li>Higher income users are more likely to be treated.</li>
+  <li>Income also directly influences outcome.</li>
+  <li>Therefore, the observed difference <strong>overstates</strong> the real effect.</li>
+</ul>
 
-This is why adjusting for confounders is critical — naive methods can easily mislead interventions and business decisions.
+<p>This is why adjusting for confounders is critical — naive methods can easily mislead interventions and business decisions.</p>
 
 </details>
 </div>
