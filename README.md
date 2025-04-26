@@ -6,45 +6,45 @@ Each notebook covers a complete workflow — from setup to summary — while sta
 
 ## 🧠 What's Inside
 
-### **1. A/B Testing** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/AB_Testing/AB_Testing.html))
+### **1. A/B Testing** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/AB_Testing/AB_Testing.html))
 
 - Experiment setup with config-driven control  
 - Randomization logic (simple, cluster, match-pair)  
 - AA testing and diagnostics  
 - Sample size & power analysis
 
-### **2. Hypothesis Testing** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Hypothesis_Testing/Hypothesis_Testing.html))
+### **2. Hypothesis Testing** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Hypothesis_Testing/Hypothesis_Testing.html))
 
 - Parametric and non-parametric test selection  
 - Normality and variance checks  
 - Paired vs unpaired logic  
 - Significance interpretation and output labeling
 
-### **3. Causal Inference** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Causal_Inference/Causal_Inference.html))
+### **3. Causal Inference** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Causal_Inference/Causal_Inference.html))
 
 - Estimating treatment effects from observational data
 - Potential outcomes framework (ATE, ATT)
 - Propensity score matching, stratification, weighting
 - Supports integration with experimental pipelines
 
-### **4. Statistical Distributions** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Distributions.html))
+### **4. Statistical Distributions** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Distributions.html))
 
 - Continuous: Uniform, Normal, Exponential, Chi-Square, Student t  
 - Discrete: Poisson, Bernoulli, Binomial  
 - Visualizations, sampling, parameter estimation
 
-### **5. Statistical Paradoxes** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Paradoxes.html))
+### **5. Statistical Paradoxes** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Paradoxes.html))
 
 - Simpson’s Paradox  
 - Will Rogers Phenomenon
 
-### **6. Statistical Similarity Metrics** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Similarity_Metrics.html))
+### **6. Statistical Similarity Metrics** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Similarity_Metrics.html))
 
 - Euclidean, Manhattan, Minkowski, Mahalanobis distances  
 - Cosine similarity/distance, Jaccard index, Hamming distance  
 - Pearson and Spearman correlation  
 
-### **7. Theoretical Foundations** ([HTML](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Theorems.html))
+### **7. Theoretical Foundations** ([Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Statistical_Distributions/Statistical_Theorems.html))
 
 - Law of Large Numbers (with visual convergence)  
 - Central Limit Theorem (sample mean simulation)
