@@ -1,0 +1,17 @@
+title: genAI for Data Scientists
+description: Practical guide for a DS attempting GenAI.
+theme: jekyll-theme-minimal
+show_downloads: false
+
+# GitHub Pages-supported Jekyll themes:
+# theme: jekyll-theme-minimal       # Clean and whitespace-heavy; very plain
+# theme: jekyll-theme-modernist     # Sleek and simple; good contrast and layout
+# theme: jekyll-theme-cayman        # Bold header with a CTA button; good for portfolios
+# theme: jekyll-theme-leap-day      # Sidebar nav; feels blog-like
+# theme: jekyll-theme-midnight      # Dark theme; stylish and professional
+# theme: jekyll-theme-architect     # Blocky header with strong lines; looks like design docs
+# theme: jekyll-theme-merlot        # Classy serif type; good for writing-heavy content
+# theme: jekyll-theme-slate         # Feels like technical documentation; gray theme
+# theme: jekyll-theme-hacker        # Terminal-style green-on-black aesthetic
+# theme: jekyll-theme-dinky         # Retro and narrow layout; niche use case
+# theme: jekyll-theme-time-machine  # Minimalist with strong title emphasis; unique blog vibe
