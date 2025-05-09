@@ -14779,6 +14779,42 @@ P(A | B) = (P(B | A) · P(A)) / P(B)
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2>📊 Distributions Cheatsheet</h2><details>
+<summary><strong>📖 Click to Expand</strong></summary>
+
+\begin{array}{|c|c|c|c|c|}
+\hline
+\textbf{Distribution} & \textbf{Parameters} & \textbf{PDF / PMF} & \textbf{Support} & \textbf{Mean / Variance} \\
+\hline
+\text{Uniform} & a, b & f(x) = \frac{1}{b - a} & a \leq x \leq b & \frac{a + b}{2} \;/\; \frac{(b - a)^2}{12} \\
+\hline
+\text{Normal} & \mu, \sigma^2 & f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{- \frac{(x - \mu)^2}{2\sigma^2}} & -\infty < x < \infty & \mu \;/\; \sigma^2 \\
+\hline
+\text{Exponential} & \lambda & f(x) = \lambda e^{-\lambda x} & x \geq 0 & \frac{1}{\lambda} \;/\; \frac{1}{\lambda^2} \\
+\hline
+\text{Chi-Square} & k & f(x) = \frac{1}{2^{k/2} \Gamma(k/2)} x^{k/2 - 1} e^{-x/2} & x \geq 0 & k \;/\; 2k \\
+\hline
+\text{Student's t} & \nu & f(x) = \frac{\Gamma\left(\frac{\nu+1}{2}\right)}{\sqrt{\nu\pi} \, \Gamma\left(\frac{\nu}{2}\right)} \left(1 + \frac{x^2}{\nu}\right)^{-\frac{\nu+1}{2}} & -\infty < x < \infty & 0 \;/\; \frac{\nu}{\nu - 2} \ (\nu > 2) \\
+\hline
+\text{Poisson} & \lambda & P(X=k) = \frac{\lambda^k e^{-\lambda}}{k!} & k \in \mathbb{N} & \lambda \;/\; \lambda \\
+\hline
+\text{Bernoulli} & p & P(X=1)=p,\; P(X=0)=1-p & x \in \{0, 1\} & p \;/\; p(1 - p) \\
+\hline
+\text{Binomial} & n, p & P(X=k) = \binom{n}{k} p^k (1-p)^{n-k} & k = 0,1,\ldots,n & np \;/\; np(1 - p) \\
+\hline
+\end{array}
+
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <hr>
 <p><a href="#table-of-contents">Back to the top</a></p>
 
@@ -14993,6 +15029,17 @@ CDF values: [0.       0.010101 0.020202 0.030303 0.040404 0.050505 0.060606 0.07
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <details>
 <summary><strong>📖 Click to Expand</strong></summary>
 
@@ -15013,6 +15060,41 @@ CDF values: [0.       0.010101 0.020202 0.030303 0.040404 0.050505 0.060606 0.07
     </ul>
   </li>
 </ul>
+
+</details>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<details>
+<summary><strong>📖 Click to Expand</strong></summary>
+
+<p>In simple terms, <strong>moments</strong> describe the <em>shape</em> of a distribution beyond just averages and variability:</p>
+
+<ul>
+  <li><strong>1st Moment (Mean)</strong>: The average — where the data tends to center.</li>
+  <li><strong>2nd Moment (Variance)</strong>: How spread out the data is around the mean.</li>
+  <li><strong>3rd Moment (Skewness)</strong>: The tilt or asymmetry of the distribution.
+    <ul>
+      <li>Positive skew → long tail on the right</li>
+      <li>Negative skew → long tail on the left</li>
+    </ul>
+  </li>
+  <li><strong>4th Moment (Kurtosis)</strong>: How heavy or light the tails are.
+    <ul>
+      <li>High kurtosis → more outliers</li>
+      <li>Low kurtosis → flatter shape</li>
+    </ul>
+  </li>
+</ul>
+
+<p>These help us understand not just the <em>average behavior</em>, but the <em>risk and irregularities</em> in the data.</p>
 
 </details>
 </div>
@@ -15093,41 +15175,6 @@ CDF values: [0.       0.010101 0.020202 0.030303 0.040404 0.050505 0.060606 0.07
 
 </div>
 
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<details>
-<summary><strong>📖 Click to Expand</strong></summary>
-
-<p>In simple terms, <strong>moments</strong> describe the <em>shape</em> of a distribution beyond just averages and variability:</p>
-
-<ul>
-  <li><strong>1st Moment (Mean)</strong>: The average — where the data tends to center.</li>
-  <li><strong>2nd Moment (Variance)</strong>: How spread out the data is around the mean.</li>
-  <li><strong>3rd Moment (Skewness)</strong>: The tilt or asymmetry of the distribution.
-    <ul>
-      <li>Positive skew → long tail on the right</li>
-      <li>Negative skew → long tail on the left</li>
-    </ul>
-  </li>
-  <li><strong>4th Moment (Kurtosis)</strong>: How heavy or light the tails are.
-    <ul>
-      <li>High kurtosis → more outliers</li>
-      <li>Low kurtosis → flatter shape</li>
-    </ul>
-  </li>
-</ul>
-
-<p>These help us understand not just the <em>average behavior</em>, but the <em>risk and irregularities</em> in the data.</p>
-
-</details>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -16291,6 +16338,17 @@ CDF values: [9.407226e-06 7.608655e-02 1.463759e-01 2.113178e-01 2.713191e-01
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -16810,6 +16868,17 @@ CDF values: [2.297413e-04 8.230174e-03 2.600452e-02 5.143825e-02 8.271051e-02
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -17333,6 +17402,17 @@ CDF values: [4.638462e-09 9.219755e-09 1.808288e-08 3.499628e-08 6.683231e-08
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -17874,6 +17954,17 @@ CDF values: [0.049105 0.197097 0.420105 0.64414  0.812939 0.914684 0.965791 0.98
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -18386,6 +18477,17 @@ CDF values: [0.5026 1.    ]
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -18914,6 +19016,17 @@ CDF values: [9.970662e-04 1.092634e-02 5.542256e-02 1.735866e-01 3.795151e-01
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Summarize-Distribution">Summarize Distribution<a class="anchor-link" href="#Summarize-Distribution">&#182;</a></h4>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
