@@ -91,7 +91,7 @@ def print_config_summary(config):
     elif group_count == 'multi-sample':
         print("→ Comparing more than two independent groups.")
 
-    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+    # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
 
 
 
@@ -678,7 +678,7 @@ def infer_variance_equality(config, df):
         config['variance_equal'] = 'unequal'
 
     print(f"\n📦 Final Decision → config['variance_equal'] = `{config['variance_equal']}`")
-    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+    # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
     return config
 
 
@@ -754,7 +754,7 @@ def infer_parametric_flag(config):
         config['parametric'] = False
 
     print(f"\n📦 Final Decision → config['parametric'] = `{config['parametric']}`")
-    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+    # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
 
     return config
 
@@ -851,7 +851,7 @@ def determine_test_to_run(config):
         test_name = 'test_not_found'
 
     print(f"\n✅ Selected Test: `{test_name}`")
-    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+    # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
     return test_name
 
 def print_hypothesis_statement(config):
@@ -1197,7 +1197,7 @@ def run_hypothesis_test(config, df):
             print("\n💼 Business Insight")
             print("• No strong evidence of difference between the groups.")
 
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return result
 
     except Exception as e:
