@@ -203,156 +203,179 @@ def validate_config(config):
 # ==========================================================
 def generate_data_from_config(config, seed=1995):
     """
-    Generates synthetic data based on the specified hypothesis test configuration.
-    
-    This function:
-    - Supports one-sample and two-sample tests for continuous and binary outcomes
-    - Simulates data using configurable distributions (normal or non-normal)
-    - Controls variance structure across groups (equal or unequal)
-    - Applies treatment effect to simulate group differences
-    - Returns a DataFrame in the appropriate structure for the given test setup
-    
-    Parameters:
-    -----------
-    config : dict
-        Dictionary specifying the test scenario with keys:
-    
-        Core Structure:
-        - 'outcome_type' (e.g., 'continuous', 'binary')
-        - 'group_count' ('one-sample' or 'two-sample')
-        - 'group_relationship' ('independent' or 'paired')
-    
-        Simulation Controls:
-        - 'sample_size': int (per group)
-        - 'effect_size': float (simulated difference to inject)
-        - 'distribution': 'normal' or 'non-normal'
-            → Controls the data-generating distribution for continuous outcomes
-        - 'variance_equal': 'equal' or 'unequal'
-            → Controls whether group variances are the same (two-sample only)
-        - 'population_mean': float (only used for one-sample tests)
-        - 'baseline_mean': float (optional, default=5.0 for two-sample continuous)
-        - 'baseline_std': float (optional, default=1.0)
-        - 'baseline_rate': float (optional, default=0.4 for binary outcomes)
-    
-    seed : int, optional
-        Random seed for reproducibility.
-    
-    Returns:
-    --------
-    pd.DataFrame
-        A synthetic dataset compatible with the selected test type.
+    Generates synthetic data based on full config surface.
+
+    Supports:
+    - outcome_type: continuous, binary, categorical, count
+    - group_count: one-sample, two-sample, multi-sample
+    - group_relationship: independent, paired (paired only valid for two-sample)
+    - distribution: normal, non-normal (continuous only)
+    - variance_equal: equal, unequal (continuous independent only)
     """
 
-    # Use passed seed (NOT global)
+    import numpy as np
+    import pandas as pd
+
     np.random.seed(seed)
 
     outcome = config['outcome_type']
     group_count = config['group_count']
-    relationship = config.get('group_relationship')
+    relationship = config['group_relationship']
     size = config['sample_size']
-    effect = config.get('effect_size', 0)
-    pop_mean = config.get('population_mean', 0)
+    effect = config['effect_size']
+    distribution = config['distribution']
+    variance_equal = config['variance_equal']
 
-    # ---- DGP Controls (with safe defaults) ----
-    distribution = config.get('distribution') or 'normal'
-    variance_equal = config.get('variance_equal') or 'equal'
-
-    baseline_mean = config.get('baseline_mean', 5.0)
-    baseline_std = config.get('baseline_std', 1.0)
-    baseline_rate = config.get('baseline_rate', 0.4)
-
-    # -------------------------------------------
-    # Helper: Continuous Generator
-    # -------------------------------------------
-    def generate_continuous(mean, std, size):
-        if distribution == 'normal':
-            return np.random.normal(loc=mean, scale=std, size=size)
-        elif distribution == 'non-normal':
-            # Lognormal as generic skewed distribution
-            return np.random.lognormal(mean=np.log(max(mean, 0.1)), sigma=std, size=size)
-        else:
-            return np.random.normal(loc=mean, scale=std, size=size)
-
-    # -------------------------------------------
-    # 1️⃣ One-Sample
-    # -------------------------------------------
+    # ----------------------------
+    # ONE-SAMPLE
+    # ----------------------------
     if group_count == 'one-sample':
 
         if outcome == 'continuous':
-            std = baseline_std
-            values = generate_continuous(pop_mean + effect, std, size)
-            df = pd.DataFrame({'value': values})
+            if distribution == 'non-normal':
+                values = np.random.lognormal(mean=effect, sigma=0.5, size=size)
+            else:
+                values = np.random.normal(loc=effect, scale=1.0, size=size)
 
         elif outcome == 'binary':
-            prob = pop_mean + effect
-            values = np.random.binomial(1, prob, size=size)
-            df = pd.DataFrame({'value': values})
+            p = min(max(0.5 + effect, 0), 1)
+            values = np.random.binomial(1, p, size=size)
+
+        elif outcome == 'categorical':
+            categories = ['A', 'B', 'C']
+            probs = np.array([0.4, 0.4, 0.2])
+            values = np.random.choice(categories, size=size, p=probs)
+
+        elif outcome == 'count':
+            lam = max(1 + effect, 0.1)
+            values = np.random.poisson(lam=lam, size=size)
 
         else:
-            raise NotImplementedError("One-sample supports continuous/binary only.")
+            raise ValueError("Invalid outcome_type.")
 
-    # -------------------------------------------
-    # 2️⃣ Two-Sample
-    # -------------------------------------------
-    elif group_count == 'two-sample':
+        return pd.DataFrame({'value': values})
 
-        # --- Variance Control ---
-        if variance_equal == 'equal':
-            std_A = baseline_std
-            std_B = baseline_std
-        elif variance_equal == 'unequal':
-            std_A = baseline_std
-            std_B = baseline_std * 2
-        else:
-            std_A = std_B = baseline_std
+    # ----------------------------
+    # TWO-SAMPLE
+    # ----------------------------
+    if group_count == 'two-sample':
 
-        if relationship == 'independent':
+        if relationship == 'paired':
 
             if outcome == 'continuous':
-                A = generate_continuous(baseline_mean, std_A, size)
-                B = generate_continuous(baseline_mean + effect, std_B, size)
+                if distribution == 'non-normal':
+                    before = np.random.lognormal(mean=0, sigma=0.5, size=size)
+                else:
+                    before = np.random.normal(loc=0, scale=1.0, size=size)
+
+                after = before + effect
 
             elif outcome == 'binary':
-                A = np.random.binomial(1, baseline_rate, size=size)
-                B = np.random.binomial(1, baseline_rate + effect, size=size)
+                before = np.random.binomial(1, 0.4, size=size)
+                after = np.clip(before + np.random.binomial(1, effect, size=size), 0, 1)
 
             else:
-                raise NotImplementedError
+                raise ValueError("Paired supported only for continuous and binary.")
 
-            df = pd.DataFrame({
-                'group': ['A'] * size + ['B'] * size,
-                'value': np.concatenate([A, B])
-            })
-
-        elif relationship == 'paired':
-
-            if outcome == 'continuous':
-                before = generate_continuous(baseline_mean, baseline_std, size)
-                noise = generate_continuous(0, baseline_std * 0.5, size)
-                after = before + effect + noise
-
-            elif outcome == 'binary':
-                before = np.random.binomial(1, baseline_rate, size=size)
-                after = np.random.binomial(1, baseline_rate + effect, size=size)
-
-            else:
-                raise NotImplementedError
-
-            df = pd.DataFrame({
-                'user_id': np.arange(size),
+            return pd.DataFrame({
+                'id': np.arange(size),
                 'group_A': before,
                 'group_B': after
             })
 
-        else:
-            raise ValueError("Invalid group_relationship.")
+        # ------------------------
+        # Independent
+        # ------------------------
 
-    else:
-        raise NotImplementedError("Multi-sample not supported yet.")
+        groups = ['A', 'B']
+        data = []
 
-    return df
+        for i, g in enumerate(groups):
 
+            shift = effect if g == 'B' else 0
 
+            if outcome == 'continuous':
+                std = 1.0
+                if variance_equal == 'unequal' and g == 'B':
+                    std = 1.5
+
+                if distribution == 'non-normal':
+                    values = np.random.lognormal(mean=shift, sigma=0.5, size=size)
+                else:
+                    values = np.random.normal(loc=shift, scale=std, size=size)
+
+            elif outcome == 'binary':
+                p = min(max(0.4 + shift, 0), 1)
+                values = np.random.binomial(1, p, size=size)
+
+            elif outcome == 'categorical':
+                categories = ['A', 'B', 'C']
+                probs = np.array([0.4, 0.4, 0.2])
+                probs = probs + shift * np.array([0, 0.1, -0.1])
+                probs = probs / probs.sum()
+                values = np.random.choice(categories, size=size, p=probs)
+
+            elif outcome == 'count':
+                lam = max(3 + shift, 0.1)
+                values = np.random.poisson(lam=lam, size=size)
+
+            else:
+                raise ValueError("Invalid outcome_type.")
+
+            for v in values:
+                data.append((g, v))
+
+        return pd.DataFrame(data, columns=['group', 'value'])
+
+    # ----------------------------
+    # MULTI-SAMPLE (Independent Only)
+    # ----------------------------
+    if group_count == 'multi-sample':
+
+        if relationship == 'paired':
+            raise ValueError("Paired multi-sample not supported.")
+
+        groups = ['A', 'B', 'C']
+        data = []
+
+        for i, g in enumerate(groups):
+
+            shift = effect * i
+
+            if outcome == 'continuous':
+                std = 1.0
+                if variance_equal == 'unequal':
+                    std = 1.0 + 0.5 * i
+
+                if distribution == 'non-normal':
+                    values = np.random.lognormal(mean=shift, sigma=0.5, size=size)
+                else:
+                    values = np.random.normal(loc=shift, scale=std, size=size)
+
+            elif outcome == 'binary':
+                p = min(max(0.4 + shift, 0), 1)
+                values = np.random.binomial(1, p, size=size)
+
+            elif outcome == 'categorical':
+                categories = ['A', 'B', 'C']
+                probs = np.array([0.4, 0.4, 0.2])
+                probs = probs + shift * np.array([0, 0.1, -0.1])
+                probs = probs / probs.sum()
+                values = np.random.choice(categories, size=size, p=probs)
+
+            elif outcome == 'count':
+                lam = max(3 + shift, 0.1)
+                values = np.random.poisson(lam=lam, size=size)
+
+            else:
+                raise ValueError("Invalid outcome_type.")
+
+            for v in values:
+                data.append((g, v))
+
+        return pd.DataFrame(data, columns=['group', 'value'])
+
+    raise ValueError("Invalid group_count.")
 
 # ==========================================================
 # region EDA functions - Sample Size
