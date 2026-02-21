@@ -1,3 +1,7 @@
+# ==========================================================
+# region Setup
+# ==========================================================
+
 # Display Settings
 from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = "all"
@@ -24,8 +28,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 my_seed = 1995
 
-
-
+# ==========================================================
+# region Config Dictionary Functions
+# ==========================================================
 pretty_json = lambda d: display(HTML(f"""
 <pre style='font-size:14px; font-family:monospace;'>
 {json.dumps(d, indent=4)
@@ -34,7 +39,6 @@ pretty_json = lambda d: display(HTML(f"""
 </pre>
 """))
 # <hr style='border: none; height: 1px; background-color: #ddd;' />
-
 
 def print_config_summary(config):
     """
@@ -82,97 +86,6 @@ def print_config_summary(config):
         elif config['group_relationship'] == 'paired':
             print("→ Comparing paired measurements (before vs after, same users).")
     display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-
-
-
-def generate_data_from_config(config, seed=1995):
-    """
-    Generates synthetic data based on the specified hypothesis test configuration.
-
-    This function:
-    - Supports one-sample and two-sample tests for continuous and binary outcomes
-    - Simulates data using normal or binomial distributions depending on outcome type
-    - Applies treatment effect to simulate group differences
-    - Returns a DataFrame in the appropriate structure for the given test setup
-
-    Parameters:
-    -----------
-    config : dict
-        Dictionary specifying the test scenario with keys:
-        - 'outcome_type' (e.g., 'continuous', 'binary')
-        - 'group_count' ('one-sample' or 'two-sample')
-        - 'group_relationship' ('independent' or 'paired')
-        - 'sample_size': int (per group)
-        - 'effect_size': float (simulated difference to inject)
-        - 'population_mean': float (only used for one-sample tests)
-
-    seed : int, optional
-        Random seed for reproducibility (default = my_seed)
-
-    Returns:
-    --------
-    pd.DataFrame
-        A synthetic dataset compatible with the selected test type
-    """
-
-    np.random.seed(my_seed)
-    
-    outcome = config['outcome_type']
-    group_count = config['group_count']
-    relationship = config['group_relationship']
-    size = config['sample_size']
-    effect = config['effect_size']
-    pop_mean = config.get('population_mean', 0)
-
-    # 1️⃣ One-sample case
-    if group_count == 'one-sample':
-        if outcome == 'continuous':
-            values = np.random.normal(loc=pop_mean + effect, scale=1.0, size=size)
-            df = pd.DataFrame({'value': values})
-        elif outcome == 'binary':
-            prob = pop_mean + effect
-            values = np.random.binomial(1, prob, size=size)
-            df = pd.DataFrame({'value': values})
-        else:
-            raise NotImplementedError("One-sample generation only supports continuous/binary for now.")
-
-    # 2️⃣ Two-sample case
-    elif group_count == 'two-sample':
-        if relationship == 'independent':
-            if outcome == 'continuous':
-                A = np.random.normal(loc=5.0, scale=1.0, size=size)
-                B = np.random.normal(loc=5.0 + effect, scale=1.0, size=size)
-            elif outcome == 'binary':
-                A = np.random.binomial(1, 0.4, size=size)
-                B = np.random.binomial(1, 0.4 + effect, size=size)
-            else:
-                raise NotImplementedError
-            df = pd.DataFrame({
-                'group': ['A'] * size + ['B'] * size,
-                'value': np.concatenate([A, B])
-            })
-        
-        elif relationship == 'paired':
-            if outcome == 'continuous':
-                before = np.random.normal(loc=5.0, scale=1.0, size=size)
-                after = before + effect + np.random.normal(0, 0.5, size=size)
-            elif outcome == 'binary':
-                before = np.random.binomial(1, 0.4, size=size)
-                after = np.random.binomial(1, 0.4 + effect, size=size)
-            else:
-                raise NotImplementedError
-            df = pd.DataFrame({
-                'user_id': np.arange(size),
-                'group_A': before,
-                'group_B': after
-            })
-        else:
-            raise ValueError("Missing or invalid group relationship.")
-
-    else:
-        raise NotImplementedError("Multi-sample not supported yet.")
-
-    return df
 
 
 def validate_config(config):
@@ -282,6 +195,102 @@ def validate_config(config):
 
     print("✅ Config validated successfully.")
 
+# ==========================================================
+# region Synthetic Data Generation
+# ==========================================================
+def generate_data_from_config(config, seed=1995):
+    """
+    Generates synthetic data based on the specified hypothesis test configuration.
+
+    This function:
+    - Supports one-sample and two-sample tests for continuous and binary outcomes
+    - Simulates data using normal or binomial distributions depending on outcome type
+    - Applies treatment effect to simulate group differences
+    - Returns a DataFrame in the appropriate structure for the given test setup
+
+    Parameters:
+    -----------
+    config : dict
+        Dictionary specifying the test scenario with keys:
+        - 'outcome_type' (e.g., 'continuous', 'binary')
+        - 'group_count' ('one-sample' or 'two-sample')
+        - 'group_relationship' ('independent' or 'paired')
+        - 'sample_size': int (per group)
+        - 'effect_size': float (simulated difference to inject)
+        - 'population_mean': float (only used for one-sample tests)
+
+    seed : int, optional
+        Random seed for reproducibility (default = my_seed)
+
+    Returns:
+    --------
+    pd.DataFrame
+        A synthetic dataset compatible with the selected test type
+    """
+
+    np.random.seed(my_seed)
+    
+    outcome = config['outcome_type']
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    size = config['sample_size']
+    effect = config['effect_size']
+    pop_mean = config.get('population_mean', 0)
+
+    # 1️⃣ One-sample case
+    if group_count == 'one-sample':
+        if outcome == 'continuous':
+            values = np.random.normal(loc=pop_mean + effect, scale=1.0, size=size)
+            df = pd.DataFrame({'value': values})
+        elif outcome == 'binary':
+            prob = pop_mean + effect
+            values = np.random.binomial(1, prob, size=size)
+            df = pd.DataFrame({'value': values})
+        else:
+            raise NotImplementedError("One-sample generation only supports continuous/binary for now.")
+
+    # 2️⃣ Two-sample case
+    elif group_count == 'two-sample':
+        if relationship == 'independent':
+            if outcome == 'continuous':
+                A = np.random.normal(loc=5.0, scale=1.0, size=size)
+                B = np.random.normal(loc=5.0 + effect, scale=1.0, size=size)
+            elif outcome == 'binary':
+                A = np.random.binomial(1, 0.4, size=size)
+                B = np.random.binomial(1, 0.4 + effect, size=size)
+            else:
+                raise NotImplementedError
+            df = pd.DataFrame({
+                'group': ['A'] * size + ['B'] * size,
+                'value': np.concatenate([A, B])
+            })
+        
+        elif relationship == 'paired':
+            if outcome == 'continuous':
+                before = np.random.normal(loc=5.0, scale=1.0, size=size)
+                after = before + effect + np.random.normal(0, 0.5, size=size)
+            elif outcome == 'binary':
+                before = np.random.binomial(1, 0.4, size=size)
+                after = np.random.binomial(1, 0.4 + effect, size=size)
+            else:
+                raise NotImplementedError
+            df = pd.DataFrame({
+                'user_id': np.arange(size),
+                'group_A': before,
+                'group_B': after
+            })
+        else:
+            raise ValueError("Missing or invalid group relationship.")
+
+    else:
+        raise NotImplementedError("Multi-sample not supported yet.")
+
+    return df
+
+
+# ==========================================================
+# region EDA functions - Normality
+# ==========================================================
 def infer_distribution_from_data(config, df):
     """
     Infers whether the outcome variable follows a normal distribution using the Shapiro-Wilk test.
@@ -541,7 +550,9 @@ def qq_plot_normality(config, df):
     else:
         print("❌ Unsupported group count.")
 
-
+# ==========================================================
+# region EDA functions - Distribution
+# ==========================================================
 def visualize_distribution(config, df):
     """
     Shows distributions side-by-side for comparison.
@@ -603,6 +614,9 @@ def visualize_distribution(config, df):
     else:
         print("❌ Unsupported group count.")
 
+# ==========================================================
+# region EDA functions - Variance
+# ==========================================================
 def infer_variance_equality(config, df):
     """
     Infers whether the variances across two independent groups are equal using Levene's test.
@@ -711,8 +725,9 @@ def visualize_variance_boxplot_annotated(config, df):
     else:
         print("⚠️ This visualization currently supports two independent groups only.")
 
-
-
+# ==========================================================
+# region Test Determination Functions
+# ==========================================================
 def infer_parametric_flag(config):
 
     print("\n📏 Step: Decide Between Parametric vs Non-Parametric Approach")
@@ -832,8 +847,6 @@ def determine_test_to_run(config):
     display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
     return test_name
 
-
-
 def print_hypothesis_statement(config):
     """
     Prints the null and alternative hypothesis statements based on the selected test and tail type.
@@ -910,7 +923,9 @@ def print_hypothesis_statement(config):
 
     return H_0, H_a
 
-
+# ==========================================================
+# region Conduct Hypothesis Test
+# ==========================================================
 def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, df2=None):
 
     plt.figure(figsize=(10,6))
