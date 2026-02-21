@@ -398,8 +398,8 @@ def infer_distribution_from_data(config, df):
     if outcome != 'continuous':
         print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
         config['distribution'] = 'NA'
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config['distribution']
 
     print("📘 Checking if the outcome variable follows a normal distribution")
     print("   Using Shapiro-Wilk Test")
@@ -420,7 +420,7 @@ def infer_distribution_from_data(config, df):
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        return config['distribution']
 
     elif group_count == 'two-sample':
         print(f"• Two-sample ({relationship}) case → testing both groups")
@@ -435,7 +435,7 @@ def infer_distribution_from_data(config, df):
             print("❌ Invalid group relationship")
             config['distribution'] = 'NA'
             # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-            return config
+            return config['distribution']
 
         p1 = shapiro(a).pvalue
         p2 = shapiro(b).pvalue
@@ -457,13 +457,13 @@ def infer_distribution_from_data(config, df):
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        return config['distribution']
 
     else:
         print("❌ Unsupported group count for distribution check.")
         config['distribution'] = 'NA'
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        return config['distribution']
 
 
 def infer_distribution_from_data_ks(config, df):
@@ -500,7 +500,7 @@ def infer_distribution_from_data_ks(config, df):
     if outcome != 'continuous':
         print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
         config['distribution'] = 'NA'
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config
 
     print("📘 Checking if the outcome variable follows a normal distribution")
@@ -528,8 +528,8 @@ def infer_distribution_from_data_ks(config, df):
             config['distribution'] = 'non-normal'
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config['distribution']
 
     elif group_count == 'two-sample':
         print(f"• Two-sample ({relationship}) case → testing both groups")
@@ -543,8 +543,8 @@ def infer_distribution_from_data_ks(config, df):
         else:
             print("❌ Invalid group relationship")
             config['distribution'] = 'NA'
-            display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-            return config
+            # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+            return config['distribution']
 
         p1 = ks_normal_test(a)
         p2 = ks_normal_test(b)
@@ -565,14 +565,14 @@ def infer_distribution_from_data_ks(config, df):
             config['distribution'] = 'non-normal'
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config['distribution']
 
     else:
         print("❌ Unsupported group count for distribution check.")
         config['distribution'] = 'NA'
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config['distribution']
 
 
 def qq_plot_normality(config, df):
@@ -720,7 +720,7 @@ def infer_variance_equality(config, df):
     if config['group_count'] != 'two-sample' or config['group_relationship'] != 'independent':
         print("⚠️ Skipping variance check: Only applicable for two-sample independent tests.")
         config['variance_equal'] = 'NA'
-        return config
+        return config['variance_equal']
 
     print("📘 We're checking if the spread (variance) of the outcome variable is similar across groups A and B.")
     print("   This is important for choosing between a **pooled t-test** vs **Welch’s t-test**.")
@@ -747,7 +747,7 @@ def infer_variance_equality(config, df):
 
     print(f"\n📦 Final Decision → config['variance_equal'] = `{config['variance_equal']}`")
     # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-    return config
+    return config['variance_equal']
 
 
 def visualize_variance_boxplot_annotated(config, df):
@@ -810,7 +810,7 @@ def infer_parametric_flag(config):
     if config['outcome_type'] != 'continuous':
         print(f"⚠️ Skipping: Outcome type = `{config['outcome_type']}` → Parametric logic not applicable.")
         config['parametric'] = 'NA'
-        return config
+        return config['parametric']
 
     print(f"🔍 Distribution of outcome = `{config['distribution']}`")
 
@@ -824,7 +824,7 @@ def infer_parametric_flag(config):
     print(f"\n📦 Final Decision → config['parametric'] = `{config['parametric']}`")
     # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
 
-    return config
+    return config['parametric']
 
 def determine_test_to_run(config):
     """
@@ -1331,7 +1331,7 @@ def infer_sample_size_from_data(config, df):
 
     print(f"📊 Synced sample_size → {config['sample_size']}")
 
-    return config
+    return config['sample_size']
 
 
 
@@ -1369,7 +1369,7 @@ def infer_group_count_from_data(config, df):
         else:
             raise ValueError("Paired design requires 'group_A' and 'group_B' columns.")
 
-        return config
+        return config['group_count']
 
     # --------------------------
     # 2️⃣ Independent Structure
@@ -1377,7 +1377,7 @@ def infer_group_count_from_data(config, df):
     if 'group' not in df.columns:
         config['group_count'] = 'one-sample'
         print("📊 No 'group' column found → group_count = 'one-sample'")
-        return config
+        return config['group_count']
 
     n_groups = df['group'].nunique()
 
@@ -1392,7 +1392,7 @@ def infer_group_count_from_data(config, df):
 
     print(f"📊 Detected {n_groups} group(s) → group_count = '{config['group_count']}'")
 
-    return config
+    return config['group_count']
 
 
 def infer_outcome_type_from_data(config, df):
@@ -1460,4 +1460,4 @@ def infer_outcome_type_from_data(config, df):
 
     print(f"📊 Inferred outcome_type → '{inferred}'")
 
-    return config
+    return config['outcome_type']
