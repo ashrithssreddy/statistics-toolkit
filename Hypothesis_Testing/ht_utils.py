@@ -1,0 +1,1183 @@
+# Display Settings
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = "all"
+from IPython.display import display, HTML
+import warnings
+import json
+# %load_ext autoreload
+# %autoreload 2
+
+# Stats Libraries
+from statsmodels.stats.oneway import anova_oneway
+from statsmodels.stats.proportion import proportions_ztest
+import scipy.stats as stats
+from scipy.stats import (
+    t, norm, f, kstest,
+    ttest_1samp, ttest_rel, ttest_ind, wilcoxon, mannwhitneyu,
+    shapiro, chi2_contingency, f_oneway, kruskal, fisher_exact, levene
+)
+
+# Data Transformation Libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+my_seed = 1995
+
+
+
+pretty_json = lambda d: display(HTML(f"""
+<pre style='font-size:14px; font-family:monospace;'>
+{json.dumps(d, indent=4)
+   .replace(": null", ': <span style="color:crimson;"><b>null</b></span>')
+   .replace(': "NA"', ': <span style="color:crimson;"><b>"NA"</b></span>')}
+</pre>
+"""))
+# <hr style='border: none; height: 1px; background-color: #ddd;' />
+
+
+def print_config_summary(config):
+    """
+    Displays a structured summary of the test configuration with visual cues for missing or inferred values.
+
+    This function:
+    - Prints each key in the config with aligned formatting
+    - Highlights `None` or 'NA' values in red (terminal only)
+    - Provides a short inference summary based on group count and relationship
+
+    Parameters:
+    -----------
+    config : dict
+        Configuration dictionary containing test settings like outcome type, group relationship,
+        distribution, variance assumption, parametric flag, and alpha level
+
+    Returns:
+    --------
+    None
+        Prints the formatted configuration summary directly to output
+    """
+
+    def highlight(value):
+        if value in [None, 'NA'] or (isinstance(value, float) and np.isnan(value)):
+            return "\033[91mNone\033[0m"  # Red in terminal
+        return value
+
+    print("📋 Hypothesis Test Configuration Summary\n")
+
+    print(f"🔸 Outcome Type            : {highlight(config['outcome_type'])}")
+    print(f"🔸 Group Relationship      : {highlight(config['group_relationship'])}")
+    print(f"🔸 Group Count             : {highlight(config['group_count'])}")
+    print(f"🔸 Distribution of Outcome : {highlight(config['distribution'])}")
+    print(f"🔸 Equal Variance          : {highlight(config['variance_equal'])}")
+    print(f"🔸 Parametric Test         : {highlight(config['parametric'])}")
+    print(f"🔸 Tail Type               : {highlight(config['tail_type'])}")
+    print(f"🔸 Significance Level α    : {highlight(config['alpha'])}")
+
+    print("\n🧠 Inference Summary:")
+    if config['group_count'] == 'one-sample':
+        print("→ This is a one-sample test comparing a sample to a known value.")
+    elif config['group_count'] == 'two-sample':
+        if config['group_relationship'] == 'independent':
+            print("→ Comparing two independent groups (A vs B).")
+        elif config['group_relationship'] == 'paired':
+            print("→ Comparing paired measurements (before vs after, same users).")
+    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+
+
+
+def generate_data_from_config(config, seed=1995):
+    """
+    Generates synthetic data based on the specified hypothesis test configuration.
+
+    This function:
+    - Supports one-sample and two-sample tests for continuous and binary outcomes
+    - Simulates data using normal or binomial distributions depending on outcome type
+    - Applies treatment effect to simulate group differences
+    - Returns a DataFrame in the appropriate structure for the given test setup
+
+    Parameters:
+    -----------
+    config : dict
+        Dictionary specifying the test scenario with keys:
+        - 'outcome_type' (e.g., 'continuous', 'binary')
+        - 'group_count' ('one-sample' or 'two-sample')
+        - 'group_relationship' ('independent' or 'paired')
+        - 'sample_size': int (per group)
+        - 'effect_size': float (simulated difference to inject)
+        - 'population_mean': float (only used for one-sample tests)
+
+    seed : int, optional
+        Random seed for reproducibility (default = my_seed)
+
+    Returns:
+    --------
+    pd.DataFrame
+        A synthetic dataset compatible with the selected test type
+    """
+
+    np.random.seed(my_seed)
+    
+    outcome = config['outcome_type']
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    size = config['sample_size']
+    effect = config['effect_size']
+    pop_mean = config.get('population_mean', 0)
+
+    # 1️⃣ One-sample case
+    if group_count == 'one-sample':
+        if outcome == 'continuous':
+            values = np.random.normal(loc=pop_mean + effect, scale=1.0, size=size)
+            df = pd.DataFrame({'value': values})
+        elif outcome == 'binary':
+            prob = pop_mean + effect
+            values = np.random.binomial(1, prob, size=size)
+            df = pd.DataFrame({'value': values})
+        else:
+            raise NotImplementedError("One-sample generation only supports continuous/binary for now.")
+
+    # 2️⃣ Two-sample case
+    elif group_count == 'two-sample':
+        if relationship == 'independent':
+            if outcome == 'continuous':
+                A = np.random.normal(loc=5.0, scale=1.0, size=size)
+                B = np.random.normal(loc=5.0 + effect, scale=1.0, size=size)
+            elif outcome == 'binary':
+                A = np.random.binomial(1, 0.4, size=size)
+                B = np.random.binomial(1, 0.4 + effect, size=size)
+            else:
+                raise NotImplementedError
+            df = pd.DataFrame({
+                'group': ['A'] * size + ['B'] * size,
+                'value': np.concatenate([A, B])
+            })
+        
+        elif relationship == 'paired':
+            if outcome == 'continuous':
+                before = np.random.normal(loc=5.0, scale=1.0, size=size)
+                after = before + effect + np.random.normal(0, 0.5, size=size)
+            elif outcome == 'binary':
+                before = np.random.binomial(1, 0.4, size=size)
+                after = np.random.binomial(1, 0.4 + effect, size=size)
+            else:
+                raise NotImplementedError
+            df = pd.DataFrame({
+                'user_id': np.arange(size),
+                'group_A': before,
+                'group_B': after
+            })
+        else:
+            raise ValueError("Missing or invalid group relationship.")
+
+    else:
+        raise NotImplementedError("Multi-sample not supported yet.")
+
+    return df
+
+
+def validate_config(config):
+    """
+    Validates the hypothesis test configuration dictionary for completeness and logical consistency.
+    
+    Parameters:
+    -----------
+    config : dict
+        Configuration dictionary to validate.
+    
+    Returns:
+    --------
+    None
+        Raises ValueError if issues are found.
+    """
+    
+    required_keys = [
+        'outcome_type', 'group_relationship', 'group_count', 'distribution',
+        'variance_equal', 'tail_type', 'parametric', 'alpha', 'sample_size', 'effect_size'
+    ]
+
+    valid_outcome_types = ['continuous', 'binary', 'categorical', 'count']
+    valid_group_relationships = ['independent', 'paired']
+    valid_group_counts = ['one-sample', 'two-sample', 'multi-sample']
+    valid_distributions = ['normal', 'non-normal', 'NA', None]
+    valid_variance_flags = ['equal', 'unequal', 'NA', None]
+    valid_tail_types = ['one-tailed', 'two-tailed']
+    valid_parametric_flags = [True, False, 'NA', None]
+
+    # 1. Missing keys
+    for key in required_keys:
+        if key not in config:
+            raise ValueError(f"❌ Missing key in config: '{key}'")
+
+    # 2. Check values are within known sets
+    if config['outcome_type'] not in valid_outcome_types:
+        raise ValueError(f"❌ Invalid outcome_type: {config['outcome_type']}")
+
+    if config['group_relationship'] not in valid_group_relationships and config['group_count'] != 'one-sample':
+        raise ValueError(f"❌ Invalid group_relationship: {config['group_relationship']}")
+
+    if config['group_count'] not in valid_group_counts:
+        raise ValueError(f"❌ Invalid group_count: {config['group_count']}")
+
+    if config['distribution'] not in valid_distributions:
+        raise ValueError(f"❌ Invalid distribution: {config['distribution']}")
+
+    if config['variance_equal'] not in valid_variance_flags:
+        raise ValueError(f"❌ Invalid variance_equal: {config['variance_equal']}")
+
+    if config['tail_type'] not in valid_tail_types:
+        raise ValueError(f"❌ Invalid tail_type: {config['tail_type']}")
+
+    if config['parametric'] not in valid_parametric_flags:
+        raise ValueError(f"❌ Invalid parametric flag: {config['parametric']}")
+
+    if not (0 < config['alpha'] < 1):
+        raise ValueError("❌ Alpha level should be between 0 and 1.")
+
+    if config['sample_size'] <= 0:
+        raise ValueError("❌ Sample size must be positive.")
+
+    # 3. Logical combination checks
+    # One-sample + non-independent → override to independent
+    if config['group_count'] == 'one-sample' and config['group_relationship'] != 'independent':
+        print("⚠️ Overriding group_relationship to 'independent' for one-sample test.")
+        config['group_relationship'] = 'independent'
+
+    # Multi-sample + paired → not supported by this module
+    if config['group_count'] == 'multi-sample' and config['group_relationship'] == 'paired':
+        raise ValueError("❌ Paired relationship not supported for multi-sample tests.")
+
+    # One-sample + missing population_mean → invalid config
+    if config['group_count'] == 'one-sample' and 'population_mean' not in config:
+        raise ValueError("❌ One-sample tests require `population_mean` to be specified.")
+    
+    # Paired + categorical (not supported by this module)
+    if config['outcome_type'] == 'categorical' and config['group_relationship'] == 'paired':
+        raise ValueError("❌ Paired tests are not supported for categorical outcomes in this module.")
+
+    # Binary outcome + parametric + small n → warn about z-test validity
+    if config['outcome_type'] == 'binary' and config['parametric'] is True:
+        if config['sample_size'] < 30:
+            print("⚠️ Sample size < 30 → z-test assumptions (np > 5) may be violated. Consider Fisher’s Exact.")
+
+    # Parametric test selected, but distribution is missing
+    if config['parametric'] is True and config['distribution'] in ['NA', None]:
+        raise ValueError("❌ Parametric test requested, but distribution is not confirmed as normal.")
+
+    # Count outcome + one-sample → not supported
+    if config['outcome_type'] == 'count' and config['group_count'] == 'one-sample':
+        raise ValueError("🔒 One-sample tests for count data are not supported by this module.")
+
+    # Effect size unusually large or small (soft validation)
+    if config['effect_size'] < 0 or config['effect_size'] > 2:
+        print("⚠️ Effect size is unusually extreme. Are you simulating a realistic scenario?")
+
+    # Optional: variance check mismatch
+    if config['variance_equal'] not in ['equal', 'unequal', 'NA', None]:
+        raise ValueError(f"❌ Invalid variance_equal flag: {config['variance_equal']}")
+
+    # Optional: group relationship irrelevant in one-sample, but present
+    if config['group_count'] == 'one-sample' and config.get('group_relationship') != 'independent':
+        print("⚠️ One-sample tests don’t require `group_relationship`. Defaulting to 'independent'.")
+        config['group_relationship'] = 'independent'
+
+    print("✅ Config validated successfully.")
+
+def infer_distribution_from_data(config, df):
+    """
+    Infers whether the outcome variable follows a normal distribution using the Shapiro-Wilk test.
+
+    This function:
+    - Checks if the outcome type is continuous (required for normality testing)
+    - Applies Shapiro-Wilk test to one or both groups depending on group structure
+    - Updates the 'distribution' key in the config as 'normal', 'non-normal', or 'NA'
+    - Logs interpretation and decision in a reader-friendly format
+
+    Parameters:
+    -----------
+    config : dict
+        Configuration dictionary containing 'outcome_type', 'group_count', and 'group_relationship'
+    df : pandas.DataFrame
+        Input dataframe containing outcome values and group assignments
+
+    Returns:
+    --------
+    dict
+        Updated config dictionary with the 'distribution' key set
+    """
+
+    print("\n🔍 Step: Infer Distribution of Outcome Variable")
+
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    outcome = config['outcome_type']
+
+    if outcome != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
+        config['distribution'] = 'NA'
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+    print("📘 Checking if the outcome variable follows a normal distribution")
+    print("   Using Shapiro-Wilk Test")
+    print("   H₀: Data comes from a normal distribution")
+    print("   H₁: Data does NOT come from a normal distribution\n")
+
+    if group_count == 'one-sample':
+        print("• One-sample case → testing entire column")
+        stat, p = shapiro(df['value'])
+        print(f"• Shapiro-Wilk p-value = {p:.4f}")
+
+        if p > 0.05:
+            print("✅ Fail to reject H₀ → Data is likely a normal distribution")
+            config['distribution'] = 'normal'
+        else:
+            print("⚠️ Reject H₀ → Data is likely a non-normal distribution")
+            config['distribution'] = 'non-normal'
+
+        print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+    elif group_count == 'two-sample':
+        print(f"• Two-sample ({relationship}) case → testing both groups")
+
+        if relationship == 'independent':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+        elif relationship == 'paired':
+            a = df['group_A']
+            b = df['group_B']
+        else:
+            print("❌ Invalid group relationship")
+            config['distribution'] = 'NA'
+            display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+            return config
+
+        p1 = shapiro(a).pvalue
+        p2 = shapiro(b).pvalue
+
+        print(f"• Group A → Shapiro-Wilk p = {p1:.4f} →", 
+              "Fail to reject H₀ ✅ (likely a normal distribution)" if p1 > 0.05 
+              else "Reject H₀ ⚠️ (likely a non-normal distribution)")
+
+        print(f"• Group B → Shapiro-Wilk p = {p2:.4f} →", 
+              "Fail to reject H₀ ✅ (likely a normal distribution)" if p2 > 0.05 
+              else "Reject H₀ ⚠️ (likely a non-normal distribution)")
+
+        if p1 > 0.05 and p2 > 0.05:
+            print("✅ Both groups are likely drawn from normal distributions")
+            config['distribution'] = 'normal'
+        else:
+            print("⚠️ At least one group does not appear normally distributed")
+            config['distribution'] = 'non-normal'
+
+        print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+    else:
+        print("❌ Unsupported group count for distribution check.")
+        config['distribution'] = 'NA'
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+
+def infer_distribution_from_data_ks(config, df):
+    """
+    Infers whether the outcome variable follows a normal distribution using the
+    Kolmogorov-Smirnov (KS) test against a fitted normal distribution.
+
+    This function:
+    - Checks if the outcome type is continuous (required for normality testing)
+    - Fits a normal distribution using sample mean and std
+    - Applies KS test to one or both groups depending on structure
+    - Updates config['distribution'] as 'normal', 'non-normal', or 'NA'
+    - Logs interpretation clearly for readability
+
+    Parameters:
+    -----------
+    config : dict
+        Configuration dictionary containing 'outcome_type', 'group_count', and 'group_relationship'
+    df : pandas.DataFrame
+        Input dataframe containing outcome values and group assignments
+
+    Returns:
+    --------
+    dict
+        Updated config dictionary with the 'distribution' key set
+    """
+
+    print("\n🔍 Step: Infer Distribution of Outcome Variable (KS Test)")
+
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    outcome = config['outcome_type']
+
+    if outcome != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
+        config['distribution'] = 'NA'
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+    print("📘 Checking if the outcome variable follows a normal distribution")
+    print("   Using Kolmogorov-Smirnov Test (against fitted normal)")
+    print("   H₀: Data comes from a normal distribution")
+    print("   H₁: Data does NOT come from a normal distribution\n")
+
+    def ks_normal_test(sample):
+        mean = np.mean(sample)
+        std = np.std(sample, ddof=1)
+        stat, p = kstest(sample, 'norm', args=(mean, std))
+        return p
+
+    if group_count == 'one-sample':
+        print("• One-sample case → testing entire column")
+
+        p = ks_normal_test(df['value'])
+        print(f"• KS p-value = {p:.4f}")
+
+        if p > 0.05:
+            print("✅ Fail to reject H₀ → Data is likely a normal distribution")
+            config['distribution'] = 'normal'
+        else:
+            print("⚠️ Reject H₀ → Data is likely a non-normal distribution")
+            config['distribution'] = 'non-normal'
+
+        print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+    elif group_count == 'two-sample':
+        print(f"• Two-sample ({relationship}) case → testing both groups")
+
+        if relationship == 'independent':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+        elif relationship == 'paired':
+            a = df['group_A']
+            b = df['group_B']
+        else:
+            print("❌ Invalid group relationship")
+            config['distribution'] = 'NA'
+            display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+            return config
+
+        p1 = ks_normal_test(a)
+        p2 = ks_normal_test(b)
+
+        print(f"• Group A → KS p = {p1:.4f} →",
+              "Fail to reject H₀ ✅ (likely normal)" if p1 > 0.05
+              else "Reject H₀ ⚠️ (likely non-normal)")
+
+        print(f"• Group B → KS p = {p2:.4f} →",
+              "Fail to reject H₀ ✅ (likely normal)" if p2 > 0.05
+              else "Reject H₀ ⚠️ (likely non-normal)")
+
+        if p1 > 0.05 and p2 > 0.05:
+            print("✅ Both groups are likely drawn from normal distributions")
+            config['distribution'] = 'normal'
+        else:
+            print("⚠️ At least one group does not appear normally distributed")
+            config['distribution'] = 'non-normal'
+
+        print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+    else:
+        print("❌ Unsupported group count for distribution check.")
+        config['distribution'] = 'NA'
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config
+
+
+def qq_plot_normality(config, df):
+    """
+    Generates Q-Q plots to visually assess normality.
+
+    - For one-sample: plots entire dataset
+    - For two-sample: plots each group separately
+    """
+
+    print("\n📊 Step: Visual Normality Check using Q-Q Plot")
+    print("If points fall approximately along the straight line → data is likely normal.\n")
+
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    outcome = config['outcome_type']
+
+    if outcome != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome}` → Q-Q plot not applicable.")
+        return
+
+    if group_count == 'one-sample':
+        plt.figure(figsize=(6, 6))
+        stats.probplot(df['value'], dist="norm", plot=plt)
+        plt.title("Q-Q Plot (One-Sample)")
+        plt.show()
+
+    elif group_count == 'two-sample':
+        if relationship == 'independent':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+        elif relationship == 'paired':
+            a = df['group_A']
+            b = df['group_B']
+        else:
+            print("❌ Invalid group relationship.")
+            return
+
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+        stats.probplot(a, dist="norm", plot=axes[0])
+        axes[0].set_title("Q-Q Plot: Group A")
+
+        stats.probplot(b, dist="norm", plot=axes[1])
+        axes[1].set_title("Q-Q Plot: Group B")
+
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        print("❌ Unsupported group count.")
+
+
+def visualize_distribution(config, df):
+    """
+    Shows distributions side-by-side for comparison.
+    """
+
+    print("\n📊 Step: Visual Distribution Overview (Side-by-Side)\n")
+
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    outcome = config['outcome_type']
+
+    if outcome != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome}` → Not applicable.")
+        return
+
+    def plot_on_axis(sample, ax, title):
+        mean = np.mean(sample)
+        std = np.std(sample, ddof=1)
+        median = np.median(sample)
+
+        sns.histplot(sample, kde=True, stat='density', bins=20, ax=ax)
+
+        x = np.linspace(min(sample), max(sample), 200)
+        ax.plot(x, norm.pdf(x, mean, std), linestyle='--')
+
+        ax.axvline(mean, linestyle='-', label='Mean')
+        ax.axvline(median, linestyle=':', label='Median')
+
+        ax.set_title(title)
+        ax.legend()
+
+    if group_count == 'one-sample':
+        fig, ax = plt.subplots(1, 1, figsize=(6, 5))
+        plot_on_axis(df['value'], ax, "Distribution")
+        plt.tight_layout()
+        plt.show()
+
+    elif group_count == 'two-sample':
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+        if relationship == 'independent':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+
+        elif relationship == 'paired':
+            a = df['group_A']
+            b = df['group_B']
+
+        else:
+            print("❌ Invalid group relationship.")
+            return
+
+        plot_on_axis(a, axes[0], "Group A")
+        plot_on_axis(b, axes[1], "Group B")
+
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        print("❌ Unsupported group count.")
+
+def infer_variance_equality(config, df):
+    """
+    Infers whether the variances across two independent groups are equal using Levene's test.
+
+    This function:
+    - Checks if the variance assumption is relevant based on config
+    - Runs Levene’s test to compare the variances of Group A and Group B
+    - Updates the 'variance_equal' key in the config as 'equal', 'unequal', or 'NA'
+    - Logs interpretation of the test result
+
+    Parameters:
+    -----------
+    config : dict
+        Configuration dictionary containing 'group_count' and 'group_relationship'
+    df : pandas.DataFrame
+        Input dataframe containing 'group' and 'value' columns
+
+    Returns:
+    --------
+    dict
+        Updated config dictionary with the 'variance_equal' key set
+    """
+    print("\n📏 **Step: Infer Equality of Variance Across Groups**")
+
+    # Skip if not applicable
+    if config['group_count'] != 'two-sample' or config['group_relationship'] != 'independent':
+        print("⚠️ Skipping variance check: Only applicable for two-sample independent tests.")
+        config['variance_equal'] = 'NA'
+        return config
+
+    print("📘 We're checking if the spread (variance) of the outcome variable is similar across groups A and B.")
+    print("   This is important for choosing between a **pooled t-test** vs **Welch’s t-test**.")
+    print("🔬 Test Used: Levene’s Test for Equal Variance")
+    print("   H₀: Variance in Group A = Variance in Group B")
+    print("   H₁: Variances are different")
+
+    # Extract data
+    a = df[df['group'] == 'A']['value']
+    b = df[df['group'] == 'B']['value']
+
+    # Run Levene's test
+    stat, p = levene(a, b)
+    print(f"\n📊 Levene’s Test Result:")
+    print(f"• Test Statistic = {stat:.4f}")
+    print(f"• p-value        = {p:.4f}")
+
+    if p > 0.05:
+        print("✅ Fail to reject H₀ → Variances appear equal across groups")
+        config['variance_equal'] = 'equal'
+    else:
+        print("⚠️ Reject H₀ → Variances appear unequal")
+        config['variance_equal'] = 'unequal'
+
+    print(f"\n📦 Final Decision → config['variance_equal'] = `{config['variance_equal']}`")
+    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+    return config
+
+
+def visualize_variance_boxplot_annotated(config, df):
+    print("\n📊 Visual Check: Spread Comparison Between Groups")
+    print("   (Spread = how much values vary within each group)\n")
+
+    if config['group_count'] == 'two-sample' and config['group_relationship'] == 'independent':
+
+        summary = df.groupby('group')['value'].agg(['std', 'var', 'median', 
+                                                    lambda x: np.percentile(x, 75) - np.percentile(x, 25)])
+        summary.columns = ['std_dev', 'variance', 'median', 'IQR']
+
+        print("📋 Spread Summary:")
+        display(summary)
+
+        plt.figure(figsize=(8,6))
+        ax = sns.boxplot(x='group', y='value', data=df)
+
+        # Annotate each group
+        for i, group in enumerate(summary.index):
+            std = summary.loc[group, 'std_dev']
+            iqr = summary.loc[group, 'IQR']
+            ax.text(i, 
+                    df['value'].max()*0.95,
+                    f"Std Dev: {std:.2f}\nIQR: {iqr:.2f}",
+                    horizontalalignment='center',
+                    fontsize=10,
+                    bbox=dict(facecolor='white', alpha=0.6))
+
+        plt.title("Comparison of Value Spread by Group")
+        plt.ylabel("Outcome Value")
+        plt.xlabel("Group")
+        plt.show()
+
+        # Business interpretation
+        std_values = summary['std_dev']
+        ratio = std_values.max() / std_values.min()
+
+        print("\n🧠 Business Interpretation:")
+        if ratio < 1.2:
+            print("✅ The spread of values across groups is very similar.")
+            print("   Variability does not appear meaningfully different.")
+        elif ratio < 1.5:
+            print("⚠️ One group shows moderately higher variability.")
+            print("   Worth confirming with a statistical variance test.")
+        else:
+            print("🚨 One group shows substantially higher variability.")
+            print("   Statistical tests assuming equal variance may not be appropriate.")
+
+    else:
+        print("⚠️ This visualization currently supports two independent groups only.")
+
+
+
+def infer_parametric_flag(config):
+
+    print("\n📏 Step: Decide Between Parametric vs Non-Parametric Approach")
+
+    if config['outcome_type'] != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{config['outcome_type']}` → Parametric logic not applicable.")
+        config['parametric'] = 'NA'
+        return config
+
+    print(f"🔍 Distribution of outcome = `{config['distribution']}`")
+
+    if config['distribution'] == 'normal':
+        print("✅ Normal distribution → Proceeding with a parametric test")
+        config['parametric'] = True
+    else:
+        print("⚠️ Non-normal distribution → Using non-parametric alternative")
+        config['parametric'] = False
+
+    print(f"\n📦 Final Decision → config['parametric'] = `{config['parametric']}`")
+    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+
+    return config
+
+def determine_test_to_run(config):
+    """
+    Determines the appropriate statistical test based on the provided configuration.
+
+    This function:
+    - Maps outcome type, group count, group relationship, distribution, and parametric flags
+    to the correct hypothesis test
+    - Prints the reasoning and selected test
+    - Returns a string identifier for the test to be used
+
+    Parameters:
+    -----------
+    config : dict
+        A dictionary containing keys like 'outcome_type', 'group_count', 'group_relationship',
+        'distribution', 'variance_equal', and 'parametric'.
+
+    Returns:
+    --------
+    str
+        A string representing the selected test name (e.g., 'two_sample_ttest_welch', 'mcnemar', etc.)
+    """
+
+    print("\n🧭 Step: Determine Which Statistical Test to Use")
+    
+    outcome = config['outcome_type']
+    group_rel = config['group_relationship']
+    group_count = config['group_count']
+    dist = config['distribution']
+    equal_var = config['variance_equal']
+    parametric = config['parametric']
+
+    print("📦 Inputs:")
+    print(f"• Outcome Type         = `{outcome}`")
+    print(f"• Group Count          = `{group_count}`")
+    print(f"• Group Relationship   = `{group_rel}`")
+    print(f"• Distribution         = `{dist}`")
+    print(f"• Equal Variance       = `{equal_var}`")
+    print(f"• Parametric Flag      = `{parametric}`")
+
+    print("\n🔍 Matching against known test cases...")
+
+    # One-sample
+    if group_count == 'one-sample':
+        if outcome == 'continuous':
+            test_name = 'one_sample_ttest' if dist == 'normal' else 'one_sample_wilcoxon'
+        elif outcome == 'binary':
+            test_name = 'one_proportion_ztest'
+        else:
+            test_name = 'test_not_found'
+
+    # Two-sample independent
+    elif group_count == 'two-sample' and group_rel == 'independent':
+        if outcome == 'continuous':
+            if parametric:
+                test_name = 'two_sample_ttest_pooled' if equal_var == 'equal' else 'two_sample_ttest_welch'
+            else:
+                test_name = 'mann_whitney_u'
+        elif outcome == 'binary':
+            test_name = 'two_proportion_ztest'
+        elif outcome == 'categorical':
+            test_name = 'chi_square'
+        else:
+            test_name = 'test_not_found'
+
+    # Two-sample paired
+    elif group_count == 'two-sample' and group_rel == 'paired':
+        if outcome == 'continuous':
+            test_name = 'paired_ttest' if parametric else 'wilcoxon_signed_rank'
+        elif outcome == 'binary':
+            test_name = 'mcnemar'
+        else:
+            test_name = 'test_not_found'
+
+    # Multi-group
+    elif group_count == 'multi-sample':
+        if outcome == 'continuous':
+            if parametric:
+                test_name = 'anova' if equal_var == 'equal' else 'welch_anova'
+            else:
+                test_name = 'kruskal_wallis'
+        elif outcome == 'categorical':
+            test_name = 'chi_square'
+        else:
+            test_name = 'test_not_found'
+    
+    # Count data
+    elif outcome == 'count':
+        test_name = 'poisson_test'
+
+    else:
+        test_name = 'test_not_found'
+
+    print(f"\n✅ Selected Test: `{test_name}`")
+    display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+    return test_name
+
+
+
+def print_hypothesis_statement(config):
+    """
+    Prints the null and alternative hypothesis statements based on the selected test and tail type.
+
+    This function:
+    - Uses the provided config to determine which statistical test applies
+    - Displays clear H₀ and H₁ statements tailored to the test type and direction (one-tailed vs two-tailed)
+    - Aims to bridge technical and business understanding of what is being tested
+
+    Parameters:
+    -----------
+    config : dict
+        Configuration dictionary containing at least 'tail_type' and the required fields to determine the test
+
+    Returns:
+    --------
+    None
+        Prints formatted hypothesis statements directly to output
+    """
+
+    print("\n🧠 Step: Generate Hypothesis Statement")
+
+    tail = config['tail_type']
+    test_name = config['test_name']
+    print(f"🔍 Selected Test        : `{test_name}`")
+    print(f"🔍 Tail Type            : `{tail}`\n")
+
+    H_0 = None
+    H_a = None
+
+    if test_name == 'one_sample_ttest':
+        H_0 = "The sample mean equals the reference value."
+        H_a = "The sample mean is different from the reference." if tail == 'two-tailed' else "The sample mean is greater/less than the reference."
+
+    elif test_name == 'one_proportion_ztest':
+        H_0 = "The sample proportion equals the baseline rate."
+        H_a = "The sample proportion is different from the baseline." if tail == 'two-tailed' else "The sample proportion is greater/less than the baseline."
+
+    elif test_name in ['two_sample_ttest_pooled', 'two_sample_ttest_welch', 'mann_whitney_u', 'two_proportion_ztest']:
+        H_0 = "The outcome (mean/proportion) is the same across groups A and B."
+        H_a = "The outcome differs between groups." if tail == 'two-tailed' else "Group B is greater/less than Group A."
+
+    elif test_name in ['paired_ttest', 'wilcoxon_signed_rank']:
+        H_0 = "The average difference between paired values (before vs after) is zero."
+        H_a = "There is a difference in paired values." if tail == 'two-tailed' else "After is greater/less than before."
+
+    elif test_name == 'mcnemar':
+        H_0 = "Proportion of success is the same before and after."
+        H_a = "Proportion of success changed after treatment."
+
+    elif test_name in ['anova', 'kruskal_wallis']:
+        H_0 = "All group means (or distributions) are equal."
+        H_a = "At least one group differs."
+
+    elif test_name == 'poisson_test':
+        H_0 = "The count rate (λ) is the same across groups."
+        H_a = "Count rate differs between groups."
+
+    elif test_name == 'bayesian_ab':
+        H_0 = "Posterior probability that Group B is not better than Group A."
+        H_a = "Posterior probability that Group B is better than Group A."
+
+    elif test_name == 'permutation_test':
+        H_0 = "Observed difference is due to chance."
+        H_a = "Observed difference is unlikely under random shuffling."
+
+    else:
+        H_0 = f"Unable to generate hypothesis statement for test: `{test_name}`"
+        H_a = ""
+
+    print("📜 Hypothesis Statement:")
+    print(f"• H₀: {H_0}")
+    print(f"• H₁: {H_a}")
+
+    return H_0, H_a
+
+
+def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, df2=None):
+
+    plt.figure(figsize=(10,6))
+
+    # ----- Select Distribution -----
+    if test_label == 't-statistic':
+        df_used = df1 if df1 else 30
+        dist = t(df=df_used)
+        x = np.linspace(-4, 4, 400)
+        y = dist.pdf(x)
+        critical = dist.ppf(1 - alpha/2)
+
+    elif test_label == 'z-statistic':
+        dist = norm()
+        x = np.linspace(-4, 4, 400)
+        y = dist.pdf(x)
+        critical = dist.ppf(1 - alpha/2)
+
+    elif test_label == 'F-statistic':
+        df1_used = df1 if df1 else 2
+        df2_used = df2 if df2 else 30
+        dist = f(df1_used, df2_used)
+        x = np.linspace(0, 5, 400)
+        y = dist.pdf(x)
+        critical = dist.ppf(1 - alpha)
+
+    else:
+        print("Visualization not supported.")
+        return
+
+    # ----- Plot Curve -----
+    plt.plot(x, y)
+
+    # ----- Shade Rejection Region -----
+    if test_label != 'F-statistic':
+        plt.fill_between(x, y, where=(x <= -critical), alpha=0.3)
+        plt.fill_between(x, y, where=(x >= critical), alpha=0.3)
+    else:
+        plt.fill_between(x, y, where=(x >= critical), alpha=0.3)
+
+    # ----- Observed Statistic -----
+    plt.axvline(stat, linewidth=3)
+    plt.axvline(critical, linestyle='--')
+    if test_label != 'F-statistic':
+        plt.axvline(-critical, linestyle='--')
+
+    # ----- Business Annotations -----
+    plt.text(stat, max(y)*0.6, f"Observed {test_label}\n({stat:.2f})",
+             ha='right' if stat < 0 else 'left')
+
+    plt.text(critical, max(y)*0.1,
+             f"Critical cutoff\n(α = {alpha})",
+             ha='left')
+
+    if test_label != 'F-statistic':
+        plt.text(-critical, max(y)*0.1,
+                 f"Critical cutoff\n(α = {alpha})",
+                 ha='right')
+
+    if abs(stat) > critical:
+        decision_text = "Result falls inside rejection region → Reject H₀"
+    else:
+        decision_text = "Result falls inside safe region → Fail to Reject H₀"
+
+    plt.text(0, max(y)*0.85, decision_text, ha='center')
+
+    plt.title(f"{test_label} — What This Decision Means")
+    plt.xlabel("Test Statistic Value")
+    plt.ylabel("Probability Density")
+
+    plt.show()
+
+
+def run_hypothesis_test(config, df):
+    """
+    Runs the appropriate hypothesis test based on the provided configuration and dataset.
+
+    This function:
+    - Identifies the correct test using `determine_test_to_run(config)`
+    - Executes the corresponding statistical test (e.g., t-test, z-test, Mann-Whitney, ANOVA, etc.)
+    - Prints a guided explanation of inputs, selected test, test statistic, p-value, and business interpretation
+    - Returns a result dictionary with test details and significance flag
+
+    Parameters:
+    -----------
+    config : dict
+        Dictionary specifying test configuration (e.g., outcome_type, group_relationship, parametric, etc.)
+    df : pandas.DataFrame
+        Input dataset containing outcome values (and group labels if applicable)
+
+    Returns:
+    --------
+    dict
+        {
+            'test': str,              # Name of the statistical test run
+            'statistic': float,       # Test statistic
+            'p_value': float,         # P-value of the test
+            'significant': bool,      # True if p < alpha
+            'alpha': float            # Significance threshold used
+        }
+    """
+    # Re-print hypothesis for clarity before execution
+    print("📜 Hypothesis Being Tested:")
+    print(f"• H₀: {config['H_0']}")
+    print(f"• H₁: {config['H_a']}\n")
+    
+    print("\n🧪 Step: Run Hypothesis Test")
+
+    alpha = config.get('alpha', 0.05)
+    test_name = config['test_name']
+
+    test_statistic_map = {
+        'one_sample_ttest': 't-statistic',
+        'two_sample_ttest_pooled': 't-statistic',
+        'two_sample_ttest_welch': 't-statistic',
+        'paired_ttest': 't-statistic',
+        'anova': 'F-statistic',
+        'welch_anova': 'F-statistic',
+        'mann_whitney_u': 'U-statistic',
+        'wilcoxon_signed_rank': 'W-statistic',
+        'kruskal_wallis': 'H-statistic',
+        'chi_square': 'Chi-square statistic',
+        'mcnemar': 'Chi-square statistic',
+        'one_proportion_ztest': 'z-statistic',
+        'two_proportion_ztest': 'z-statistic'
+    }
+    
+    test_statistic_label = test_statistic_map.get(test_name, 'Test statistic')
+
+    print(f"✅ Selected Test        : `{test_name}`")
+    print(f"🔍 Significance Threshold (α) : {alpha:.2f}\n")
+
+    result = {
+        'test': test_name,
+        'statistic': None,
+        'p_value': None,
+        'significant': None,
+        'alpha': alpha
+    }
+
+    try:
+        print("🚀 Executing statistical test...")
+
+        # --- Run appropriate test ---
+        if test_name == 'one_sample_ttest':
+            stat, p = ttest_1samp(df['value'], config['population_mean'])
+
+        elif test_name == 'one_sample_wilcoxon':
+            stat, p = wilcoxon(df['value'] - config['population_mean'])
+
+        elif test_name == 'one_proportion_ztest':
+            x = np.sum(df['value'])
+            n = len(df)
+            stat, p = proportions_ztest(x, n, value=config['population_mean'])
+
+        elif test_name == 'two_sample_ttest_pooled':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+            stat, p = ttest_ind(a, b, equal_var=True)
+
+        elif test_name == 'two_sample_ttest_welch':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+            stat, p = ttest_ind(a, b, equal_var=False)
+
+        elif test_name == 'mann_whitney_u':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+            stat, p = mannwhitneyu(a, b, alternative='two-sided')
+
+        elif test_name == 'paired_ttest':
+            stat, p = ttest_rel(df['group_A'], df['group_B'])
+
+        elif test_name == 'wilcoxon_signed_rank':
+            stat, p = wilcoxon(df['group_A'], df['group_B'])
+
+        elif test_name == 'two_proportion_ztest':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+            counts = [np.sum(a), np.sum(b)]
+            nobs = [len(a), len(b)]
+            stat, p = proportions_ztest(count=counts, nobs=nobs)
+
+        elif test_name == 'mcnemar':
+            before = df['group_A']
+            after = df['group_B']
+            both = np.sum((before == 1) & (after == 1))
+            before_only = np.sum((before == 1) & (after == 0))
+            after_only = np.sum((before == 0) & (after == 1))
+            neither = np.sum((before == 0) & (after == 0))
+            table = np.array([[both, before_only], [after_only, neither]])
+            stat, p = chi2_contingency(table, correction=True)[:2]
+
+        elif test_name == 'anova':
+            groups = [g['value'].values for _, g in df.groupby('group')]
+            stat, p = f_oneway(*groups)
+
+        elif test_name == 'welch_anova':
+            groups = [g['value'].values for _, g in df.groupby('group')]
+            res = anova_oneway(groups, use_var='unequal')
+            stat = res.statistic
+            p = res.pvalue
+        
+        elif test_name == 'kruskal_wallis':
+            groups = [g['value'].values for _, g in df.groupby('group')]
+            stat, p = kruskal(*groups)
+
+        elif test_name == 'chi_square':
+            contingency = pd.crosstab(df['group'], df['value'])
+            stat, p, _, _ = chi2_contingency(contingency)
+
+        else:
+            warnings.warn(f"❌ Test not implemented: `{test_name}`")
+            return result
+
+        result['statistic'] = stat
+        result['p_value'] = p
+        result['significant'] = p < alpha
+
+        # --- Final Output Block ---
+        print(f"\n📊 Test Summary: {test_name.replace('_', ' ').title()}")
+
+        print("\n🧪 Technical Result")
+        print(f"• Test Statistic ({test_statistic_label}) = {stat:.4f}")
+        print(f"• P-value            = {p:.4f}")
+        print(f"• Alpha (α)          = {alpha:.2f}")
+        visualize_test_result(
+            stat,
+            alpha,
+            test_statistic_label,
+            tail=config.get('tail_type', 'two-tailed'),
+            df1=len(df) - 1)
+
+        if p < alpha:
+            print(f"• Conclusion         = ✅ Statistically significant → Reject H₀")
+            print("\n📈 Interpretation")
+            print("• The observed difference is unlikely due to random variation.")
+
+            # Business Interpretation
+            if config['group_count'] == 'two-sample' and config['group_relationship'] == 'independent':
+                a = df[df['group'] == 'A']['value']
+                b = df[df['group'] == 'B']['value']
+                mean_a = np.mean(a)
+                mean_b = np.mean(b)
+                lift = mean_b - mean_a
+                pct_lift = (lift / mean_a) * 100
+
+                label = "mean" if config['outcome_type'] == 'continuous' else 'conversion rate'
+                print("\n💼 Business Insight")
+                print(f"• Group A {label} = {mean_a:.2f}")
+                print(f"• Group B {label} = {mean_b:.2f}")
+                print(f"• Lift = {lift:.2f} ({pct_lift:+.2f}%)")
+
+                if lift > 0:
+                    print("🏆 Group B outperforms Group A — and the effect is statistically significant.")
+                else:
+                    print("📉 Group B underperforms Group A — and the drop is statistically significant.")
+        else:
+            print(f"• Conclusion         = ❌ Not statistically significant → Fail to reject H₀")
+            print("\n📈 Interpretation")
+            print("• The observed difference could be explained by randomness.")
+            print("\n💼 Business Insight")
+            print("• No strong evidence of difference between the groups.")
+
+        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return result
+
+    except Exception as e:
+        warnings.warn(f"🚨 Error during test execution: {e}")
+        return result
