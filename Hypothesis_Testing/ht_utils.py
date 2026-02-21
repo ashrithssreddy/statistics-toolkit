@@ -206,91 +206,161 @@ def validate_config(config):
 def generate_data_from_config(config, seed=1995):
     """
     Generates synthetic data based on the specified hypothesis test configuration.
-
+    
     This function:
     - Supports one-sample and two-sample tests for continuous and binary outcomes
-    - Simulates data using normal or binomial distributions depending on outcome type
+    - Simulates data using configurable distributions (normal or non-normal)
+    - Controls variance structure across groups (equal or unequal)
     - Applies treatment effect to simulate group differences
     - Returns a DataFrame in the appropriate structure for the given test setup
-
+    
     Parameters:
     -----------
     config : dict
         Dictionary specifying the test scenario with keys:
+    
+        Core Structure:
         - 'outcome_type' (e.g., 'continuous', 'binary')
         - 'group_count' ('one-sample' or 'two-sample')
         - 'group_relationship' ('independent' or 'paired')
+    
+        Simulation Controls:
         - 'sample_size': int (per group)
         - 'effect_size': float (simulated difference to inject)
+        - 'distribution': 'normal' or 'non-normal'
+            → Controls the data-generating distribution for continuous outcomes
+        - 'variance_equal': 'equal' or 'unequal'
+            → Controls whether group variances are the same (two-sample only)
         - 'population_mean': float (only used for one-sample tests)
-
+        - 'baseline_mean': float (optional, default=5.0 for two-sample continuous)
+        - 'baseline_std': float (optional, default=1.0)
+        - 'baseline_rate': float (optional, default=0.4 for binary outcomes)
+    
     seed : int, optional
-        Random seed for reproducibility (default = my_seed)
-
+        Random seed for reproducibility.
+    
     Returns:
     --------
     pd.DataFrame
-        A synthetic dataset compatible with the selected test type
+        A synthetic dataset compatible with the selected test type.
     """
 
-    np.random.seed(my_seed)
-    
+    # Use passed seed (NOT global)
+    np.random.seed(seed)
+
     outcome = config['outcome_type']
     group_count = config['group_count']
-    relationship = config['group_relationship']
+    relationship = config.get('group_relationship')
     size = config['sample_size']
-    effect = config['effect_size']
+    effect = config.get('effect_size', 0)
     pop_mean = config.get('population_mean', 0)
 
-    # 1️⃣ One-sample case
+    # ---- DGP Controls (with safe defaults) ----
+    distribution = config.get('distribution') or 'normal'
+    variance_equal = config.get('variance_equal') or 'equal'
+
+    baseline_mean = config.get('baseline_mean', 5.0)
+    baseline_std = config.get('baseline_std', 1.0)
+    baseline_rate = config.get('baseline_rate', 0.4)
+
+    # -------------------------------------------
+    # Helper: Continuous Generator
+    # -------------------------------------------
+    def generate_continuous(mean, std, size):
+        if distribution == 'normal':
+            return np.random.normal(loc=mean, scale=std, size=size)
+        elif distribution == 'non-normal':
+            # Lognormal as generic skewed distribution
+            return np.random.lognormal(mean=np.log(max(mean, 0.1)), sigma=std, size=size)
+        else:
+            return np.random.normal(loc=mean, scale=std, size=size)
+
+    # -------------------------------------------
+    # 1️⃣ One-Sample
+    # -------------------------------------------
     if group_count == 'one-sample':
+
         if outcome == 'continuous':
-            values = np.random.normal(loc=pop_mean + effect, scale=1.0, size=size)
+            std = baseline_std
+            values = generate_continuous(pop_mean + effect, std, size)
             df = pd.DataFrame({'value': values})
+
         elif outcome == 'binary':
             prob = pop_mean + effect
             values = np.random.binomial(1, prob, size=size)
             df = pd.DataFrame({'value': values})
-        else:
-            raise NotImplementedError("One-sample generation only supports continuous/binary for now.")
 
-    # 2️⃣ Two-sample case
+        else:
+            raise NotImplementedError("One-sample supports continuous/binary only.")
+
+    # -------------------------------------------
+    # 2️⃣ Two-Sample
+    # -------------------------------------------
     elif group_count == 'two-sample':
+
+        # --- Variance Control ---
+        if variance_equal == 'equal':
+            std_A = baseline_std
+            std_B = baseline_std
+        elif variance_equal == 'unequal':
+            std_A = baseline_std
+            std_B = baseline_std * 2
+        else:
+            std_A = std_B = baseline_std
+
         if relationship == 'independent':
+
             if outcome == 'continuous':
-                A = np.random.normal(loc=5.0, scale=1.0, size=size)
-                B = np.random.normal(loc=5.0 + effect, scale=1.0, size=size)
+                A = generate_continuous(baseline_mean, std_A, size)
+                B = generate_continuous(baseline_mean + effect, std_B, size)
+
             elif outcome == 'binary':
-                A = np.random.binomial(1, 0.4, size=size)
-                B = np.random.binomial(1, 0.4 + effect, size=size)
+                A = np.random.binomial(1, baseline_rate, size=size)
+                B = np.random.binomial(1, baseline_rate + effect, size=size)
+
             else:
                 raise NotImplementedError
+
             df = pd.DataFrame({
                 'group': ['A'] * size + ['B'] * size,
                 'value': np.concatenate([A, B])
             })
-        
+
         elif relationship == 'paired':
+
             if outcome == 'continuous':
-                before = np.random.normal(loc=5.0, scale=1.0, size=size)
-                after = before + effect + np.random.normal(0, 0.5, size=size)
+                before = generate_continuous(baseline_mean, baseline_std, size)
+                noise = generate_continuous(0, baseline_std * 0.5, size)
+                after = before + effect + noise
+
             elif outcome == 'binary':
-                before = np.random.binomial(1, 0.4, size=size)
-                after = np.random.binomial(1, 0.4 + effect, size=size)
+                before = np.random.binomial(1, baseline_rate, size=size)
+                after = np.random.binomial(1, baseline_rate + effect, size=size)
+
             else:
                 raise NotImplementedError
+
             df = pd.DataFrame({
                 'user_id': np.arange(size),
                 'group_A': before,
                 'group_B': after
             })
+
         else:
-            raise ValueError("Missing or invalid group relationship.")
+            raise ValueError("Invalid group_relationship.")
 
     else:
         raise NotImplementedError("Multi-sample not supported yet.")
 
     return df
+
+
+
+
+
+
+
+
 
 
 # ==========================================================
@@ -349,7 +419,7 @@ def infer_distribution_from_data(config, df):
             config['distribution'] = 'non-normal'
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config
 
     elif group_count == 'two-sample':
@@ -364,7 +434,7 @@ def infer_distribution_from_data(config, df):
         else:
             print("❌ Invalid group relationship")
             config['distribution'] = 'NA'
-            display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+            # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
             return config
 
         p1 = shapiro(a).pvalue
@@ -386,13 +456,13 @@ def infer_distribution_from_data(config, df):
             config['distribution'] = 'non-normal'
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config
 
     else:
         print("❌ Unsupported group count for distribution check.")
         config['distribution'] = 'NA'
-        display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config
 
 
@@ -1201,3 +1271,193 @@ def run_hypothesis_test(config, df):
     except Exception as e:
         warnings.warn(f"🚨 Error during test execution: {e}")
         return result
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def infer_sample_size_from_data(config, df):
+    """
+    Infers and updates sample_size in config based on the dataset structure.
+
+    Rules:
+    - one-sample → total rows
+    - two-sample independent → minimum group size (per-group n)
+    - two-sample paired → number of paired rows
+    - multi-sample → total rows (can refine later)
+    """
+
+    group_count = config['group_count']
+    relationship = config.get('group_relationship')
+
+    if group_count == 'one-sample':
+        n = len(df)
+
+    elif group_count == 'two-sample' and relationship == 'independent':
+        if 'group' not in df.columns:
+            raise ValueError("Expected 'group' column for two-sample independent test.")
+        group_sizes = df['group'].value_counts()
+        n = group_sizes.min()  # conservative per-group size
+
+    elif group_count == 'two-sample' and relationship == 'paired':
+        n = len(df)
+
+    elif group_count == 'multi-sample':
+        if 'group' not in df.columns:
+            raise ValueError("Expected 'group' column for multi-sample test.")
+        n = len(df)
+
+    else:
+        raise ValueError("Invalid group configuration.")
+
+    config['sample_size'] = int(n)
+
+    print(f"📊 Synced sample_size → {config['sample_size']}")
+
+    return config
+
+
+
+
+
+
+
+
+def infer_group_count_from_data(config, df):
+    """
+    Infers group_count ('one-sample', 'two-sample', 'multi-sample')
+    based on dataframe structure and group_relationship.
+
+    Rules:
+    - If paired → must be two-sample
+    - If independent:
+        • No 'group' column → one-sample
+        • 1 unique group → one-sample
+        • 2 unique groups → two-sample
+        • >2 unique groups → multi-sample
+    """
+
+    relationship = config.get('group_relationship')
+
+    print("\n🔄 Step: Infer Group Count from Dataset")
+
+    # --------------------------
+    # 1️⃣ Paired Structure
+    # --------------------------
+    if relationship == 'paired':
+        required_cols = {'group_A', 'group_B'}
+        if required_cols.issubset(df.columns):
+            config['group_count'] = 'two-sample'
+            print("📊 Detected paired structure → group_count = 'two-sample'")
+        else:
+            raise ValueError("Paired design requires 'group_A' and 'group_B' columns.")
+
+        return config
+
+    # --------------------------
+    # 2️⃣ Independent Structure
+    # --------------------------
+    if 'group' not in df.columns:
+        config['group_count'] = 'one-sample'
+        print("📊 No 'group' column found → group_count = 'one-sample'")
+        return config
+
+    n_groups = df['group'].nunique()
+
+    if n_groups == 1:
+        config['group_count'] = 'one-sample'
+    elif n_groups == 2:
+        config['group_count'] = 'two-sample'
+    elif n_groups > 2:
+        config['group_count'] = 'multi-sample'
+    else:
+        raise ValueError("Unable to infer group_count.")
+
+    print(f"📊 Detected {n_groups} group(s) → group_count = '{config['group_count']}'")
+
+    return config
+
+
+def infer_outcome_type_from_data(config, df):
+    """
+    Infers outcome_type based on dataframe structure and values.
+    """
+
+    print("\n🔄 Step: Infer Outcome Type from Dataset")
+
+    group_count = config['group_count']
+    relationship = config.get('group_relationship')
+
+    # --------------------------
+    # Identify outcome column
+    # --------------------------
+    if group_count == 'one-sample':
+        outcome_series = df['value']
+
+    elif group_count == 'two-sample' and relationship == 'independent':
+        outcome_series = df['value']
+
+    elif group_count == 'two-sample' and relationship == 'paired':
+        outcome_series = df['group_A']  # use one column to infer type
+
+    elif group_count == 'multi-sample':
+        outcome_series = df['value']
+
+    else:
+        raise ValueError("Unable to determine outcome column.")
+
+    unique_vals = outcome_series.dropna().unique()
+    n_unique = len(unique_vals)
+
+    # --------------------------
+    # Binary Check
+    # --------------------------
+    if set(unique_vals).issubset({0, 1}):
+        inferred = 'binary'
+
+    # --------------------------
+    # Categorical Check
+    # --------------------------
+    elif outcome_series.dtype == 'object':
+        inferred = 'categorical'
+
+    # --------------------------
+    # Count Check
+    # --------------------------
+    elif pd.api.types.is_integer_dtype(outcome_series):
+        if outcome_series.min() >= 0 and n_unique > 2:
+            inferred = 'count'
+        else:
+            inferred = 'continuous'
+
+    # --------------------------
+    # Continuous Default
+    # --------------------------
+    elif pd.api.types.is_numeric_dtype(outcome_series):
+        inferred = 'continuous'
+
+    else:
+        inferred = 'continuous'
+
+    config['outcome_type'] = inferred
+
+    print(f"📊 Inferred outcome_type → '{inferred}'")
+
+    return config
