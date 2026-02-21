@@ -60,32 +60,39 @@ def print_config_summary(config):
     None
         Prints the formatted configuration summary directly to output
     """
-
     def highlight(value):
         if value in [None, 'NA'] or (isinstance(value, float) and np.isnan(value)):
-            return "\033[91mNone\033[0m"  # Red in terminal
+            return "\033[91mNone\033[0m"
         return value
 
     print("📋 Hypothesis Test Configuration Summary\n")
 
-    print(f"🔸 Outcome Type            : {highlight(config['outcome_type'])}")
-    print(f"🔸 Group Relationship      : {highlight(config['group_relationship'])}")
-    print(f"🔸 Group Count             : {highlight(config['group_count'])}")
-    print(f"🔸 Distribution of Outcome : {highlight(config['distribution'])}")
-    print(f"🔸 Equal Variance          : {highlight(config['variance_equal'])}")
-    print(f"🔸 Parametric Test         : {highlight(config['parametric'])}")
-    print(f"🔸 Tail Type               : {highlight(config['tail_type'])}")
-    print(f"🔸 Significance Level α    : {highlight(config['alpha'])}")
+    # Pretty key formatting
+    max_key_length = max(len(k) for k in config.keys())
+
+    for key, value in config.items():
+        formatted_key = key.replace('_', ' ').title()
+        print(f"🔸 {formatted_key:<{max_key_length+2}} : {highlight(value)}")
 
     print("\n🧠 Inference Summary:")
-    if config['group_count'] == 'one-sample':
+
+    group_count = config.get('group_count')
+    group_rel = config.get('group_relationship')
+
+    if group_count == 'one-sample':
         print("→ This is a one-sample test comparing a sample to a known value.")
-    elif config['group_count'] == 'two-sample':
-        if config['group_relationship'] == 'independent':
+
+    elif group_count == 'two-sample':
+        if group_rel == 'independent':
             print("→ Comparing two independent groups (A vs B).")
-        elif config['group_relationship'] == 'paired':
+        elif group_rel == 'paired':
             print("→ Comparing paired measurements (before vs after, same users).")
+
+    elif group_count == 'multi-sample':
+        print("→ Comparing more than two independent groups.")
+
     display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+
 
 
 def validate_config(config):
