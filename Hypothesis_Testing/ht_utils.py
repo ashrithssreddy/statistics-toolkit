@@ -91,8 +91,6 @@ def print_config_summary(config):
     #     print("→ Comparing more than two independent groups.")
     # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
 
-
-
 def validate_config(config):
     """
     Validates the hypothesis test configuration dictionary for completeness and logical consistency.
@@ -356,15 +354,180 @@ def generate_data_from_config(config, seed=1995):
 
 
 
+# ==========================================================
+# region EDA functions - Sample Size
+# ==========================================================
+def infer_sample_size_from_data(config, df):
+    """
+    Infers and updates sample_size in config based on the dataset structure.
 
+    Rules:
+    - one-sample → total rows
+    - two-sample independent → minimum group size (per-group n)
+    - two-sample paired → number of paired rows
+    - multi-sample → total rows (can refine later)
+    """
 
+    group_count = config['group_count']
+    relationship = config.get('group_relationship')
 
+    if group_count == 'one-sample':
+        n = len(df)
 
+    elif group_count == 'two-sample' and relationship == 'independent':
+        if 'group' not in df.columns:
+            raise ValueError("Expected 'group' column for two-sample independent test.")
+        group_sizes = df['group'].value_counts()
+        n = group_sizes.min()  # conservative per-group size
 
+    elif group_count == 'two-sample' and relationship == 'paired':
+        n = len(df)
+
+    elif group_count == 'multi-sample':
+        if 'group' not in df.columns:
+            raise ValueError("Expected 'group' column for multi-sample test.")
+        n = len(df)
+
+    else:
+        raise ValueError("Invalid group configuration.")
+
+    config['sample_size'] = int(n)
+
+    print(f"📊 Synced sample_size → {config['sample_size']}")
+
+    return config['sample_size']
+
+# ==========================================================
+# region EDA functions - Group Count
+# ==========================================================
+def infer_group_count_from_data(config, df):
+    """
+    Infers group_count ('one-sample', 'two-sample', 'multi-sample')
+    based on dataframe structure and group_relationship.
+
+    Rules:
+    - If paired → must be two-sample
+    - If independent:
+        • No 'group' column → one-sample
+        • 1 unique group → one-sample
+        • 2 unique groups → two-sample
+        • >2 unique groups → multi-sample
+    """
+
+    relationship = config.get('group_relationship')
+
+    print("\n🔄 Step: Infer Group Count from Dataset")
+
+    # --------------------------
+    # 1️⃣ Paired Structure
+    # --------------------------
+    if relationship == 'paired':
+        required_cols = {'group_A', 'group_B'}
+        if required_cols.issubset(df.columns):
+            config['group_count'] = 'two-sample'
+            print("📊 Detected paired structure → group_count = 'two-sample'")
+        else:
+            raise ValueError("Paired design requires 'group_A' and 'group_B' columns.")
+
+        return config['group_count']
+
+    # --------------------------
+    # 2️⃣ Independent Structure
+    # --------------------------
+    if 'group' not in df.columns:
+        config['group_count'] = 'one-sample'
+        print("📊 No 'group' column found → group_count = 'one-sample'")
+        return config['group_count']
+
+    n_groups = df['group'].nunique()
+
+    if n_groups == 1:
+        config['group_count'] = 'one-sample'
+    elif n_groups == 2:
+        config['group_count'] = 'two-sample'
+    elif n_groups > 2:
+        config['group_count'] = 'multi-sample'
+    else:
+        raise ValueError("Unable to infer group_count.")
+
+    print(f"📊 Detected {n_groups} group(s) → group_count = '{config['group_count']}'")
+
+    return config['group_count']
 
 
 # ==========================================================
-# region EDA functions - Normality
+# region EDA functions - Outcome Type
+# ==========================================================
+def infer_outcome_type_from_data(config, df):
+    """
+    Infers outcome_type based on dataframe structure and values.
+    """
+
+    print("\n🔄 Step: Infer Outcome Type from Dataset")
+
+    group_count = config['group_count']
+    relationship = config.get('group_relationship')
+
+    # --------------------------
+    # Identify outcome column
+    # --------------------------
+    if group_count == 'one-sample':
+        outcome_series = df['value']
+
+    elif group_count == 'two-sample' and relationship == 'independent':
+        outcome_series = df['value']
+
+    elif group_count == 'two-sample' and relationship == 'paired':
+        outcome_series = df['group_A']  # use one column to infer type
+
+    elif group_count == 'multi-sample':
+        outcome_series = df['value']
+
+    else:
+        raise ValueError("Unable to determine outcome column.")
+
+    unique_vals = outcome_series.dropna().unique()
+    n_unique = len(unique_vals)
+
+    # --------------------------
+    # Binary Check
+    # --------------------------
+    if set(unique_vals).issubset({0, 1}):
+        inferred = 'binary'
+
+    # --------------------------
+    # Categorical Check
+    # --------------------------
+    elif outcome_series.dtype == 'object':
+        inferred = 'categorical'
+
+    # --------------------------
+    # Count Check
+    # --------------------------
+    elif pd.api.types.is_integer_dtype(outcome_series):
+        if outcome_series.min() >= 0 and n_unique > 2:
+            inferred = 'count'
+        else:
+            inferred = 'continuous'
+
+    # --------------------------
+    # Continuous Default
+    # --------------------------
+    elif pd.api.types.is_numeric_dtype(outcome_series):
+        inferred = 'continuous'
+
+    else:
+        inferred = 'continuous'
+
+    config['outcome_type'] = inferred
+
+    print(f"📊 Inferred outcome_type → '{inferred}'")
+
+    return config['outcome_type']
+
+
+# ==========================================================
+# region EDA functions - Normality Infer
 # ==========================================================
 def infer_distribution_from_data(config, df):
     """
@@ -465,7 +628,9 @@ def infer_distribution_from_data(config, df):
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
 
-
+# ==========================================================
+# region EDA functions - Normality Infer KS Test
+# ==========================================================
 def infer_distribution_from_data_ks(config, df):
     """
     Infers whether the outcome variable follows a normal distribution using the
@@ -575,6 +740,9 @@ def infer_distribution_from_data_ks(config, df):
         return config['distribution']
 
 
+# ==========================================================
+# region EDA functions - Normality Visualization
+# ==========================================================
 def qq_plot_normality(config, df):
     """
     Generates Q-Q plots to visually assess normality.
@@ -618,70 +786,6 @@ def qq_plot_normality(config, df):
 
         stats.probplot(b, dist="norm", plot=axes[1])
         axes[1].set_title("Q-Q Plot: Group B")
-
-        plt.tight_layout()
-        plt.show()
-
-    else:
-        print("❌ Unsupported group count.")
-
-# ==========================================================
-# region EDA functions - Distribution
-# ==========================================================
-def visualize_distribution(config, df):
-    """
-    Shows distributions side-by-side for comparison.
-    """
-
-    print("\n📊 Step: Visual Distribution Overview (Side-by-Side)\n")
-
-    group_count = config['group_count']
-    relationship = config['group_relationship']
-    outcome = config['outcome_type']
-
-    if outcome != 'continuous':
-        print(f"⚠️ Skipping: Outcome type = `{outcome}` → Not applicable.")
-        return
-
-    def plot_on_axis(sample, ax, title):
-        mean = np.mean(sample)
-        std = np.std(sample, ddof=1)
-        median = np.median(sample)
-
-        sns.histplot(sample, kde=True, stat='density', bins=20, ax=ax)
-
-        x = np.linspace(min(sample), max(sample), 200)
-        ax.plot(x, norm.pdf(x, mean, std), linestyle='--')
-
-        ax.axvline(mean, linestyle='-', label='Mean')
-        ax.axvline(median, linestyle=':', label='Median')
-
-        ax.set_title(title)
-        ax.legend()
-
-    if group_count == 'one-sample':
-        fig, ax = plt.subplots(1, 1, figsize=(6, 5))
-        plot_on_axis(df['value'], ax, "Distribution")
-        plt.tight_layout()
-        plt.show()
-
-    elif group_count == 'two-sample':
-        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-
-        if relationship == 'independent':
-            a = df[df['group'] == 'A']['value']
-            b = df[df['group'] == 'B']['value']
-
-        elif relationship == 'paired':
-            a = df['group_A']
-            b = df['group_B']
-
-        else:
-            print("❌ Invalid group relationship.")
-            return
-
-        plot_on_axis(a, axes[0], "Group A")
-        plot_on_axis(b, axes[1], "Group B")
 
         plt.tight_layout()
         plt.show()
@@ -749,6 +853,69 @@ def infer_variance_equality(config, df):
     # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
     return config['variance_equal']
 
+# ==========================================================
+# region EDA functions - Visualization
+# ==========================================================
+def visualize_distribution(config, df):
+    """
+    Shows distributions side-by-side for comparison.
+    """
+
+    print("\n📊 Step: Visual Distribution Overview (Side-by-Side)\n")
+
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+    outcome = config['outcome_type']
+
+    if outcome != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome}` → Not applicable.")
+        return
+
+    def plot_on_axis(sample, ax, title):
+        mean = np.mean(sample)
+        std = np.std(sample, ddof=1)
+        median = np.median(sample)
+
+        sns.histplot(sample, kde=True, stat='density', bins=20, ax=ax)
+
+        x = np.linspace(min(sample), max(sample), 200)
+        ax.plot(x, norm.pdf(x, mean, std), linestyle='--')
+
+        ax.axvline(mean, linestyle='-', label='Mean')
+        ax.axvline(median, linestyle=':', label='Median')
+
+        ax.set_title(title)
+        ax.legend()
+
+    if group_count == 'one-sample':
+        fig, ax = plt.subplots(1, 1, figsize=(6, 5))
+        plot_on_axis(df['value'], ax, "Distribution")
+        plt.tight_layout()
+        plt.show()
+
+    elif group_count == 'two-sample':
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+        if relationship == 'independent':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+
+        elif relationship == 'paired':
+            a = df['group_A']
+            b = df['group_B']
+
+        else:
+            print("❌ Invalid group relationship.")
+            return
+
+        plot_on_axis(a, axes[0], "Group A")
+        plot_on_axis(b, axes[1], "Group B")
+
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        print("❌ Unsupported group count.")
 
 def visualize_variance_boxplot_annotated(config, df):
     print("\n📊 Visual Check: Spread Comparison Between Groups")
@@ -999,7 +1166,7 @@ def print_hypothesis_statement(config):
     return H_0, H_a
 
 # ==========================================================
-# region Conduct Hypothesis Test
+# region Conduct Hypothesis Test - Visualization
 # ==========================================================
 def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, df2=None):
 
@@ -1074,6 +1241,9 @@ def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, 
     plt.show()
 
 
+# ==========================================================
+# region Conduct Hypothesis Test
+# ==========================================================
 def run_hypothesis_test(config, df):
     """
     Runs the appropriate hypothesis test based on the provided configuration and dataset.
@@ -1271,193 +1441,3 @@ def run_hypothesis_test(config, df):
     except Exception as e:
         warnings.warn(f"🚨 Error during test execution: {e}")
         return result
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def infer_sample_size_from_data(config, df):
-    """
-    Infers and updates sample_size in config based on the dataset structure.
-
-    Rules:
-    - one-sample → total rows
-    - two-sample independent → minimum group size (per-group n)
-    - two-sample paired → number of paired rows
-    - multi-sample → total rows (can refine later)
-    """
-
-    group_count = config['group_count']
-    relationship = config.get('group_relationship')
-
-    if group_count == 'one-sample':
-        n = len(df)
-
-    elif group_count == 'two-sample' and relationship == 'independent':
-        if 'group' not in df.columns:
-            raise ValueError("Expected 'group' column for two-sample independent test.")
-        group_sizes = df['group'].value_counts()
-        n = group_sizes.min()  # conservative per-group size
-
-    elif group_count == 'two-sample' and relationship == 'paired':
-        n = len(df)
-
-    elif group_count == 'multi-sample':
-        if 'group' not in df.columns:
-            raise ValueError("Expected 'group' column for multi-sample test.")
-        n = len(df)
-
-    else:
-        raise ValueError("Invalid group configuration.")
-
-    config['sample_size'] = int(n)
-
-    print(f"📊 Synced sample_size → {config['sample_size']}")
-
-    return config['sample_size']
-
-
-
-
-
-
-
-
-def infer_group_count_from_data(config, df):
-    """
-    Infers group_count ('one-sample', 'two-sample', 'multi-sample')
-    based on dataframe structure and group_relationship.
-
-    Rules:
-    - If paired → must be two-sample
-    - If independent:
-        • No 'group' column → one-sample
-        • 1 unique group → one-sample
-        • 2 unique groups → two-sample
-        • >2 unique groups → multi-sample
-    """
-
-    relationship = config.get('group_relationship')
-
-    print("\n🔄 Step: Infer Group Count from Dataset")
-
-    # --------------------------
-    # 1️⃣ Paired Structure
-    # --------------------------
-    if relationship == 'paired':
-        required_cols = {'group_A', 'group_B'}
-        if required_cols.issubset(df.columns):
-            config['group_count'] = 'two-sample'
-            print("📊 Detected paired structure → group_count = 'two-sample'")
-        else:
-            raise ValueError("Paired design requires 'group_A' and 'group_B' columns.")
-
-        return config['group_count']
-
-    # --------------------------
-    # 2️⃣ Independent Structure
-    # --------------------------
-    if 'group' not in df.columns:
-        config['group_count'] = 'one-sample'
-        print("📊 No 'group' column found → group_count = 'one-sample'")
-        return config['group_count']
-
-    n_groups = df['group'].nunique()
-
-    if n_groups == 1:
-        config['group_count'] = 'one-sample'
-    elif n_groups == 2:
-        config['group_count'] = 'two-sample'
-    elif n_groups > 2:
-        config['group_count'] = 'multi-sample'
-    else:
-        raise ValueError("Unable to infer group_count.")
-
-    print(f"📊 Detected {n_groups} group(s) → group_count = '{config['group_count']}'")
-
-    return config['group_count']
-
-
-def infer_outcome_type_from_data(config, df):
-    """
-    Infers outcome_type based on dataframe structure and values.
-    """
-
-    print("\n🔄 Step: Infer Outcome Type from Dataset")
-
-    group_count = config['group_count']
-    relationship = config.get('group_relationship')
-
-    # --------------------------
-    # Identify outcome column
-    # --------------------------
-    if group_count == 'one-sample':
-        outcome_series = df['value']
-
-    elif group_count == 'two-sample' and relationship == 'independent':
-        outcome_series = df['value']
-
-    elif group_count == 'two-sample' and relationship == 'paired':
-        outcome_series = df['group_A']  # use one column to infer type
-
-    elif group_count == 'multi-sample':
-        outcome_series = df['value']
-
-    else:
-        raise ValueError("Unable to determine outcome column.")
-
-    unique_vals = outcome_series.dropna().unique()
-    n_unique = len(unique_vals)
-
-    # --------------------------
-    # Binary Check
-    # --------------------------
-    if set(unique_vals).issubset({0, 1}):
-        inferred = 'binary'
-
-    # --------------------------
-    # Categorical Check
-    # --------------------------
-    elif outcome_series.dtype == 'object':
-        inferred = 'categorical'
-
-    # --------------------------
-    # Count Check
-    # --------------------------
-    elif pd.api.types.is_integer_dtype(outcome_series):
-        if outcome_series.min() >= 0 and n_unique > 2:
-            inferred = 'count'
-        else:
-            inferred = 'continuous'
-
-    # --------------------------
-    # Continuous Default
-    # --------------------------
-    elif pd.api.types.is_numeric_dtype(outcome_series):
-        inferred = 'continuous'
-
-    else:
-        inferred = 'continuous'
-
-    config['outcome_type'] = inferred
-
-    print(f"📊 Inferred outcome_type → '{inferred}'")
-
-    return config['outcome_type']
