@@ -74,23 +74,21 @@ def print_config_summary(config):
         formatted_key = key.replace('_', ' ').title()
         print(f"🔸 {formatted_key:<{max_key_length+2}} : {highlight(value)}")
 
-    print("\n🧠 Inference Summary:")
+    # print("\n🧠 Inference Summary:")
+    # group_count = config.get('group_count')
+    # group_rel = config.get('group_relationship')
 
-    group_count = config.get('group_count')
-    group_rel = config.get('group_relationship')
+    # if group_count == 'one-sample':
+    #     print("→ This is a one-sample test comparing a sample to a known value.")
 
-    if group_count == 'one-sample':
-        print("→ This is a one-sample test comparing a sample to a known value.")
+    # elif group_count == 'two-sample':
+    #     if group_rel == 'independent':
+    #         print("→ Comparing two independent groups (A vs B).")
+    #     elif group_rel == 'paired':
+    #         print("→ Comparing paired measurements (before vs after, same users).")
 
-    elif group_count == 'two-sample':
-        if group_rel == 'independent':
-            print("→ Comparing two independent groups (A vs B).")
-        elif group_rel == 'paired':
-            print("→ Comparing paired measurements (before vs after, same users).")
-
-    elif group_count == 'multi-sample':
-        print("→ Comparing more than two independent groups.")
-
+    # elif group_count == 'multi-sample':
+    #     print("→ Comparing more than two independent groups.")
     # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
 
 
