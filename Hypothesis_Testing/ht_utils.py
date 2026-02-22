@@ -195,6 +195,44 @@ def generate_data_from_config(config, seed=1995):
     - group_relationship: independent, paired (paired only valid for two-sample)
     - distribution: normal, non-normal (continuous only)
     - variance_equal: equal, unequal (continuous independent only)
+
+    Returns
+    -------
+    pandas.DataFrame
+        Shape and columns depend on group_count and group_relationship.
+        Example outputs (5 rows, dummy data):
+
+        One-sample (columns: value):
+             value
+        0   1.23
+        1  -0.45
+        2   2.10
+        3   0.67
+        4   1.88
+
+        Two-sample independent (columns: group, value):
+          group  value
+        0     A   0.52
+        1     A   1.11
+        2     B   1.03
+        3     B   0.89
+        4     A   0.41
+
+        Two-sample paired (columns: id, group_A, group_B):
+           id  group_A  group_B
+        0   0     0.12     0.58
+        1   1     1.02     1.49
+        2   2    -0.33     0.21
+        3   3     0.77     1.22
+        4   4     0.45     0.91
+
+        Multi-sample independent (columns: group, value):
+          group  value
+        0     A   0.31
+        1     B   0.95
+        2     C   1.12
+        3     A   0.44
+        4     B   0.78
     """
 
     import numpy as np
