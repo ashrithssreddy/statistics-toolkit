@@ -167,6 +167,14 @@ def validate_config(config):
     if config['outcome_type'] == 'count' and config['group_count'] == 'one-sample':
         raise ValueError("🔒 One-sample tests for count data are not supported by this module.")
 
+    # One-sample + categorical → not supported (no goodness-of-fit in this module)
+    if config['group_count'] == 'one-sample' and config['outcome_type'] == 'categorical':
+        raise ValueError("❌ One-sample categorical (goodness-of-fit) tests are not supported by this module.")
+
+    # Paired + count → not supported
+    if config['group_relationship'] == 'paired' and config['outcome_type'] == 'count':
+        raise ValueError("❌ Paired tests for count outcomes are not supported by this module.")
+
     # Distribution only applicable for continuous outcome
     if config['outcome_type'] != 'continuous' and config['distribution'] is not None:
         raise ValueError(
