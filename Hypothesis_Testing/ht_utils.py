@@ -926,6 +926,11 @@ def visualize_distribution(config, df):
         plot_on_axis(a, axes[0], "Group A")
         plot_on_axis(b, axes[1], "Group B")
 
+        # Standardize y-axis (density) so both panels are comparable
+        y_max = max(axes[0].get_ylim()[1], axes[1].get_ylim()[1])
+        axes[0].set_ylim(0, y_max)
+        axes[1].set_ylim(0, y_max)
+
         plt.tight_layout()
         plt.show()
 
@@ -945,8 +950,8 @@ def visualize_variance_boxplot_annotated(config, df):
         print("📋 Spread Summary:")
         display(summary)
 
-        plt.figure(figsize=(8,6))
-        ax = sns.boxplot(x='group', y='value', data=df)
+        fig, ax = plt.subplots(figsize=(8, 5))
+        sns.boxplot(x='group', y='value', data=df, ax=ax)
 
         # Annotate each group
         for i, group in enumerate(summary.index):
@@ -959,9 +964,11 @@ def visualize_variance_boxplot_annotated(config, df):
                     fontsize=10,
                     bbox=dict(facecolor='white', alpha=0.6))
 
-        plt.title("Comparison of Value Spread by Group")
-        plt.ylabel("Outcome Value")
-        plt.xlabel("Group")
+        ax.set_title("Comparison of Value Spread by Group")
+        ax.set_ylabel("Outcome Value")
+        ax.set_xlabel("Group")
+        fig.set_size_inches(8, 5)
+        plt.tight_layout()
         plt.show()
 
         # Business interpretation
@@ -1193,7 +1200,7 @@ def print_hypothesis_statement(config):
 # ==========================================================
 def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, df2=None):
 
-    plt.figure(figsize=(10,6))
+    plt.figure(figsize=(10, 5))
 
     # ----- Select Distribution -----
     if test_label == 't-statistic':
