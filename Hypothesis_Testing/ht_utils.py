@@ -266,11 +266,11 @@ def generate_data_from_config(config, seed=1995):
 
     np.random.seed(seed)
 
-    outcome = config['outcome_type']
+    outcome_type = config['outcome_type']
     group_count = config['group_count']
-    relationship = config['group_relationship']
-    size = config['sample_size']
-    effect = config['effect_size']
+    group_relationship = config['group_relationship']
+    sample_size = config['sample_size']
+    effect_size = config['effect_size']
     distribution = config['distribution']
     variance_equal = config['variance_equal']
 
@@ -278,30 +278,30 @@ def generate_data_from_config(config, seed=1995):
     # ONE-SAMPLE
     # ----------------------------
     if group_count == 'one-sample':
-        if outcome == 'count':
+        if outcome_type == 'count':
             raise ValueError(
                 "One-sample tests for count data are not supported by this module. "
                 "Use two-sample or multi-sample for count outcomes."
             )
 
-        if outcome == 'continuous':
+        if outcome_type == 'continuous':
             if distribution == 'non-normal':
-                values = np.random.lognormal(mean=effect, sigma=0.5, size=size)
+                values = np.random.lognormal(mean=effect_size, sigma=0.5, size=sample_size)
             else:
-                values = np.random.normal(loc=effect, scale=1.0, size=size)
+                values = np.random.normal(loc=effect_size, scale=1.0, size=sample_size)
 
-        elif outcome == 'binary':
-            p = min(max(0.5 + effect, 0), 1)
-            values = np.random.binomial(1, p, size=size)
+        elif outcome_type == 'binary':
+            p = min(max(0.5 + effect_size, 0), 1)
+            values = np.random.binomial(1, p, size=sample_size)
 
-        elif outcome == 'categorical':
+        elif outcome_type == 'categorical':
             categories = ['A', 'B', 'C']
             probs = np.array([0.4, 0.4, 0.2])
-            values = np.random.choice(categories, size=size, p=probs)
+            values = np.random.choice(categories, size=sample_size, p=probs)
 
-        elif outcome == 'count':
-            lam = max(1 + effect, 0.1)
-            values = np.random.poisson(lam=lam, size=size)
+        elif outcome_type == 'count':
+            lam = max(1 + effect_size, 0.1)
+            values = np.random.poisson(lam=lam, size=sample_size)
 
         else:
             raise ValueError("Invalid outcome_type.")
@@ -313,25 +313,25 @@ def generate_data_from_config(config, seed=1995):
     # ----------------------------
     if group_count == 'two-sample':
 
-        if relationship == 'paired':
+        if group_relationship == 'paired':
 
-            if outcome == 'continuous':
+            if outcome_type == 'continuous':
                 if distribution == 'non-normal':
-                    before = np.random.lognormal(mean=0, sigma=0.5, size=size)
+                    before = np.random.lognormal(mean=0, sigma=0.5, size=sample_size)
                 else:
-                    before = np.random.normal(loc=0, scale=1.0, size=size)
+                    before = np.random.normal(loc=0, scale=1.0, size=sample_size)
 
-                after = before + effect
+                after = before + effect_size
 
-            elif outcome == 'binary':
-                before = np.random.binomial(1, 0.4, size=size)
-                after = np.clip(before + np.random.binomial(1, effect, size=size), 0, 1)
+            elif outcome_type == 'binary':
+                before = np.random.binomial(1, 0.4, size=sample_size)
+                after = np.clip(before + np.random.binomial(1, effect_size, size=sample_size), 0, 1)
 
             else:
                 raise ValueError("Paired supported only for continuous and binary.")
 
             return pd.DataFrame({
-                'id': np.arange(size),
+                'id': np.arange(sample_size),
                 'group_A': before,
                 'group_B': after
             })
@@ -345,32 +345,32 @@ def generate_data_from_config(config, seed=1995):
 
         for i, g in enumerate(groups):
 
-            shift = effect if g == 'B' else 0
+            shift = effect_size if g == 'B' else 0
 
-            if outcome == 'continuous':
+            if outcome_type == 'continuous':
                 std = 1.0
                 if variance_equal == 'unequal' and g == 'B':
                     std = 1.5
 
                 if distribution == 'non-normal':
-                    values = np.random.lognormal(mean=shift, sigma=0.5, size=size)
+                    values = np.random.lognormal(mean=shift, sigma=0.5, size=sample_size)
                 else:
-                    values = np.random.normal(loc=shift, scale=std, size=size)
+                    values = np.random.normal(loc=shift, scale=std, size=sample_size)
 
-            elif outcome == 'binary':
+            elif outcome_type == 'binary':
                 p = min(max(0.4 + shift, 0), 1)
-                values = np.random.binomial(1, p, size=size)
+                values = np.random.binomial(1, p, size=sample_size)
 
-            elif outcome == 'categorical':
+            elif outcome_type == 'categorical':
                 categories = ['A', 'B', 'C']
                 probs = np.array([0.4, 0.4, 0.2])
                 probs = probs + shift * np.array([0, 0.1, -0.1])
                 probs = probs / probs.sum()
-                values = np.random.choice(categories, size=size, p=probs)
+                values = np.random.choice(categories, size=sample_size, p=probs)
 
-            elif outcome == 'count':
+            elif outcome_type == 'count':
                 lam = max(3 + shift, 0.1)
-                values = np.random.poisson(lam=lam, size=size)
+                values = np.random.poisson(lam=lam, size=sample_size)
 
             else:
                 raise ValueError("Invalid outcome_type.")
@@ -385,7 +385,7 @@ def generate_data_from_config(config, seed=1995):
     # ----------------------------
     if group_count == 'multi-sample':
 
-        if relationship == 'paired':
+        if group_relationship == 'paired':
             raise ValueError("Paired multi-sample not supported.")
 
         groups = ['A', 'B', 'C']
@@ -393,32 +393,32 @@ def generate_data_from_config(config, seed=1995):
 
         for i, g in enumerate(groups):
 
-            shift = effect * i
+            shift = effect_size * i
 
-            if outcome == 'continuous':
+            if outcome_type == 'continuous':
                 std = 1.0
                 if variance_equal == 'unequal':
                     std = 1.0 + 0.5 * i
 
                 if distribution == 'non-normal':
-                    values = np.random.lognormal(mean=shift, sigma=0.5, size=size)
+                    values = np.random.lognormal(mean=shift, sigma=0.5, size=sample_size)
                 else:
-                    values = np.random.normal(loc=shift, scale=std, size=size)
+                    values = np.random.normal(loc=shift, scale=std, size=sample_size)
 
-            elif outcome == 'binary':
+            elif outcome_type == 'binary':
                 p = min(max(0.4 + shift, 0), 1)
-                values = np.random.binomial(1, p, size=size)
+                values = np.random.binomial(1, p, size=sample_size)
 
-            elif outcome == 'categorical':
+            elif outcome_type == 'categorical':
                 categories = ['A', 'B', 'C']
                 probs = np.array([0.4, 0.4, 0.2])
                 probs = probs + shift * np.array([0, 0.1, -0.1])
                 probs = probs / probs.sum()
-                values = np.random.choice(categories, size=size, p=probs)
+                values = np.random.choice(categories, size=sample_size, p=probs)
 
-            elif outcome == 'count':
+            elif outcome_type == 'count':
                 lam = max(3 + shift, 0.1)
-                values = np.random.poisson(lam=lam, size=size)
+                values = np.random.poisson(lam=lam, size=sample_size)
 
             else:
                 raise ValueError("Invalid outcome_type.")
@@ -445,18 +445,18 @@ def infer_sample_size_from_data(config, df):
     """
 
     group_count = config['group_count']
-    relationship = config.get('group_relationship')
+    group_relationship = config.get('group_relationship')
 
     if group_count == 'one-sample':
         n = len(df)
 
-    elif group_count == 'two-sample' and relationship == 'independent':
+    elif group_count == 'two-sample' and group_relationship == 'independent':
         if 'group' not in df.columns:
             raise ValueError("Expected 'group' column for two-sample independent test.")
         group_sizes = df['group'].value_counts()
         n = group_sizes.min()  # conservative per-group size
 
-    elif group_count == 'two-sample' and relationship == 'paired':
+    elif group_count == 'two-sample' and group_relationship == 'paired':
         n = len(df)
 
     elif group_count == 'multi-sample':
@@ -490,14 +490,14 @@ def infer_group_count_from_data(config, df):
         • >2 unique groups → multi-sample
     """
 
-    relationship = config.get('group_relationship')
+    group_relationship = config.get('group_relationship')
 
     print("\n🔄 Step: Infer Group Count from Dataset")
 
     # --------------------------
     # 1️⃣ Paired Structure
     # --------------------------
-    if relationship == 'paired':
+    if group_relationship == 'paired':
         required_cols = {'group_A', 'group_B'}
         if required_cols.issubset(df.columns):
             config['group_count'] = 'two-sample'
@@ -542,7 +542,7 @@ def infer_outcome_type_from_data(config, df):
     print("\n🔄 Step: Infer Outcome Type from Dataset")
 
     group_count = config['group_count']
-    relationship = config.get('group_relationship')
+    group_relationship = config.get('group_relationship')
 
     # --------------------------
     # Identify outcome column
@@ -550,10 +550,10 @@ def infer_outcome_type_from_data(config, df):
     if group_count == 'one-sample':
         outcome_series = df['value']
 
-    elif group_count == 'two-sample' and relationship == 'independent':
+    elif group_count == 'two-sample' and group_relationship == 'independent':
         outcome_series = df['value']
 
-    elif group_count == 'two-sample' and relationship == 'paired':
+    elif group_count == 'two-sample' and group_relationship == 'paired':
         outcome_series = df['group_A']  # use one column to infer type
 
     elif group_count == 'multi-sample':
@@ -632,11 +632,11 @@ def infer_distribution_from_data(config, df):
     print("\n🔍 Step: Infer Distribution of Outcome Variable")
 
     group_count = config['group_count']
-    relationship = config['group_relationship']
-    outcome = config['outcome_type']
+    group_relationship = config['group_relationship']
+    outcome_type = config['outcome_type']
 
-    if outcome != 'continuous':
-        print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
+    if outcome_type != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome_type}` → normality check not applicable.")
         config['distribution'] = None
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
@@ -663,12 +663,12 @@ def infer_distribution_from_data(config, df):
         return config['distribution']
 
     elif group_count == 'two-sample':
-        print(f"• Two-sample ({relationship}) case → testing both groups")
+        print(f"• Two-sample ({group_relationship}) case → testing both groups")
 
-        if relationship == 'independent':
+        if group_relationship == 'independent':
             a = df[df['group'] == 'A']['value']
             b = df[df['group'] == 'B']['value']
-        elif relationship == 'paired':
+        elif group_relationship == 'paired':
             a = df['group_A']
             b = df['group_B']
         else:
@@ -760,11 +760,11 @@ def infer_distribution_from_data_ks(config, df):
     print("\n🔍 Step: Infer Distribution of Outcome Variable (KS Test)")
 
     group_count = config['group_count']
-    relationship = config['group_relationship']
-    outcome = config['outcome_type']
+    group_relationship = config['group_relationship']
+    outcome_type = config['outcome_type']
 
-    if outcome != 'continuous':
-        print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
+    if outcome_type != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome_type}` → normality check not applicable.")
         config['distribution'] = None
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
@@ -798,12 +798,12 @@ def infer_distribution_from_data_ks(config, df):
         return config['distribution']
 
     elif group_count == 'two-sample':
-        print(f"• Two-sample ({relationship}) case → testing both groups")
+        print(f"• Two-sample ({group_relationship}) case → testing both groups")
 
-        if relationship == 'independent':
+        if group_relationship == 'independent':
             a = df[df['group'] == 'A']['value']
             b = df[df['group'] == 'B']['value']
-        elif relationship == 'paired':
+        elif group_relationship == 'paired':
             a = df['group_A']
             b = df['group_B']
         else:
@@ -880,11 +880,11 @@ def qq_plot_normality(config, df):
     print("If points fall approximately along the straight line → data is likely normal.\n")
 
     group_count = config['group_count']
-    relationship = config['group_relationship']
-    outcome = config['outcome_type']
+    group_relationship = config['group_relationship']
+    outcome_type = config['outcome_type']
 
-    if outcome != 'continuous':
-        print(f"⚠️ Skipping: Outcome type = `{outcome}` → Q-Q plot not applicable.")
+    if outcome_type != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome_type}` → Q-Q plot not applicable.")
         return
 
     if group_count == 'one-sample':
@@ -894,10 +894,10 @@ def qq_plot_normality(config, df):
         plt.show()
 
     elif group_count == 'two-sample':
-        if relationship == 'independent':
+        if group_relationship == 'independent':
             a = df[df['group'] == 'A']['value']
             b = df[df['group'] == 'B']['value']
-        elif relationship == 'paired':
+        elif group_relationship == 'paired':
             a = df['group_A']
             b = df['group_B']
         else:
@@ -964,16 +964,16 @@ def infer_variance_equality(config, df):
     print("\n📏 **Step: Infer Equality of Variance Across Groups**")
 
     group_count = config['group_count']
-    relationship = config['group_relationship']
-    outcome = config.get('outcome_type')
+    group_relationship = config['group_relationship']
+    outcome_type = config.get('outcome_type')
 
     # Variance equality is only relevant for continuous outcomes
-    if outcome != 'continuous':
-        print(f"⚠️ Skipping variance check: Only applicable for continuous outcome (current: `{outcome}`).")
+    if outcome_type != 'continuous':
+        print(f"⚠️ Skipping variance check: Only applicable for continuous outcome (current: `{outcome_type}`).")
         config['variance_equal'] = None
         return config['variance_equal']
     # Skip if not applicable (only for independent two-sample or multi-sample)
-    if relationship != 'independent':
+    if group_relationship != 'independent':
         print("⚠️ Skipping variance check: Only applicable for independent groups (two-sample or multi-sample).")
         config['variance_equal'] = None
         return config['variance_equal']
@@ -1032,11 +1032,11 @@ def visualize_distribution(config, df):
     print("\n📊 Step: Visual Distribution Overview (Side-by-Side)\n")
 
     group_count = config['group_count']
-    relationship = config['group_relationship']
-    outcome = config['outcome_type']
+    group_relationship = config['group_relationship']
+    outcome_type = config['outcome_type']
 
-    if outcome != 'continuous':
-        print(f"⚠️ Skipping: Outcome type = `{outcome}` → Not applicable.")
+    if outcome_type != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome_type}` → Not applicable.")
         return
 
     def plot_on_axis(sample, ax, title):
@@ -1064,11 +1064,11 @@ def visualize_distribution(config, df):
     elif group_count == 'two-sample':
         fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-        if relationship == 'independent':
+        if group_relationship == 'independent':
             a = df[df['group'] == 'A']['value']
             b = df[df['group'] == 'B']['value']
 
-        elif relationship == 'paired':
+        elif group_relationship == 'paired':
             a = df['group_A']
             b = df['group_B']
 
@@ -1119,10 +1119,10 @@ def visualize_variance_boxplot_annotated(config, df):
     print("   (Spread = how much values vary within each group)\n")
 
     group_count = config['group_count']
-    relationship = config['group_relationship']
+    group_relationship = config['group_relationship']
 
-    if (group_count == 'two-sample' and relationship == 'independent') or (
-            group_count == 'multi-sample' and relationship == 'independent'):
+    if (group_count == 'two-sample' and group_relationship == 'independent') or (
+            group_count == 'multi-sample' and group_relationship == 'independent'):
 
         if 'group' not in df.columns:
             print("⚠️ Spread comparison requires 'group' column.")
@@ -1183,14 +1183,17 @@ def infer_parametric_flag(config):
 
     print("\n📏 Step: Decide Between Parametric vs Non-Parametric Approach")
 
-    if config['outcome_type'] != 'continuous':
-        print(f"⚠️ Skipping: Outcome type = `{config['outcome_type']}` → Parametric logic not applicable.")
+    outcome_type = config['outcome_type']
+    distribution = config['distribution']
+
+    if outcome_type != 'continuous':
+        print(f"⚠️ Skipping: Outcome type = `{outcome_type}` → Parametric logic not applicable.")
         config['parametric'] = None
         return config['parametric']
 
-    print(f"🔍 Distribution of outcome = `{config['distribution']}`")
+    print(f"🔍 Distribution of outcome = `{distribution}`")
 
-    if config['distribution'] == 'normal':
+    if distribution == 'normal':
         print("✅ Normal distribution → Proceeding with a parametric test")
         config['parametric'] = True
     else:
@@ -1226,69 +1229,69 @@ def determine_test_to_run(config):
 
     print("\n🧭 Step: Determine Which Statistical Test to Use")
     
-    outcome = config['outcome_type']
-    group_rel = config['group_relationship']
+    outcome_type = config['outcome_type']
+    group_relationship = config['group_relationship']
     group_count = config['group_count']
-    dist = config['distribution']
-    equal_var = config['variance_equal']
+    distribution = config['distribution']
+    variance_equal = config['variance_equal']
     parametric = config['parametric']
 
     print("📦 Inputs:")
-    print(f"• Outcome Type         = `{outcome}`")
+    print(f"• Outcome Type         = `{outcome_type}`")
     print(f"• Group Count          = `{group_count}`")
-    print(f"• Group Relationship   = `{group_rel}`")
-    print(f"• Distribution         = `{dist}`")
-    print(f"• Equal Variance       = `{equal_var}`")
+    print(f"• Group Relationship   = `{group_relationship}`")
+    print(f"• Distribution         = `{distribution}`")
+    print(f"• Equal Variance       = `{variance_equal}`")
     print(f"• Parametric Flag      = `{parametric}`")
 
     print("\n🔍 Matching against known test cases...")
 
     # One-sample
     if group_count == 'one-sample':
-        if outcome == 'continuous':
-            test_name = 'one_sample_ttest' if dist == 'normal' else 'one_sample_wilcoxon'
-        elif outcome == 'binary':
+        if outcome_type == 'continuous':
+            test_name = 'one_sample_ttest' if distribution == 'normal' else 'one_sample_wilcoxon'
+        elif outcome_type == 'binary':
             test_name = 'one_proportion_ztest'
         else:
             test_name = 'test_not_found'
 
     # Two-sample independent
-    elif group_count == 'two-sample' and group_rel == 'independent':
-        if outcome == 'continuous':
+    elif group_count == 'two-sample' and group_relationship == 'independent':
+        if outcome_type == 'continuous':
             if parametric:
-                test_name = 'two_sample_ttest_pooled' if equal_var == 'equal' else 'two_sample_ttest_welch'
+                test_name = 'two_sample_ttest_pooled' if variance_equal == 'equal' else 'two_sample_ttest_welch'
             else:
                 test_name = 'mann_whitney_u'
-        elif outcome == 'binary':
+        elif outcome_type == 'binary':
             test_name = 'two_proportion_ztest'
-        elif outcome == 'categorical':
+        elif outcome_type == 'categorical':
             test_name = 'chi_square'
-        elif outcome == 'count':
+        elif outcome_type == 'count':
             test_name = 'poisson_test'
         else:
             test_name = 'test_not_found'
 
     # Two-sample paired
-    elif group_count == 'two-sample' and group_rel == 'paired':
-        if outcome == 'continuous':
+    elif group_count == 'two-sample' and group_relationship == 'paired':
+        if outcome_type == 'continuous':
             test_name = 'paired_ttest' if parametric else 'wilcoxon_signed_rank'
-        elif outcome == 'binary':
+        elif outcome_type == 'binary':
             test_name = 'mcnemar'
         else:
             test_name = 'test_not_found'
 
     # Multi-group
     elif group_count == 'multi-sample':
-        if outcome == 'continuous':
+        if outcome_type == 'continuous':
             if parametric:
-                test_name = 'anova' if equal_var == 'equal' else 'welch_anova'
+                test_name = 'anova' if variance_equal == 'equal' else 'welch_anova'
             else:
                 test_name = 'kruskal_wallis'
-        elif outcome == 'binary':
+        elif outcome_type == 'binary':
             test_name = 'chi_square'
-        elif outcome == 'categorical':
+        elif outcome_type == 'categorical':
             test_name = 'chi_square'
-        elif outcome == 'count':
+        elif outcome_type == 'count':
             test_name = 'poisson_test'
         else:
             test_name = 'test_not_found'
@@ -1324,33 +1327,33 @@ def print_hypothesis_statement(config):
 
     print("\n🧠 Step: Generate Hypothesis Statement")
 
-    tail = config['tail_type']
+    tail_type = config['tail_type']
     test_name = config['test_name']
     print(f"🔍 Selected Test        : `{test_name}`")
-    print(f"🔍 Tail Type            : `{tail}`\n")
+    print(f"🔍 Tail Type            : `{tail_type}`\n")
 
     H_0 = None
     H_a = None
 
     if test_name == 'one_sample_ttest':
         H_0 = "The sample mean equals the reference value."
-        H_a = "The sample mean is different from the reference." if tail == 'two-tailed' else "The sample mean is greater/less than the reference."
+        H_a = "The sample mean is different from the reference." if tail_type == 'two-tailed' else "The sample mean is greater/less than the reference."
 
     elif test_name == 'one_sample_wilcoxon':
         H_0 = "The population median (or symmetric center) equals the reference value."
-        H_a = "The median is different from the reference." if tail == 'two-tailed' else "The median is greater/less than the reference."
+        H_a = "The median is different from the reference." if tail_type == 'two-tailed' else "The median is greater/less than the reference."
 
     elif test_name == 'one_proportion_ztest':
         H_0 = "The sample proportion equals the baseline rate."
-        H_a = "The sample proportion is different from the baseline." if tail == 'two-tailed' else "The sample proportion is greater/less than the baseline."
+        H_a = "The sample proportion is different from the baseline." if tail_type == 'two-tailed' else "The sample proportion is greater/less than the baseline."
 
     elif test_name in ['two_sample_ttest_pooled', 'two_sample_ttest_welch', 'mann_whitney_u', 'two_proportion_ztest']:
         H_0 = "The outcome (mean/proportion) is the same across groups A and B."
-        H_a = "The outcome differs between groups." if tail == 'two-tailed' else "Group B is greater/less than Group A."
+        H_a = "The outcome differs between groups." if tail_type == 'two-tailed' else "Group B is greater/less than Group A."
 
     elif test_name in ['paired_ttest', 'wilcoxon_signed_rank']:
         H_0 = "The average difference between paired values (before vs after) is zero."
-        H_a = "There is a difference in paired values." if tail == 'two-tailed' else "After is greater/less than before."
+        H_a = "There is a difference in paired values." if tail_type == 'two-tailed' else "After is greater/less than before."
 
     elif test_name == 'mcnemar':
         H_0 = "Proportion of success is the same before and after."
