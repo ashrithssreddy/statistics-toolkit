@@ -1205,6 +1205,10 @@ def print_hypothesis_statement(config):
         H_0 = "The sample mean equals the reference value."
         H_a = "The sample mean is different from the reference." if tail == 'two-tailed' else "The sample mean is greater/less than the reference."
 
+    elif test_name == 'one_sample_wilcoxon':
+        H_0 = "The population median (or symmetric center) equals the reference value."
+        H_a = "The median is different from the reference." if tail == 'two-tailed' else "The median is greater/less than the reference."
+
     elif test_name == 'one_proportion_ztest':
         H_0 = "The sample proportion equals the baseline rate."
         H_a = "The sample proportion is different from the baseline." if tail == 'two-tailed' else "The sample proportion is greater/less than the baseline."
