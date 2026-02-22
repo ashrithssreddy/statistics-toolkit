@@ -12,6 +12,7 @@ import json
 # %autoreload 2
 
 # Stats Libraries
+import statsmodels.api as sm
 from statsmodels.stats.oneway import anova_oneway
 from statsmodels.stats.proportion import proportions_ztest
 import scipy.stats as stats
@@ -1306,7 +1307,8 @@ def run_hypothesis_test(config, df):
         'chi_square': 'Chi-square statistic',
         'mcnemar': 'Chi-square statistic',
         'one_proportion_ztest': 'z-statistic',
-        'two_proportion_ztest': 'z-statistic'
+        'two_proportion_ztest': 'z-statistic',
+        'poisson_test': 'Chi-square statistic (LRT)'
     }
     
     test_statistic_label = test_statistic_map.get(test_name, 'Test statistic')
@@ -1392,6 +1394,18 @@ def run_hypothesis_test(config, df):
         elif test_name == 'chi_square':
             contingency = pd.crosstab(df['group'], df['value'])
             stat, p, _, _ = chi2_contingency(contingency)
+
+        elif test_name == 'poisson_test':
+            # Compare Poisson rates across groups via GLM likelihood-ratio test
+            y = df['value'].values
+            X_dummies = pd.get_dummies(df['group'], drop_first=True)
+            X = sm.add_constant(X_dummies)
+            full = sm.GLM(y, X, family=sm.families.Poisson()).fit()
+            null_model = sm.GLM(y, np.ones((len(y), 1)), family=sm.families.Poisson()).fit()
+            lr_stat = 2 * (full.llf - null_model.llf)
+            df_diff = full.df_model - null_model.df_model
+            p = float(stats.chi2.sf(lr_stat, df_diff))
+            stat = lr_stat
 
         else:
             warnings.warn(f"❌ Test not implemented: `{test_name}`")
