@@ -1,3 +1,7 @@
+# ==========================================================
+# region Setup
+# ==========================================================
+
 # Display Settings
 from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = "all"
@@ -30,8 +34,15 @@ from statsmodels.stats.power import (
 )
 from sklearn.model_selection import train_test_split
 
+# ==========================================================
+# region Data Setup
+# ==========================================================
+# (No utils in this section — data is created in the notebook.)
 
-
+s
+# ==========================================================
+# region Randomization Methods
+# ==========================================================
 def apply_simple_randomization(df, group_labels=None, group_col=None, seed=my_seed):
     """
     Randomly assigns each row to one of the specified groups.
@@ -240,10 +251,9 @@ def apply_cuped(
     df[outcome_col] = y - theta * df[pre_metric]
 
     return df
-
-
-
-
+# ==========================================================
+# region EDA
+# ==========================================================
 def test_normality(df, outcome_metric_col, group_col, group_labels):
     results = {}
     for group in group_labels:
@@ -296,8 +306,9 @@ def determine_test_family(test_config):
 
     else:
         raise ValueError(f"Unsupported outcome_metric_datatype: {data_type}")
-
-
+# ==========================================================
+# region AA Testing
+# ==========================================================
 def run_outcome_similarity_test(
     df,
     group_col,
@@ -599,9 +610,9 @@ def plot_p_value_distribution(p_values, alpha=0.05):
     plt.legend()
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     plt.show()
-
-
-
+# ==========================================================
+# region Power Analysis
+# ==========================================================
 def calculate_power_sample_size(
     test_family,
     variant=None,
@@ -691,10 +702,9 @@ def print_power_summary(
 
     else:
         print("⚠️ Unsupported family for summary.")
-
-
-
-
+# ==========================================================
+# region AB Testing
+# ==========================================================
 
 
 
@@ -783,6 +793,9 @@ def run_ab_test(
 
 
 
+# ==========================================================
+# region Results
+# ==========================================================
 
 def summarize_ab_test_result(result):
     """
@@ -1043,9 +1056,9 @@ def print_final_ab_test_summary(result):
         print("⚠️ No p-value available.")
 
     print("="*40 + "\n")
-
-
-
+# ==========================================================
+# region How Long? (Monitoring Dashboard Components)
+# ==========================================================
 def estimate_test_duration(
     required_sample_size_per_group,
     daily_eligible_users,
@@ -1091,9 +1104,9 @@ def estimate_test_duration(
         'longest_group_runtime': longest_group_runtime,
         'recommended_total_duration': total_with_buffer
     }
-
-
-
+# ==========================================================
+# region Post Hoc Analysis
+# ==========================================================
 def visualize_segment_lift(df_segment, segment_col):
     """
     Plots horizontal bar chart of mean lift per segment (Treatment - Control).
