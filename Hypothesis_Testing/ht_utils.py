@@ -214,6 +214,11 @@ def generate_data_from_config(config, seed=1995):
     # ONE-SAMPLE
     # ----------------------------
     if group_count == 'one-sample':
+        if outcome == 'count':
+            raise ValueError(
+                "One-sample tests for count data are not supported by this module. "
+                "Use two-sample or multi-sample for count outcomes."
+            )
 
         if outcome == 'continuous':
             if distribution == 'non-normal':
@@ -1064,6 +1069,8 @@ def determine_test_to_run(config):
             test_name = 'two_proportion_ztest'
         elif outcome == 'categorical':
             test_name = 'chi_square'
+        elif outcome == 'count':
+            test_name = 'poisson_test'
         else:
             test_name = 'test_not_found'
 
@@ -1083,14 +1090,14 @@ def determine_test_to_run(config):
                 test_name = 'anova' if equal_var == 'equal' else 'welch_anova'
             else:
                 test_name = 'kruskal_wallis'
+        elif outcome == 'binary':
+            test_name = 'chi_square'
         elif outcome == 'categorical':
             test_name = 'chi_square'
+        elif outcome == 'count':
+            test_name = 'poisson_test'
         else:
             test_name = 'test_not_found'
-    
-    # Count data
-    elif outcome == 'count':
-        test_name = 'poisson_test'
 
     else:
         test_name = 'test_not_found'
@@ -1151,9 +1158,13 @@ def print_hypothesis_statement(config):
         H_0 = "Proportion of success is the same before and after."
         H_a = "Proportion of success changed after treatment."
 
-    elif test_name in ['anova', 'kruskal_wallis']:
+    elif test_name in ['anova', 'welch_anova', 'kruskal_wallis']:
         H_0 = "All group means (or distributions) are equal."
         H_a = "At least one group differs."
+
+    elif test_name == 'chi_square':
+        H_0 = "The distribution of the outcome (across categories) is the same in all groups."
+        H_a = "The distribution differs across groups."
 
     elif test_name == 'poisson_test':
         H_0 = "The count rate (λ) is the same across groups."
