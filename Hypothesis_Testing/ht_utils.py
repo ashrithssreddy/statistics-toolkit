@@ -965,7 +965,13 @@ def infer_variance_equality(config, df):
 
     group_count = config['group_count']
     relationship = config['group_relationship']
+    outcome = config.get('outcome_type')
 
+    # Variance equality is only relevant for continuous outcomes
+    if outcome != 'continuous':
+        print(f"⚠️ Skipping variance check: Only applicable for continuous outcome (current: `{outcome}`).")
+        config['variance_equal'] = None
+        return config['variance_equal']
     # Skip if not applicable (only for independent two-sample or multi-sample)
     if relationship != 'independent':
         print("⚠️ Skipping variance check: Only applicable for independent groups (two-sample or multi-sample).")
