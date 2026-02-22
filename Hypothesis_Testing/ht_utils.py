@@ -555,8 +555,9 @@ def infer_distribution_from_data(config, df):
 
     Returns:
     --------
-    dict
-        Updated config dictionary with the 'distribution' key set
+    str
+        The inferred distribution: 'normal', 'non-normal', or 'NA'.
+        Callers typically assign to config, e.g. config['distribution'] = infer_distribution_from_data(config, df).
     """
 
     print("\n🔍 Step: Infer Distribution of Outcome Variable")
@@ -823,8 +824,9 @@ def infer_variance_equality(config, df):
 
     Returns:
     --------
-    dict
-        Updated config dictionary with the 'variance_equal' key set
+    str
+        The inferred variance assumption: 'equal', 'unequal', or 'NA'.
+        Callers typically assign to config, e.g. config['variance_equal'] = infer_variance_equality(config, df).
     """
     print("\n📏 **Step: Infer Equality of Variance Across Groups**")
 
@@ -1113,8 +1115,10 @@ def print_hypothesis_statement(config):
 
     Returns:
     --------
-    None
-        Prints formatted hypothesis statements directly to output
+    tuple of (str, str)
+        (H_0, H_a) — the null and alternative hypothesis strings.
+        Callers may assign to config, e.g. config['H_0'], config['H_a'] = print_hypothesis_statement(config).
+        Also prints the statements to output.
     """
 
     print("\n🧠 Step: Generate Hypothesis Statement")
