@@ -36,6 +36,36 @@ from sklearn.model_selection import train_test_split
 
 
 
+def create_dummy_ab_data(observations_count=1000, seed=1995):
+    users = pd.DataFrame({
+        # identifiers
+        'user_id': range(1, observations_count + 1),
+        # segmentation features
+        'platform': np.random.choice(['iOS', 'Android'], size=observations_count, p=[0.6, 0.4]),
+        'device_type': np.random.choice(['mobile', 'desktop'], size=observations_count, p=[0.7, 0.3]),
+        'user_tier': np.random.choice(['new', 'returning'], size=observations_count, p=[0.4, 0.6]),
+        'region': np.random.choice(['North', 'South', 'East', 'West'], size=observations_count, p=[0.25, 0.25, 0.25, 0.25]),
+        'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
+        'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
+        # outcome metrics
+        'engagement_score': np.random.normal(50, 15, observations_count),
+        'converted': np.random.binomial(n=1, p=0.1, size=observations_count),
+        'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count),
+        'bounce_rate': np.nan
+    })
+    
+    # Simulate  a guardrail metric (bounce_rate)
+    np.random.seed(seed)
+    users['bounce_rate'] = np.where(
+        users['converted'] == 1,
+        np.random.normal(loc=0.2, scale=0.05, size=observations_count),
+        np.random.normal(loc=0.6, scale=0.10, size=observations_count)
+    )
+    users['bounce_rate'] = users['bounce_rate'].clip(0, 1) # Bound bounce_rate between 0 and 1
+    return users
+
+
+
 # ==========================================================
 # region Randomization Methods
 # ==========================================================
