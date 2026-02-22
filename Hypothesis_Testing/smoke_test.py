@@ -62,13 +62,18 @@ BASE_CONFIG = {
 }
 
 # List of (override_dict, expected_test_name). Override is merged on top of BASE_CONFIG.
+# 5 keys: group_count, outcome_type, group_relationship, distribution, variance_equal.
+# Not all key combinations are valid (e.g. one-sample+count, multi-sample+paired are invalid).
+# We cover all valid design types: 4 one-sample + 9 two-sample independent + 3 two-sample paired + 9 multi-sample = 25 distinct valid combos; some configs repeat the same test (e.g. dist=None vs normal with equal var both yield pooled t) so the list has 23 entries.
 SMOKE_CONFIGS = [
-    # One-sample
+    # ---- One-sample (4 valid combos: continuous×3 + binary) ----
     (
         {
             "group_count": "one-sample",
             "outcome_type": "continuous",
+            "group_relationship": "independent",
             "distribution": "normal",
+            "variance_equal": None,
             "population_mean": 0.0,
         },
         "one_sample_ttest",
@@ -77,7 +82,9 @@ SMOKE_CONFIGS = [
         {
             "group_count": "one-sample",
             "outcome_type": "continuous",
+            "group_relationship": "independent",
             "distribution": "non-normal",
+            "variance_equal": None,
             "population_mean": 0.0,
         },
         "one_sample_wilcoxon",
@@ -85,13 +92,26 @@ SMOKE_CONFIGS = [
     (
         {
             "group_count": "one-sample",
-            "outcome_type": "binary",
+            "outcome_type": "continuous",
+            "group_relationship": "independent",
             "distribution": None,
+            "variance_equal": None,
+            "population_mean": 0.0,
+        },
+        "one_sample_ttest",  # data generated as normal when dist is None
+    ),
+    (
+        {
+            "group_count": "one-sample",
+            "outcome_type": "binary",
+            "group_relationship": "independent",
+            "distribution": None,
+            "variance_equal": None,
             "population_mean": 0.5,
         },
         "one_proportion_ztest",
     ),
-    # Two-sample independent
+    # ---- Two-sample independent (9: continuous×6 + binary + categorical + count) ----
     (
         {
             "group_count": "two-sample",
@@ -126,6 +146,26 @@ SMOKE_CONFIGS = [
         {
             "group_count": "two-sample",
             "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": "equal",
+        },
+        "two_sample_ttest_pooled",
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": "unequal",
+        },
+        "two_sample_ttest_welch",
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "independent",
             "outcome_type": "binary",
             "distribution": None,
             "variance_equal": None,
@@ -152,7 +192,7 @@ SMOKE_CONFIGS = [
         },
         "poisson_test",
     ),
-    # Two-sample paired
+    # ---- Two-sample paired (3: continuous normal, continuous non-normal, binary) ----
     (
         {
             "group_count": "two-sample",
@@ -167,13 +207,23 @@ SMOKE_CONFIGS = [
         {
             "group_count": "two-sample",
             "group_relationship": "paired",
+            "outcome_type": "continuous",
+            "distribution": "non-normal",
+            "variance_equal": None,
+        },
+        "wilcoxon_signed_rank",
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "paired",
             "outcome_type": "binary",
             "distribution": None,
             "variance_equal": None,
         },
         "mcnemar",
     ),
-    # Multi-sample
+    # ---- Multi-sample independent (9: continuous×6 + binary + categorical + count) ----
     (
         {
             "group_count": "multi-sample",
@@ -208,7 +258,37 @@ SMOKE_CONFIGS = [
         {
             "group_count": "multi-sample",
             "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": "equal",
+        },
+        "anova",
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": "unequal",
+        },
+        "welch_anova",
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
             "outcome_type": "binary",
+            "distribution": None,
+            "variance_equal": None,
+        },
+        "chi_square",
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
+            "outcome_type": "categorical",
             "distribution": None,
             "variance_equal": None,
         },
@@ -264,11 +344,21 @@ def run_pipeline(config: dict, quiet: bool = True) -> dict:
             sys.stdout, sys.stderr = old_stdout, old_stderr
 
 
+def _five_key_label(config: dict, expected_test: str) -> str:
+    """Format the 5-key combo + expected test for readable output."""
+    gc = config["group_count"]
+    ot = config["outcome_type"]
+    gr = config["group_relationship"]
+    dist = config["distribution"] if config.get("distribution") is not None else "None"
+    ve = config["variance_equal"] if config.get("variance_equal") is not None else "None"
+    return f"{gc} | {ot} | {gr} | dist={dist} | var={ve} => {expected_test}"
+
+
 def main() -> int:
     failed = 0
     for override, expected_test in SMOKE_CONFIGS:
         config = {**BASE_CONFIG, **override}
-        label = f"{config['group_count']} | {config['outcome_type']} | {expected_test}"
+        label = _five_key_label(config, expected_test)
         try:
             result = run_pipeline(config, quiet=True)
             p = result.get("p_value")
