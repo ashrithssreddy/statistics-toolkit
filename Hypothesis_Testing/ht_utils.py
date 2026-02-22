@@ -763,6 +763,7 @@ def qq_plot_normality(config, df):
 
     - For one-sample: plots entire dataset
     - For two-sample: plots each group separately
+    - For multi-sample: plots one Q-Q per group in a row
     """
 
     print("\n📊 Step: Visual Normality Check using Q-Q Plot")
@@ -801,6 +802,23 @@ def qq_plot_normality(config, df):
         stats.probplot(b, dist="norm", plot=axes[1])
         axes[1].set_title("Q-Q Plot: Group B")
 
+        plt.tight_layout()
+        plt.show()
+
+    elif group_count == 'multi-sample':
+        if 'group' not in df.columns:
+            print("❌ Multi-sample Q-Q plot requires 'group' column.")
+            return
+        groups = df['group'].unique()
+        n_groups = len(groups)
+        fig_width = min(4 * n_groups, 16)
+        fig, axes = plt.subplots(1, n_groups, figsize=(fig_width, 5))
+        if n_groups == 1:
+            axes = [axes]
+        for i, grp in enumerate(groups):
+            series = df[df['group'] == grp]['value']
+            stats.probplot(series, dist="norm", plot=axes[i])
+            axes[i].set_title(f"Q-Q Plot: Group {grp}")
         plt.tight_layout()
         plt.show()
 
