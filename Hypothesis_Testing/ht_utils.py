@@ -167,6 +167,24 @@ def validate_config(config):
     if config['outcome_type'] == 'count' and config['group_count'] == 'one-sample':
         raise ValueError("🔒 One-sample tests for count data are not supported by this module.")
 
+    # Distribution only applicable for continuous outcome
+    if config['outcome_type'] != 'continuous' and config['distribution'] is not None:
+        raise ValueError(
+            f"❌ Invalid combo: outcome_type = '{config['outcome_type']}' requires distribution = None "
+            "(normality applies only to continuous outcomes)."
+        )
+
+    # variance_equal only applicable for continuous + (two-sample or multi-sample) + independent
+    if config['variance_equal'] is not None:
+        if config['outcome_type'] != 'continuous':
+            raise ValueError(
+                f"❌ Invalid combo: outcome_type = '{config['outcome_type']}' requires variance_equal = None."
+            )
+        if config['group_count'] == 'one-sample':
+            raise ValueError("❌ Invalid combo: one-sample requires variance_equal = None.")
+        if config['group_relationship'] == 'paired':
+            raise ValueError("❌ Invalid combo: paired design requires variance_equal = None.")
+
     # Effect size unusually large or small (soft validation)
     if config['effect_size'] < 0 or config['effect_size'] > 2:
         print("⚠️ Effect size is unusually extreme. Are you simulating a realistic scenario?")
