@@ -32,7 +32,7 @@ from sklearn.model_selection import train_test_split
 
 
 
-def apply_simple_randomization(df, group_labels=group_labels, group_col=group_col, seed=my_seed):
+def apply_simple_randomization(df, group_labels=None, group_col=None, seed=my_seed):
     """
     Randomly assigns each row to one of the specified groups.
 
@@ -45,11 +45,15 @@ def apply_simple_randomization(df, group_labels=group_labels, group_col=group_co
     Returns:
     - DataFrame with an added group assignment column
     """
+    if group_labels is None:
+        group_labels = ('control', 'treatment')
+    if group_col is None:
+        group_col = 'group'
     np.random.seed(seed)
     df[group_col] = np.random.choice(group_labels, size=len(df), replace=True)
     return df
 
-def apply_stratified_randomization(df, stratify_col, group_labels=group_labels, group_col=group_col, seed=my_seed):
+def apply_stratified_randomization(df, stratify_col, group_labels=None, group_col=None, seed=my_seed):
     """
     Performs stratified randomization to assign rows into multiple groups while maintaining balance across strata.
 
@@ -63,6 +67,10 @@ def apply_stratified_randomization(df, stratify_col, group_labels=group_labels, 
     Returns:
     - DataFrame with a new group assignment column
     """
+    if group_labels is None:
+        group_labels = ('control', 'treatment')
+    if group_col is None:
+        group_col = 'group'
     np.random.seed(seed)
     df[group_col] = None
     n_groups = len(group_labels)
@@ -75,7 +83,7 @@ def apply_stratified_randomization(df, stratify_col, group_labels=group_labels, 
 
     return df
 
-def apply_block_randomization(df, observation_id_col, group_col=group_col, block_size=10, group_labels=group_labels, seed=my_seed):
+def apply_block_randomization(df, observation_id_col, group_col=None, block_size=10, group_labels=None, seed=my_seed):
     """
     Assigns group labels using block randomization to ensure balance within fixed-size blocks.
 
@@ -90,6 +98,10 @@ def apply_block_randomization(df, observation_id_col, group_col=group_col, block
     Returns:
     - DataFrame with a new column [group_col] indicating assigned group
     """
+    if group_labels is None:
+        group_labels = ('control', 'treatment')
+    if group_col is None:
+        group_col = 'group'
     np.random.seed(seed)
     df = df.sort_values(observation_id_col).reset_index(drop=True).copy()
     n_groups = len(group_labels)
@@ -112,7 +124,7 @@ def apply_block_randomization(df, observation_id_col, group_col=group_col, block
     return df
 
 
-def apply_matched_pair_randomization(df, sort_col, group_col=group_col, group_labels=group_labels):
+def apply_matched_pair_randomization(df, sort_col, group_col=None, group_labels=None):
     """
     Assigns groups using matched-pair randomization based on a sorting variable.
 
@@ -125,6 +137,10 @@ def apply_matched_pair_randomization(df, sort_col, group_col=group_col, group_la
     Returns:
     - DataFrame with alternating group assignments within sorted pairs
     """
+    if group_labels is None:
+        group_labels = ('control', 'treatment')
+    if group_col is None:
+        group_col = 'group'
     # Sort by matching variable so similar users are adjacent
     df = df.sort_values(by=sort_col).reset_index(drop=True)
 
@@ -134,7 +150,7 @@ def apply_matched_pair_randomization(df, sort_col, group_col=group_col, group_la
     return df
 
 
-def apply_cluster_randomization(df, cluster_col, group_col=group_col, group_labels=group_labels, seed=my_seed):
+def apply_cluster_randomization(df, cluster_col, group_col=None, group_labels=None, seed=my_seed):
     """
     Assigns groups using cluster-level randomization — all observations in a cluster
     receive the same group assignment.
@@ -149,6 +165,10 @@ def apply_cluster_randomization(df, cluster_col, group_col=group_col, group_labe
     Returns:
     - DataFrame with assigned groups at the cluster level
     """
+    if group_labels is None:
+        group_labels = ('control', 'treatment')
+    if group_col is None:
+        group_col = 'group'
     np.random.seed(seed)
 
     # Unique clusters (e.g., unique city/store values)
@@ -169,8 +189,8 @@ def apply_cuped(
     pre_metric,
     outcome_metric_col,  # observed outcome column (e.g., engagement_score)
     outcome_col=None,
-    group_col=group_col,
-    group_labels=group_labels,
+    group_col=None,
+    group_labels=None,
     seed=my_seed
 ):
     """
