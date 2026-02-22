@@ -980,27 +980,41 @@ def visualize_distribution(config, df):
         print("❌ Unsupported group count.")
 
 def visualize_variance_boxplot_annotated(config, df):
+    """
+    Boxplot of outcome by group with std/IQR annotations.
+    Applicable for two-sample independent and multi-sample independent (spread comparison across groups).
+    """
     print("\n📊 Visual Check: Spread Comparison Between Groups")
     print("   (Spread = how much values vary within each group)\n")
 
-    if config['group_count'] == 'two-sample' and config['group_relationship'] == 'independent':
+    group_count = config['group_count']
+    relationship = config['group_relationship']
 
-        summary = df.groupby('group')['value'].agg(['std', 'var', 'median', 
+    if (group_count == 'two-sample' and relationship == 'independent') or (
+            group_count == 'multi-sample' and relationship == 'independent'):
+
+        if 'group' not in df.columns:
+            print("⚠️ Spread comparison requires 'group' column.")
+            return
+
+        summary = df.groupby('group')['value'].agg(['std', 'var', 'median',
                                                     lambda x: np.percentile(x, 75) - np.percentile(x, 25)])
         summary.columns = ['std_dev', 'variance', 'median', 'IQR']
 
         print("📋 Spread Summary:")
         display(summary)
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        n_groups = len(summary.index)
+        fig_width = min(4 * n_groups, 16)
+        fig, ax = plt.subplots(figsize=(fig_width, 5))
         sns.boxplot(x='group', y='value', data=df, ax=ax)
 
         # Annotate each group
         for i, group in enumerate(summary.index):
             std = summary.loc[group, 'std_dev']
             iqr = summary.loc[group, 'IQR']
-            ax.text(i, 
-                    df['value'].max()*0.95,
+            ax.text(i,
+                    df['value'].max() * 0.95,
                     f"Std Dev: {std:.2f}\nIQR: {iqr:.2f}",
                     horizontalalignment='center',
                     fontsize=10,
@@ -1009,7 +1023,7 @@ def visualize_variance_boxplot_annotated(config, df):
         ax.set_title("Comparison of Value Spread by Group")
         ax.set_ylabel("Outcome Value")
         ax.set_xlabel("Group")
-        fig.set_size_inches(8, 5)
+        fig.set_size_inches(fig_width, 5)
         plt.tight_layout()
         plt.show()
 
@@ -1029,7 +1043,7 @@ def visualize_variance_boxplot_annotated(config, df):
             print("   Statistical tests assuming equal variance may not be appropriate.")
 
     else:
-        print("⚠️ This visualization currently supports two independent groups only.")
+        print("⚠️ Spread comparison is only applicable for independent groups (two-sample or multi-sample).")
 
 # ==========================================================
 # region Test Determination Functions
