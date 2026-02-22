@@ -585,7 +585,7 @@ def infer_distribution_from_data(config, df):
 
     This function:
     - Checks if the outcome type is continuous (required for normality testing)
-    - Applies Shapiro-Wilk test to one or both groups depending on group structure
+    - Applies Shapiro-Wilk test to the outcome (one group, both groups, or each group for multi-sample)
     - Updates the 'distribution' key in the config as 'normal', 'non-normal', or None (when not applicable)
     - Logs interpretation and decision in a reader-friendly format
 
@@ -670,7 +670,30 @@ def infer_distribution_from_data(config, df):
             config['distribution'] = 'non-normal'
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
-        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config['distribution']
+
+    elif group_count == 'multi-sample':
+        if 'group' not in df.columns:
+            print("❌ Multi-sample distribution check requires 'group' column.")
+            config['distribution'] = None
+            return config['distribution']
+        print("• Multi-sample case → testing each group")
+        groups = df['group'].unique()
+        all_normal = True
+        for grp in groups:
+            series = df[df['group'] == grp]['value']
+            p = shapiro(series).pvalue
+            status = "Fail to reject H₀ ✅ (likely normal)" if p > 0.05 else "Reject H₀ ⚠️ (likely non-normal)"
+            print(f"• Group {grp} → Shapiro-Wilk p = {p:.4f} → {status}")
+            if p <= 0.05:
+                all_normal = False
+        if all_normal:
+            print("✅ All groups are likely drawn from normal distributions")
+            config['distribution'] = 'normal'
+        else:
+            print("⚠️ At least one group does not appear normally distributed")
+            config['distribution'] = 'non-normal'
+        print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
         return config['distribution']
 
     else:
