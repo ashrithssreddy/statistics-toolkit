@@ -88,6 +88,7 @@ def apply_simple_randomization(df, group_labels=None, group_col=None, seed=my_se
         group_col = 'group'
     np.random.seed(seed)
     df[group_col] = np.random.choice(group_labels, size=len(df), replace=True)
+    df = df[[group_col] + [c for c in df.columns if c != group_col]]
     return df
 
 def apply_stratified_randomization(df, stratify_col, group_labels=None, group_col=None, seed=my_seed):
@@ -118,6 +119,7 @@ def apply_stratified_randomization(df, stratify_col, group_labels=None, group_co
         group_assignments = np.tile(group_labels, int(np.ceil(len(shuffled) / n_groups)))[:len(shuffled)]
         df.loc[shuffled.index, group_col] = group_assignments
 
+    df = df[[group_col] + [c for c in df.columns if c != group_col]]
     return df
 
 def apply_block_randomization(df, observation_id_col, group_col=None, block_size=10, group_labels=None, seed=my_seed):
@@ -157,6 +159,7 @@ def apply_block_randomization(df, observation_id_col, group_col=None, block_size
 
     df[group_col] = group_assignments
     df = df.drop(columns=['_block'])
+    df = df[[group_col] + [c for c in df.columns if c != group_col]]
 
     return df
 
@@ -183,6 +186,7 @@ def apply_matched_pair_randomization(df, sort_col, group_col=None, group_labels=
 
     # Cycle through group labels for each row
     df[group_col] = [group_labels[i % len(group_labels)] for i in range(len(df))]
+    df = df[[group_col] + [c for c in df.columns if c != group_col]]
 
     return df
 
@@ -218,6 +222,7 @@ def apply_cluster_randomization(df, cluster_col, group_col=None, group_labels=No
 
     # Map group assignments to full DataFrame
     df[group_col] = df[cluster_col].map(cluster_assignments)
+    df = df[[group_col] + [c for c in df.columns if c != group_col]]
 
     return df
 
@@ -275,6 +280,8 @@ def apply_cuped(
     if outcome_col is None:
         outcome_col = f'{outcome_metric_col}_cuped_adjusted'
     df[outcome_col] = y - theta * df[pre_metric]
+    if group_col in df.columns:
+        df = df[[group_col] + [c for c in df.columns if c != group_col]]
 
     return df
 # ==========================================================
