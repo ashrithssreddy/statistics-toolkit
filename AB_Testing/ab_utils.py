@@ -1,5 +1,5 @@
 # ==========================================================
-# region Setup
+# region Data Setup
 # ==========================================================
 
 # Display Settings
@@ -34,12 +34,8 @@ from statsmodels.stats.power import (
 )
 from sklearn.model_selection import train_test_split
 
-# ==========================================================
-# region Data Setup
-# ==========================================================
-# (No utils in this section — data is created in the notebook.)
 
-s
+
 # ==========================================================
 # region Randomization Methods
 # ==========================================================
