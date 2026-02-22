@@ -1433,12 +1433,38 @@ def run_hypothesis_test(config, df):
         print(f"• Test Statistic ({test_statistic_label}) = {stat:.4f}")
         print(f"• P-value            = {p:.4f}")
         print(f"• Alpha (α)          = {alpha:.2f}")
+
+        # Degrees of freedom for visualization (t and F distributions)
+        vis_df1, vis_df2 = None, None
+        if test_name == 'one_sample_ttest':
+            vis_df1 = len(df) - 1
+        elif test_name == 'two_sample_ttest_pooled':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+            vis_df1 = len(a) + len(b) - 2
+        elif test_name == 'two_sample_ttest_welch':
+            a = df[df['group'] == 'A']['value']
+            b = df[df['group'] == 'B']['value']
+            var_a, var_b = np.var(a, ddof=1), np.var(b, ddof=1)
+            n_a, n_b = len(a), len(b)
+            num = (var_a / n_a + var_b / n_b) ** 2
+            den = (var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1)
+            vis_df1 = num / den if den > 0 else (n_a + n_b - 2)
+        elif test_name == 'paired_ttest':
+            vis_df1 = len(df) - 1
+        elif test_name in ('anova', 'welch_anova'):
+            k = df['group'].nunique()
+            n = len(df)
+            vis_df1 = k - 1
+            vis_df2 = n - k
+
         visualize_test_result(
             stat,
             alpha,
             test_statistic_label,
             tail=config.get('tail_type', 'two-tailed'),
-            df1=len(df) - 1)
+            df1=vis_df1,
+            df2=vis_df2)
 
         if p < alpha:
             print(f"• Conclusion         = ✅ Statistically significant → Reject H₀")
