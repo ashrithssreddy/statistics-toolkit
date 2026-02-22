@@ -868,11 +868,11 @@ def qq_plot_normality(config, df):
 # ==========================================================
 def infer_variance_equality(config, df):
     """
-    Infers whether the variances across two independent groups are equal using Levene's test.
+    Infers whether the variances across independent groups are equal using Levene's test.
 
     This function:
-    - Checks if the variance assumption is relevant based on config
-    - Runs Levene’s test to compare the variances of Group A and Group B
+    - Checks if the variance assumption is relevant (two-sample or multi-sample independent)
+    - Runs Levene's test to compare variances across groups
     - Updates the 'variance_equal' key in the config as 'equal', 'unequal', or None (when not applicable)
     - Logs interpretation of the test result
 
@@ -891,25 +891,41 @@ def infer_variance_equality(config, df):
     """
     print("\n📏 **Step: Infer Equality of Variance Across Groups**")
 
-    # Skip if not applicable
-    if config['group_count'] != 'two-sample' or config['group_relationship'] != 'independent':
-        print("⚠️ Skipping variance check: Only applicable for two-sample independent tests.")
+    group_count = config['group_count']
+    relationship = config['group_relationship']
+
+    # Skip if not applicable (only for independent two-sample or multi-sample)
+    if relationship != 'independent':
+        print("⚠️ Skipping variance check: Only applicable for independent groups (two-sample or multi-sample).")
+        config['variance_equal'] = None
+        return config['variance_equal']
+    if group_count not in ('two-sample', 'multi-sample'):
+        print("⚠️ Skipping variance check: Only applicable for two-sample or multi-sample independent tests.")
+        config['variance_equal'] = None
+        return config['variance_equal']
+    if 'group' not in df.columns:
+        print("⚠️ Skipping variance check: 'group' column required.")
         config['variance_equal'] = None
         return config['variance_equal']
 
-    print("📘 We're checking if the spread (variance) of the outcome variable is similar across groups A and B.")
-    print("   This is important for choosing between a **pooled t-test** vs **Welch’s t-test**.")
-    print("🔬 Test Used: Levene’s Test for Equal Variance")
-    print("   H₀: Variance in Group A = Variance in Group B")
-    print("   H₁: Variances are different")
+    groups = df['group'].unique()
+    n_groups = len(groups)
 
-    # Extract data
-    a = df[df['group'] == 'A']['value']
-    b = df[df['group'] == 'B']['value']
+    print("📘 We're checking if the spread (variance) of the outcome variable is similar across all groups.")
+    if group_count == 'two-sample':
+        print("   This is important for choosing between a **pooled t-test** vs **Welch's t-test**.")
+    else:
+        print("   This is important for choosing between **ANOVA** vs **Welch ANOVA**.")
+    print("🔬 Test Used: Levene's Test for Equal Variance")
+    print("   H₀: Variances are equal across groups")
+    print("   H₁: Variances are not equal across groups")
 
-    # Run Levene's test
-    stat, p = levene(a, b)
-    print(f"\n📊 Levene’s Test Result:")
+    # Extract data: one array per group
+    group_arrays = [df[df['group'] == g]['value'].values for g in groups]
+
+    # Run Levene's test (supports 2 or more groups)
+    stat, p = levene(*group_arrays)
+    print(f"\n📊 Levene's Test Result:")
     print(f"• Test Statistic = {stat:.4f}")
     print(f"• p-value        = {p:.4f}")
 
@@ -917,11 +933,10 @@ def infer_variance_equality(config, df):
         print("✅ Fail to reject H₀ → Variances appear equal across groups")
         config['variance_equal'] = 'equal'
     else:
-        print("⚠️ Reject H₀ → Variances appear unequal")
+        print("⚠️ Reject H₀ → Variances appear unequal across groups")
         config['variance_equal'] = 'unequal'
 
     print(f"\n📦 Final Decision → config['variance_equal'] = `{config['variance_equal']}`")
-    # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
     return config['variance_equal']
 
 # ==========================================================
