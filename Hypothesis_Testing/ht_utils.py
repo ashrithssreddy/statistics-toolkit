@@ -892,6 +892,10 @@ def infer_variance_equality(config, df):
 def visualize_distribution(config, df):
     """
     Shows distributions side-by-side for comparison.
+
+    - For one-sample: single panel
+    - For two-sample: two panels (Group A, Group B)
+    - For multi-sample: one panel per group in a row
     """
 
     print("\n📊 Step: Visual Distribution Overview (Side-by-Side)\n")
@@ -949,6 +953,26 @@ def visualize_distribution(config, df):
         axes[0].set_ylim(0, y_max)
         axes[1].set_ylim(0, y_max)
 
+        plt.tight_layout()
+        plt.show()
+
+    elif group_count == 'multi-sample':
+        if 'group' not in df.columns:
+            print("❌ Multi-sample distribution plot requires 'group' column.")
+            return
+        groups = df['group'].unique()
+        n_groups = len(groups)
+        fig_width = min(4 * n_groups, 16)
+        fig, axes = plt.subplots(1, n_groups, figsize=(fig_width, 5))
+        if n_groups == 1:
+            axes = [axes]
+        for i, grp in enumerate(groups):
+            series = df[df['group'] == grp]['value']
+            plot_on_axis(series, axes[i], f"Group {grp}")
+        # Standardize y-axis across panels
+        y_max = max(ax.get_ylim()[1] for ax in axes)
+        for ax in axes:
+            ax.set_ylim(0, y_max)
         plt.tight_layout()
         plt.show()
 
