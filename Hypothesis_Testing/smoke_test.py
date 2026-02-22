@@ -61,10 +61,12 @@ BASE_CONFIG = {
     "H_a": None,
 }
 
-# List of (override_dict, expected_test_name). Override is merged on top of BASE_CONFIG.
+# List of (override_dict, expected_test_name or tuple of allowed test names). Override is merged on top of BASE_CONFIG.
 # 5 keys: group_count, outcome_type, group_relationship, distribution, variance_equal.
-# Not all key combinations are valid (e.g. one-sample+count, multi-sample+paired are invalid).
-# We cover all valid design types: 4 one-sample + 9 two-sample independent + 3 two-sample paired + 9 multi-sample = 25 distinct valid combos; some configs repeat the same test (e.g. dist=None vs normal with equal var both yield pooled t) so the list has 23 entries.
+# 33 Valid=Yes combos. We run 32; the only one skipped is one-sample categorical (row 115),
+# which validate_config rejects (goodness-of-fit not supported). When variance_equal=None for continuous
+# two/multi-sample (or distribution=None for paired continuous), EDA infers the value, so expected_test
+# can be a tuple of allowed tests.
 SMOKE_CONFIGS = [
     # ---- One-sample (4 valid combos: continuous×3 + binary) ----
     (
@@ -137,10 +139,50 @@ SMOKE_CONFIGS = [
             "group_count": "two-sample",
             "group_relationship": "independent",
             "outcome_type": "continuous",
+            "distribution": "normal",
+            "variance_equal": None,
+        },
+        ("two_sample_ttest_pooled", "two_sample_ttest_welch"),  # EDA sets variance_equal from Levene
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
             "distribution": "non-normal",
             "variance_equal": None,
         },
         "mann_whitney_u",
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": "non-normal",
+            "variance_equal": "equal",
+        },
+        "mann_whitney_u",
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": "non-normal",
+            "variance_equal": "unequal",
+        },
+        "mann_whitney_u",
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": None,
+        },
+        ("two_sample_ttest_pooled", "two_sample_ttest_welch"),  # EDA sets variance_equal from Levene
     ),
     (
         {
@@ -217,6 +259,16 @@ SMOKE_CONFIGS = [
         {
             "group_count": "two-sample",
             "group_relationship": "paired",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": None,
+        },
+        ("paired_ttest", "wilcoxon_signed_rank"),  # EDA infers distribution
+    ),
+    (
+        {
+            "group_count": "two-sample",
+            "group_relationship": "paired",
             "outcome_type": "binary",
             "distribution": None,
             "variance_equal": None,
@@ -249,10 +301,50 @@ SMOKE_CONFIGS = [
             "group_count": "multi-sample",
             "group_relationship": "independent",
             "outcome_type": "continuous",
+            "distribution": "normal",
+            "variance_equal": None,
+        },
+        ("anova", "welch_anova"),  # EDA sets variance_equal from Levene
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
             "distribution": "non-normal",
             "variance_equal": None,
         },
         "kruskal_wallis",
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": "non-normal",
+            "variance_equal": "equal",
+        },
+        "kruskal_wallis",
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": "non-normal",
+            "variance_equal": "unequal",
+        },
+        "kruskal_wallis",
+    ),
+    (
+        {
+            "group_count": "multi-sample",
+            "group_relationship": "independent",
+            "outcome_type": "continuous",
+            "distribution": None,
+            "variance_equal": None,
+        },
+        ("anova", "welch_anova"),  # EDA sets variance_equal from Levene
     ),
     (
         {
@@ -344,14 +436,15 @@ def run_pipeline(config: dict, quiet: bool = True) -> dict:
             sys.stdout, sys.stderr = old_stdout, old_stderr
 
 
-def _five_key_label(config: dict, expected_test: str) -> str:
+def _five_key_label(config: dict, expected_test) -> str:
     """Format the 5-key combo + expected test for readable output."""
     gc = config["group_count"]
     ot = config["outcome_type"]
     gr = config["group_relationship"]
     dist = config["distribution"] if config.get("distribution") is not None else "None"
     ve = config["variance_equal"] if config.get("variance_equal") is not None else "None"
-    return f"{gc} | {ot} | {gr} | dist={dist} | var={ve} => {expected_test}"
+    exp = expected_test if isinstance(expected_test, str) else "|".join(expected_test)
+    return f"{gc} | {ot} | {gr} | dist={dist} | var={ve} => {exp}"
 
 
 def main() -> int:
@@ -363,17 +456,18 @@ def main() -> int:
             result = run_pipeline(config, quiet=True)
             p = result.get("p_value")
             test = result.get("test")
+            allowed = (expected_test,) if isinstance(expected_test, str) else expected_test
             if test is None or test == "test_not_found":
                 print(f"FAIL {label}: test_name = {test!r}")
                 failed += 1
-            elif test != expected_test:
-                print(f"FAIL {label}: got test {test!r}, expected {expected_test!r}")
+            elif test not in allowed:
+                print(f"FAIL {label}: got test {test!r}, expected one of {allowed}")
                 failed += 1
             elif p is not None and not (0 <= p <= 1):
                 print(f"FAIL {label}: invalid p_value = {p!r}")
                 failed += 1
             else:
-                if p is None and expected_test == "poisson_test":
+                if p is None and "poisson_test" in allowed:
                     print(f"OK   {label} (p_value None: GLM may have failed)")
                 else:
                     print(f"OK   {label}")
