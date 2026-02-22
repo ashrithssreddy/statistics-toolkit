@@ -659,8 +659,9 @@ def infer_distribution_from_data_ks(config, df):
 
     Returns:
     --------
-    dict
-        Updated config dictionary with the 'distribution' key set
+    str
+        The inferred distribution: 'normal', 'non-normal', or 'NA'.
+        Callers typically assign to config, e.g. config['distribution'] = infer_distribution_from_data_ks(config, df).
     """
 
     print("\n🔍 Step: Infer Distribution of Outcome Variable (KS Test)")
@@ -673,7 +674,7 @@ def infer_distribution_from_data_ks(config, df):
         print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
         config['distribution'] = 'NA'
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
-        return config
+        return config['distribution']
 
     print("📘 Checking if the outcome variable follows a normal distribution")
     print("   Using Kolmogorov-Smirnov Test (against fitted normal)")
