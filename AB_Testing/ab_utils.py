@@ -284,6 +284,50 @@ def apply_cuped(
         df = df[[group_col] + [c for c in df.columns if c != group_col]]
 
     return df
+
+
+def check_sample_ratio_mismatch(df, group_col, group_labels, expected_ratios=None, alpha=0.05):
+    """
+    Checks for Sample Ratio Mismatch (SRM) using a Chi-Square test.
+
+    Parameters:
+    - df: DataFrame with group assignments
+    - group_col: Column containing group assignment
+    - group_labels: List or tuple of group names (e.g., ['control', 'treatment'])
+    - expected_ratios: Expected proportions per group (e.g., [0.5, 0.5])
+    - alpha: Significance level
+
+    Prints observed vs expected distribution and test results.
+    """
+    print("🔍 Sample Ratio Mismatch (SRM) Check")
+
+    observed_counts = df[group_col].value_counts().reindex(group_labels, fill_value=0)
+
+    if expected_ratios is None:
+        expected_ratios = [1 / len(group_labels)] * len(group_labels)
+    else:
+        total = sum(expected_ratios)
+        expected_ratios = [r / total for r in expected_ratios]  # normalize to sum to 1
+
+    expected_counts = [len(df) * ratio for ratio in expected_ratios]
+
+    # Print group-wise summary
+    for grp, expected in zip(group_labels, expected_counts):
+        observed = observed_counts.get(grp, 0)
+        pct = observed / len(df) * 100
+        print(f"Group {grp}: {observed} users ({pct:.2f}%) — Expected: {expected:.1f}")
+
+    # Run Chi-square test
+    chi2_stat, chi2_p = stats.chisquare(f_obs=observed_counts, f_exp=expected_counts)
+    print(f"\nChi2 Statistic: {chi2_stat:.4f}")
+    print(f"P-value       : {chi2_p:.4f}")
+
+    if chi2_p < alpha:
+        print("⚠️ SRM Detected — group assignment might be biased.\n")
+    else:
+        print("✅ No SRM — group sizes look balanced.\n")
+
+
 # ==========================================================
 # region EDA
 # ==========================================================
@@ -460,12 +504,11 @@ def run_aa_testing_generalized(
     visualize=True
 ):
     """
-    Runs A/A test: SRM check + similarity test + optional visualization.
+    Runs A/A test: outcome similarity test + optional visualization.
+    SRM (Sample Ratio Mismatch) is checked separately in the Randomization section.
     All logic routed by test_family + variant (no experiment_type).
     """
     print(f"\n📊 A/A Test Summary for metric: '{metric_col}' [{test_family}, {variant}]\n")
-
-    check_sample_ratio_mismatch(df, group_col, group_labels, alpha=alpha, expected_ratios=[0.5, 0.5])
 
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]
@@ -489,48 +532,6 @@ def run_aa_testing_generalized(
             variant=variant,
             group_labels=group_labels
         )
-
-
-def check_sample_ratio_mismatch(df, group_col, group_labels, expected_ratios=None, alpha=0.05):
-    """
-    Checks for Sample Ratio Mismatch (SRM) using a Chi-Square test.
-
-    Parameters:
-    - df: DataFrame with group assignments
-    - group_col: Column containing group assignment
-    - group_labels: List or tuple of group names (e.g., ['control', 'treatment'])
-    - expected_ratios: Expected proportions per group (e.g., [0.5, 0.5])
-    - alpha: Significance level
-
-    Prints observed vs expected distribution and test results.
-    """
-    print("🔍 Sample Ratio Mismatch (SRM) Check")
-
-    observed_counts = df[group_col].value_counts().reindex(group_labels, fill_value=0)
-
-    if expected_ratios is None:
-        expected_ratios = [1 / len(group_labels)] * len(group_labels)
-    else:
-        total = sum(expected_ratios)
-        expected_ratios = [r / total for r in expected_ratios]  # normalize to sum to 1
-
-    expected_counts = [len(df) * ratio for ratio in expected_ratios]
-
-    # Print group-wise summary
-    for grp, expected in zip(group_labels, expected_counts):
-        observed = observed_counts.get(grp, 0)
-        pct = observed / len(df) * 100
-        print(f"Group {grp}: {observed} users ({pct:.2f}%) — Expected: {expected:.1f}")
-
-    # Run Chi-square test
-    chi2_stat, chi2_p = stats.chisquare(f_obs=observed_counts, f_exp=expected_counts)
-    print(f"\nChi2 Statistic: {chi2_stat:.4f}")
-    print(f"P-value       : {chi2_p:.4f}")
-
-    if chi2_p < alpha:
-        print("⚠️ SRM Detected — group assignment might be biased.\n")
-    else:
-        print("✅ No SRM — group sizes look balanced.\n")
 
 
 def visualize_aa_distribution(df, group1, group2, group_col, metric_col, test_family, variant=None, group_labels=('control', 'treatment')):
