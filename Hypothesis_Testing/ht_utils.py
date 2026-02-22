@@ -713,7 +713,7 @@ def infer_distribution_from_data_ks(config, df):
     This function:
     - Checks if the outcome type is continuous (required for normality testing)
     - Fits a normal distribution using sample mean and std
-    - Applies KS test to one or both groups depending on structure
+    - Applies KS test to the outcome (one group, both groups, or each group for multi-sample)
     - Updates config['distribution'] as 'normal', 'non-normal', or None (when not applicable)
     - Logs interpretation clearly for readability
 
@@ -805,7 +805,30 @@ def infer_distribution_from_data_ks(config, df):
             config['distribution'] = 'non-normal'
 
         print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
-        # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
+        return config['distribution']
+
+    elif group_count == 'multi-sample':
+        if 'group' not in df.columns:
+            print("❌ Multi-sample distribution check requires 'group' column.")
+            config['distribution'] = None
+            return config['distribution']
+        print("• Multi-sample case → testing each group")
+        groups = df['group'].unique()
+        all_normal = True
+        for grp in groups:
+            series = df[df['group'] == grp]['value']
+            p = ks_normal_test(series)
+            status = "Fail to reject H₀ ✅ (likely normal)" if p > 0.05 else "Reject H₀ ⚠️ (likely non-normal)"
+            print(f"• Group {grp} → KS p = {p:.4f} → {status}")
+            if p <= 0.05:
+                all_normal = False
+        if all_normal:
+            print("✅ All groups are likely drawn from normal distributions")
+            config['distribution'] = 'normal'
+        else:
+            print("⚠️ At least one group does not appear normally distributed")
+            config['distribution'] = 'non-normal'
+        print(f"📦 Final Decision → config['distribution'] = `{config['distribution']}`")
         return config['distribution']
 
     else:
