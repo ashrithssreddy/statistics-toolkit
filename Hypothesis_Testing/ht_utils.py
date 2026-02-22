@@ -17,7 +17,7 @@ from statsmodels.stats.oneway import anova_oneway
 from statsmodels.stats.proportion import proportions_ztest
 import scipy.stats as stats
 from scipy.stats import (
-    t, norm, f, kstest,
+    t, norm, f, chi2, kstest,
     ttest_1samp, ttest_rel, ttest_ind, wilcoxon, mannwhitneyu,
     shapiro, chi2_contingency, f_oneway, kruskal, fisher_exact, levene
 )
@@ -1384,7 +1384,14 @@ def print_hypothesis_statement(config):
 # region Conduct Hypothesis Test - Visualization
 # ==========================================================
 def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, df2=None):
+    """
+    Plot the null distribution and show where the observed statistic falls.
 
+    Supported test_label values (valid 5-key tests):
+    - t-statistic, z-statistic, F-statistic → full plot
+    - Chi-square statistic (contingency, mcnemar, LRT) → chi2 plot (pass df1 for df)
+    - U-, W-, H-statistic (Mann-Whitney, Wilcoxon signed-rank, Kruskal-Wallis) → no plot (message only)
+    """
     plt.figure(figsize=(10, 5))
 
     # ----- Select Distribution -----
@@ -1409,15 +1416,27 @@ def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, 
         y = dist.pdf(x)
         critical = dist.ppf(1 - alpha)
 
+    elif test_label is not None and 'Chi-square' in str(test_label):
+        # Chi-square statistic (contingency, mcnemar, LRT): one-tailed upper
+        df_used = int(df1) if df1 is not None else 1
+        dist = chi2(df=df_used)
+        x = np.linspace(0, max(15, df_used * 2 + 5), 400)
+        y = dist.pdf(x)
+        critical = dist.ppf(1 - alpha)
+
     else:
-        print("Visualization not supported.")
+        # Non-parametric rank tests (U, W, H) have no simple null-distribution plot here
+        print("Visualization not supported for this test statistic (no null-distribution plot).")
         return
 
     # ----- Plot Curve -----
     plt.plot(x, y)
 
+    # One-tailed upper (F, Chi-square); two-tailed (t, z)
+    one_tailed_upper = test_label == 'F-statistic' or (test_label is not None and 'Chi-square' in str(test_label))
+
     # ----- Shade Rejection Region -----
-    if test_label != 'F-statistic':
+    if not one_tailed_upper:
         plt.fill_between(x, y, where=(x <= -critical), alpha=0.3)
         plt.fill_between(x, y, where=(x >= critical), alpha=0.3)
     else:
@@ -1426,7 +1445,7 @@ def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, 
     # ----- Observed Statistic -----
     plt.axvline(stat, linewidth=3)
     plt.axvline(critical, linestyle='--')
-    if test_label != 'F-statistic':
+    if not one_tailed_upper:
         plt.axvline(-critical, linestyle='--')
 
     # ----- Business Annotations -----
@@ -1437,12 +1456,16 @@ def visualize_test_result(stat, alpha, test_label, tail='two-tailed', df1=None, 
              f"Critical cutoff\n(α = {alpha})",
              ha='left')
 
-    if test_label != 'F-statistic':
+    if not one_tailed_upper:
         plt.text(-critical, max(y)*0.1,
                  f"Critical cutoff\n(α = {alpha})",
                  ha='right')
 
-    if abs(stat) > critical:
+    if one_tailed_upper:
+        in_rejection = stat >= critical
+    else:
+        in_rejection = abs(stat) > critical
+    if in_rejection:
         decision_text = "Result falls inside rejection region → Reject H₀"
     else:
         decision_text = "Result falls inside safe region → Fail to Reject H₀"
@@ -1649,6 +1672,13 @@ def run_hypothesis_test(config, df):
             n = len(df)
             vis_df1 = k - 1
             vis_df2 = n - k
+        elif test_name == 'chi_square':
+            contingency = pd.crosstab(df['group'], df['value'])
+            vis_df1 = (contingency.shape[0] - 1) * (contingency.shape[1] - 1)
+        elif test_name == 'mcnemar':
+            vis_df1 = 1
+        elif test_name == 'poisson_test':
+            vis_df1 = df['group'].nunique() - 1
 
         visualize_test_result(
             stat,
