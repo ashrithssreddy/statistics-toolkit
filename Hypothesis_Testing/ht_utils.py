@@ -34,8 +34,7 @@ my_seed = 1995
 pretty_json = lambda d: display(HTML(f"""
 <pre style='font-size:14px; font-family:monospace;'>
 {json.dumps(d, indent=4)
-   .replace(": null", ': <span style="color:crimson;"><b>null</b></span>')
-   .replace(': "NA"', ': <span style="color:crimson;"><b>"NA"</b></span>')}
+   .replace(": null", ': <span style="color:crimson;"><b>null</b></span>')}
 </pre>
 """))
 # <hr style='border: none; height: 1px; background-color: #ddd;' />
@@ -46,7 +45,7 @@ def print_config_summary(config):
 
     This function:
     - Prints each key in the config with aligned formatting
-    - Highlights `None` or 'NA' values in red (terminal only)
+    - Highlights `None` values in red (terminal only)
     - Provides a short inference summary based on group count and relationship
 
     Parameters:
@@ -61,7 +60,7 @@ def print_config_summary(config):
         Prints the formatted configuration summary directly to output
     """
     def highlight(value):
-        if value in [None, 'NA'] or (isinstance(value, float) and np.isnan(value)):
+        if value is None or (isinstance(value, float) and np.isnan(value)):
             return "\033[91mNone\033[0m"
         return value
 
@@ -98,10 +97,10 @@ def validate_config(config):
     valid_outcome_types = ['continuous', 'binary', 'categorical', 'count']
     valid_group_relationships = ['independent', 'paired']
     valid_group_counts = ['one-sample', 'two-sample', 'multi-sample']
-    valid_distributions = ['normal', 'non-normal', 'NA', None]
-    valid_variance_flags = ['equal', 'unequal', 'NA', None]
+    valid_distributions = ['normal', 'non-normal', None]
+    valid_variance_flags = ['equal', 'unequal', None]
     valid_tail_types = ['one-tailed', 'two-tailed']
-    valid_parametric_flags = [True, False, 'NA', None]
+    valid_parametric_flags = [True, False, None]
 
     # 1. Missing keys
     for key in required_keys:
@@ -160,7 +159,7 @@ def validate_config(config):
             print("⚠️ Sample size < 30 → z-test assumptions (np > 5) may be violated. Consider Fisher’s Exact.")
 
     # Parametric test selected, but distribution is missing
-    if config['parametric'] is True and config['distribution'] in ['NA', None]:
+    if config['parametric'] is True and config['distribution'] is None:
         raise ValueError("❌ Parametric test requested, but distribution is not confirmed as normal.")
 
     # Count outcome + one-sample → not supported
@@ -172,7 +171,7 @@ def validate_config(config):
         print("⚠️ Effect size is unusually extreme. Are you simulating a realistic scenario?")
 
     # Optional: variance check mismatch
-    if config['variance_equal'] not in ['equal', 'unequal', 'NA', None]:
+    if config['variance_equal'] not in valid_variance_flags:
         raise ValueError(f"❌ Invalid variance_equal flag: {config['variance_equal']}")
 
     # Optional: group relationship irrelevant in one-sample, but present
@@ -543,7 +542,7 @@ def infer_distribution_from_data(config, df):
     This function:
     - Checks if the outcome type is continuous (required for normality testing)
     - Applies Shapiro-Wilk test to one or both groups depending on group structure
-    - Updates the 'distribution' key in the config as 'normal', 'non-normal', or 'NA'
+    - Updates the 'distribution' key in the config as 'normal', 'non-normal', or None (when not applicable)
     - Logs interpretation and decision in a reader-friendly format
 
     Parameters:
@@ -556,7 +555,7 @@ def infer_distribution_from_data(config, df):
     Returns:
     --------
     str
-        The inferred distribution: 'normal', 'non-normal', or 'NA'.
+        The inferred distribution: 'normal', 'non-normal', or None (when not applicable).
         Callers typically assign to config, e.g. config['distribution'] = infer_distribution_from_data(config, df).
     """
 
@@ -568,7 +567,7 @@ def infer_distribution_from_data(config, df):
 
     if outcome != 'continuous':
         print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
-        config['distribution'] = 'NA'
+        config['distribution'] = None
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
 
@@ -604,7 +603,7 @@ def infer_distribution_from_data(config, df):
             b = df['group_B']
         else:
             print("❌ Invalid group relationship")
-            config['distribution'] = 'NA'
+            config['distribution'] = None
             # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
             return config['distribution']
 
@@ -632,7 +631,7 @@ def infer_distribution_from_data(config, df):
 
     else:
         print("❌ Unsupported group count for distribution check.")
-        config['distribution'] = 'NA'
+        config['distribution'] = None
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
 
@@ -648,7 +647,7 @@ def infer_distribution_from_data_ks(config, df):
     - Checks if the outcome type is continuous (required for normality testing)
     - Fits a normal distribution using sample mean and std
     - Applies KS test to one or both groups depending on structure
-    - Updates config['distribution'] as 'normal', 'non-normal', or 'NA'
+    - Updates config['distribution'] as 'normal', 'non-normal', or None (when not applicable)
     - Logs interpretation clearly for readability
 
     Parameters:
@@ -661,7 +660,7 @@ def infer_distribution_from_data_ks(config, df):
     Returns:
     --------
     str
-        The inferred distribution: 'normal', 'non-normal', or 'NA'.
+        The inferred distribution: 'normal', 'non-normal', or None (when not applicable).
         Callers typically assign to config, e.g. config['distribution'] = infer_distribution_from_data_ks(config, df).
     """
 
@@ -673,7 +672,7 @@ def infer_distribution_from_data_ks(config, df):
 
     if outcome != 'continuous':
         print(f"⚠️ Skipping: Outcome type = `{outcome}` → normality check not applicable.")
-        config['distribution'] = 'NA'
+        config['distribution'] = None
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
 
@@ -716,7 +715,7 @@ def infer_distribution_from_data_ks(config, df):
             b = df['group_B']
         else:
             print("❌ Invalid group relationship")
-            config['distribution'] = 'NA'
+            config['distribution'] = None
             # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
             return config['distribution']
 
@@ -744,7 +743,7 @@ def infer_distribution_from_data_ks(config, df):
 
     else:
         print("❌ Unsupported group count for distribution check.")
-        config['distribution'] = 'NA'
+        config['distribution'] = None
         # display(HTML("<hr style='border: none; height: 1px; background-color: #ddd;' />"))
         return config['distribution']
 
@@ -812,7 +811,7 @@ def infer_variance_equality(config, df):
     This function:
     - Checks if the variance assumption is relevant based on config
     - Runs Levene’s test to compare the variances of Group A and Group B
-    - Updates the 'variance_equal' key in the config as 'equal', 'unequal', or 'NA'
+    - Updates the 'variance_equal' key in the config as 'equal', 'unequal', or None (when not applicable)
     - Logs interpretation of the test result
 
     Parameters:
@@ -825,7 +824,7 @@ def infer_variance_equality(config, df):
     Returns:
     --------
     str
-        The inferred variance assumption: 'equal', 'unequal', or 'NA'.
+        The inferred variance assumption: 'equal', 'unequal', or None (when not applicable).
         Callers typically assign to config, e.g. config['variance_equal'] = infer_variance_equality(config, df).
     """
     print("\n📏 **Step: Infer Equality of Variance Across Groups**")
@@ -833,7 +832,7 @@ def infer_variance_equality(config, df):
     # Skip if not applicable
     if config['group_count'] != 'two-sample' or config['group_relationship'] != 'independent':
         print("⚠️ Skipping variance check: Only applicable for two-sample independent tests.")
-        config['variance_equal'] = 'NA'
+        config['variance_equal'] = None
         return config['variance_equal']
 
     print("📘 We're checking if the spread (variance) of the outcome variable is similar across groups A and B.")
@@ -986,7 +985,7 @@ def infer_parametric_flag(config):
 
     if config['outcome_type'] != 'continuous':
         print(f"⚠️ Skipping: Outcome type = `{config['outcome_type']}` → Parametric logic not applicable.")
-        config['parametric'] = 'NA'
+        config['parametric'] = None
         return config['parametric']
 
     print(f"🔍 Distribution of outcome = `{config['distribution']}`")
