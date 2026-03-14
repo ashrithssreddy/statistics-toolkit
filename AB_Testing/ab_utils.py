@@ -36,33 +36,44 @@ from sklearn.model_selection import train_test_split
 
 
 
-def create_dummy_ab_data(observations_count=1000, seed=1995):
+def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=None):
     """Generate user population with attributes and pre-experiment variables only.
-    Outcome metrics (e.g. engagement_score, converted, bounce_rate) are not generated here;
-    they are created after randomization."""
+    Outcome metrics are not generated here; they are created after randomization.
+    If outcome_metric_col is provided, a placeholder column (NaN) is added so column order
+    puts must-haves (user_id, outcome_metric_col, past_purchase_count) on the left."""
     np.random.seed(seed)
     users = pd.DataFrame({
-        # identifiers
+        # must-have: identifier
         'user_id': range(1, observations_count + 1),
-        # segmentation / user attributes
+        # must-have: pre-experiment variable (e.g. for CUPED)
+        'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
+        # good-to-have: segmentation / user attributes
         'platform': np.random.choice(['iOS', 'Android'], size=observations_count, p=[0.6, 0.4]),
         'device_type': np.random.choice(['mobile', 'desktop'], size=observations_count, p=[0.7, 0.3]),
         'user_tier': np.random.choice(['new', 'returning'], size=observations_count, p=[0.4, 0.6]),
         'region': np.random.choice(['North', 'South', 'East', 'West'], size=observations_count, p=[0.25, 0.25, 0.25, 0.25]),
         'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
         'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
-        # pre-experiment variables (e.g. for CUPED)
-        'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
     })
+    # Must-have outcome column (placeholder until filled after randomization)
+    if outcome_metric_col:
+        users[outcome_metric_col] = np.nan
+    # Order: must-haves left, extras right
+    must_have = ['user_id']
+    if outcome_metric_col:
+        must_have.append(outcome_metric_col)
+    must_have.append('past_purchase_count')
+    extras = [c for c in users.columns if c not in must_have]
+    users = users[must_have + extras]
     return users
 
 
-def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), seed=my_seed):
+def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', seed=my_seed):
     """
     Add outcome and guardrail metrics to a dataframe that already has group assignment.
     Call this after randomization so outcomes are generated post-assignment.
 
-    Adds: engagement_score, converted, bounce_rate.
+    Fills the primary outcome column (outcome_metric_col) and adds: converted, bounce_rate.
     """
     np.random.seed(seed)
     n = len(df)
@@ -70,7 +81,7 @@ def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatme
     # Primary outcome: baseline + optional treatment effect
     base_engagement = np.random.normal(50, 15, n)
     treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
-    df['engagement_score'] = (base_engagement + treatment_lift).clip(0, 100)
+    df[outcome_metric_col] = (base_engagement + treatment_lift).clip(0, 100)
     # Binary conversion
     df['converted'] = np.random.binomial(n=1, p=0.1 + 0.02 * treatment_mask.astype(float), size=n)
     # Guardrail: bounce rate (lower for converted)

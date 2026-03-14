@@ -187,7 +187,7 @@ print_config_summary(test_config)
 
 # %%
 observations_count = 1000
-df = create_dummy_ab_data(observations_count, seed=my_seed)
+df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col)
 df
 
 # %% [markdown]
@@ -699,7 +699,7 @@ elif randomization_method == "cluster":
 
 elif randomization_method == "cuped":
     df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, seed=my_seed)
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, outcome_metric_col=outcome_metric_col, seed=my_seed)
     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=outcome_metric_col, group_col=group_col, group_labels=group_labels, seed=my_seed)
     outcome_metric_col = f"{outcome_metric_col}_cuped_adjusted"
 else:
@@ -707,7 +707,7 @@ else:
 
 # Generate outcome metrics after assignment (not before randomization)
 if randomization_method != "cuped":
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, seed=my_seed)
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, outcome_metric_col=outcome_metric_col, seed=my_seed)
 df
 
 # %% [markdown]
