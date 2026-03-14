@@ -692,18 +692,22 @@ elif randomization_method == "block":
     df = apply_block_randomization(df, observation_id_col='user_id', group_col=group_col, block_size=10, seed=my_seed)
 
 elif randomization_method == "matched_pair":
-    df = apply_matched_pair_randomization(df, sort_col=outcome_metric_col, group_col=group_col, seed=my_seed)
+    df = apply_matched_pair_randomization(df, sort_col=pre_experiment_metric, group_col=group_col, group_labels=group_labels)
 
 elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
 
 elif randomization_method == "cuped":
+    df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, seed=my_seed)
     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=outcome_metric_col, group_col=group_col, group_labels=group_labels, seed=my_seed)
-    # Update global outcome to CUPED-adjusted version
     outcome_metric_col = f"{outcome_metric_col}_cuped_adjusted"
 else:
     raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
 
+# Generate outcome metrics after assignment (not before randomization)
+if randomization_method != "cuped":
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, seed=my_seed)
 df
 
 # %% [markdown]

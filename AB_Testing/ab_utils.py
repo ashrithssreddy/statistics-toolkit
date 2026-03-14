@@ -37,33 +37,50 @@ from sklearn.model_selection import train_test_split
 
 
 def create_dummy_ab_data(observations_count=1000, seed=1995):
+    """Generate user population with attributes and pre-experiment variables only.
+    Outcome metrics (e.g. engagement_score, converted, bounce_rate) are not generated here;
+    they are created after randomization."""
+    np.random.seed(seed)
     users = pd.DataFrame({
         # identifiers
         'user_id': range(1, observations_count + 1),
-        # segmentation features
+        # segmentation / user attributes
         'platform': np.random.choice(['iOS', 'Android'], size=observations_count, p=[0.6, 0.4]),
         'device_type': np.random.choice(['mobile', 'desktop'], size=observations_count, p=[0.7, 0.3]),
         'user_tier': np.random.choice(['new', 'returning'], size=observations_count, p=[0.4, 0.6]),
         'region': np.random.choice(['North', 'South', 'East', 'West'], size=observations_count, p=[0.25, 0.25, 0.25, 0.25]),
         'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
         'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
-        # outcome metrics
-        'engagement_score': np.random.normal(50, 15, observations_count),
-        'converted': np.random.binomial(n=1, p=0.1, size=observations_count),
-        'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count),
-        'bounce_rate': np.nan
+        # pre-experiment variables (e.g. for CUPED)
+        'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
     })
-    
-    # Simulate  a guardrail metric (bounce_rate)
-    np.random.seed(seed)
-    users['bounce_rate'] = np.where(
-        users['converted'] == 1,
-        np.random.normal(loc=0.2, scale=0.05, size=observations_count),
-        np.random.normal(loc=0.6, scale=0.10, size=observations_count)
-    )
-    users['bounce_rate'] = users['bounce_rate'].clip(0, 1) # Bound bounce_rate between 0 and 1
     return users
 
+
+def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), seed=my_seed):
+    """
+    Add outcome and guardrail metrics to a dataframe that already has group assignment.
+    Call this after randomization so outcomes are generated post-assignment.
+
+    Adds: engagement_score, converted, bounce_rate.
+    """
+    np.random.seed(seed)
+    n = len(df)
+    treatment_mask = df[group_col] == group_labels[1]
+    # Primary outcome: baseline + optional treatment effect
+    base_engagement = np.random.normal(50, 15, n)
+    treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
+    df['engagement_score'] = (base_engagement + treatment_lift).clip(0, 100)
+    # Binary conversion
+    df['converted'] = np.random.binomial(n=1, p=0.1 + 0.02 * treatment_mask.astype(float), size=n)
+    # Guardrail: bounce rate (lower for converted)
+    df['bounce_rate'] = np.where(
+        df['converted'] == 1,
+        np.random.normal(loc=0.2, scale=0.05, size=n),
+        np.random.normal(loc=0.6, scale=0.10, size=n)
+    )
+    df['bounce_rate'] = df['bounce_rate'].clip(0, 1)
+    return df
 
 
 # ==========================================================
