@@ -28,16 +28,6 @@
 # - [🔧 Central Control Panel](#central-control-panel)
 # - [📥 Read/Generate Data](#read-data)
 #
-# [🔀 Randomization Methods](#randomization-methods)  
-# - [🔄 Simple Randomization](#simple-randomization)  
-# - [🧬 Stratified Sampling](#stratified-sampling)  
-# - [🔁 Block Randomization](#block-randomization)  
-# - [🧯 Match Pair Randomization](#match-pair-randomization)  
-# - [🗃️ Cluster Randomization](#cluster-randomization)  
-# - [📉 CUPED](#cuped)
-# - [🕸️ Network Effects](#network-effects)
-# - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
-#
 # [📈 EDA](#eda)  
 # - [🔍 Normality](#normality)  
 # - [🧪 Variance Homogeneity Check](#variance-homogeneity-check)  
@@ -46,9 +36,18 @@
 # - [⚙️ Setup Inputs + Config](#setup-inputs--config-values)  
 # - [📊 Baseline Estimation from Data](#baseline-from-data)  
 # - [📈 Minimum Detectable Effect](#minimum-detectable-effect)  
-# - [📐 Required Sample Size](#required-sample-size)  
 # - [🧬 Test Family](#test-family)
+# - [📐 Required Sample Size](#required-sample-size)  
 # - [📊 Power Analysis Summary](#power-analysis-summary)
+#
+# [🔀 Randomization Methods](#randomization-methods)  
+# - [🔄 Simple Randomization](#simple-randomization)  
+# - [🧬 Stratified Sampling](#stratified-sampling)  
+# - [🔁 Block Randomization](#block-randomization)  
+# - [🧯 Match Pair Randomization](#match-pair-randomization)  
+# - [🗃️ Cluster Randomization](#cluster-randomization)  
+# - [🕸️ Network Effects](#network-effects)
+# - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
 #
 # [🧪 AA Testing](#aa-testing)
 # - [🧬 Outcome Similarity Test](#outcome-similarity-test)
@@ -66,6 +65,7 @@
 # [🔍 Post Hoc Analysis](#post-hoc-analysis)  
 # - [🧩 Segmented Lift](#segmented-lift)  
 # - [🚦 Guardrail Metrics](#guardrail-metrics)  
+# - [📉 CUPED](#cuped)
 # - [🧠 Correcting for Multiple Comparisons](#multiple-comparisons)
 # - [🪄 Novelty Effects](#novelty-effects)
 # - [🎯 Primacy Effect](#primacy-effect)
@@ -195,305 +195,6 @@ df
 #
 
 # %% [markdown]
-# <a id="randomization-methods"></a>
-# <h1>🔀 Randomization Methods</h1>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Randomization is used to ensure that observed differences in outcome metrics are due to the experiment, not pre-existing differences.</p>
-#
-# <ul>
-#   <li>Prevents <strong>selection bias</strong> (e.g., users self-selecting into groups)</li>
-#   <li>Balances <strong>confounding factors</strong> like platform, region, or past behavior</li>
-#   <li>Enables <strong>valid inference</strong> through statistical testing</li>
-# </ul>
-#
-# </details>
-#
-
-# %% [markdown]
-# <a id="simple-randomization"></a>
-#
-# #### 🔄 Simple Randomization
-#
-# <details>
-#   <summary><strong>📖 Click to Expand</strong></summary>
-#
-#   <p><strong>Each user is assigned to control or treatment with equal probability, independent of any characteristics.</strong></p>
-#
-#   <strong>✅ When to Use:</strong>
-#   <ul>
-#     <li>Sample size is <em>large enough</em> to ensure natural balance</li>
-#     <li>No strong concern about <em>confounding variables</em></li>
-#     <li>Need a <em>quick, default assignment</em> strategy</li>
-#   </ul>
-#
-#   <strong>🛠️ How It Works:</strong>
-#   <ul>
-#     <li>Assign each user randomly (e.g., 50/50 split)</li>
-#     <li>No grouping, segmentation, or blocking involved</li>
-#     <li>Groups are expected to balance out on average</li>
-#   </ul>
-# </details>
-#
-
-# %% [markdown]
-# <a id="stratified-sampling"></a>
-#
-# <h4>🔄 Stratified Sampling</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Ensures that key segments (e.g., platform, region) are evenly represented across control and treatment.</p>
-#
-# <h5>When to Use</h5>
-# <ul>
-#   <li>User base is <strong>naturally skewed</strong> (e.g., 70% mobile, 30% desktop)</li>
-#   <li>Important to control for <strong>known confounders</strong> like geography or device</li>
-#   <li>You want balance <strong>within subgroups</strong>, not just overall</li>
-# </ul>
-#
-# <h5>How It Works</h5>
-# <ul>
-#   <li>Pick a stratification variable (e.g., platform)</li>
-#   <li>Split population into strata (groups)</li>
-#   <li>Randomly assign users <strong>within each stratum</strong></li>
-# </ul>
-#
-# </details>
-#
-
-# %% [markdown]
-# <a id="block-randomization"></a>
-#
-# <h4>🔄 Block Randomization</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Groups users into fixed-size blocks and randomly assigns groups within each block.</p>
-#
-# <h5>When to Use</h5>
-# <ul>
-#   <li>Users arrive in <strong>time-based batches</strong> (e.g., daily cohorts)</li>
-#   <li>Sample size is <strong>small</strong> and needs enforced balance</li>
-#   <li>You want to minimize <strong>temporal or ordering effects</strong></li>
-# </ul>
-#
-# <h5>How It Works</h5>
-# <ul>
-#   <li>Create blocks based on order or ID (e.g., every 10 users)</li>
-#   <li>Randomize assignments <strong>within each block</strong></li>
-#   <li>Ensures near-equal split in every batch</li>
-# </ul>
-#
-# </details>
-#
-
-# %% [markdown]
-# <a id="match-pair-randomization"></a>
-#
-# <h4>🔄 Match Pair Randomization</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Participants are <strong>paired based on similar characteristics</strong> before random group assignment.  
-# This reduces variance and improves <strong>statistical power</strong> by ensuring balance on key covariates.</p>
-#
-# <h5>When to Use</h5>
-# <ul>
-#   <li>Small sample size with high risk of <strong>confounding</strong></li>
-#   <li>Outcomes influenced by user traits (e.g., <strong>age, income, tenure</strong>)</li>
-#   <li>Need to <strong>minimize variance</strong> across groups</li>
-# </ul>
-#
-# <h5>How It Works</h5>
-# <ol>
-#   <li>Identify important covariates (e.g., age, purchase history)</li>
-#   <li>Sort users by those variables</li>
-#   <li>Create matched pairs (or small groups)</li>
-#   <li>Randomly assign one to <strong>control</strong>, the other to <strong>treatment</strong></li>
-# </ol>
-#
-# </details>
-#
-
-# %% [markdown]
-# <a id="cluster-randomization"></a>
-#
-# <h4>🔄 Cluster Randomization</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Entire <strong>groups or clusters</strong> (e.g., cities, stores, schools) are assigned to control or treatment.  
-# Used when it's impractical or risky to randomize individuals within a cluster.</p>
-#
-# <h5>When to Use</h5>
-# <ul>
-#   <li>Users naturally exist in <strong>groups</strong> (e.g., teams, locations, devices)</li>
-#   <li>There's a risk of <strong>interference</strong> between users (e.g., word-of-mouth)</li>
-#   <li>Operational or tech constraints prevent individual-level randomization</li>
-# </ul>
-#
-# <h5>How It Works</h5>
-# <ol>
-#   <li>Define the cluster unit (e.g., store, city)</li>
-#   <li>Randomly assign each cluster to control or treatment</li>
-#   <li>All users within the cluster inherit the group assignment</li>
-# </ol>
-#
-# </details>
-#
-
-# %% [markdown]
-# <a id="cuped"></a>
-# <h4>🔄 CUPED</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Controlled Pre-Experiment Data: A statistical adjustment that uses <strong>pre-experiment behavior</strong> to reduce variance and improve power.  
-# It helps detect smaller effects without increasing sample size.</p>
-#
-# <h5>When to Use</h5>
-# <ul>
-#   <li>You have reliable <strong>pre-experiment metrics</strong> (e.g., past spend, engagement)</li>
-#   <li>You want to <strong>reduce variance</strong> and improve test sensitivity</li>
-#   <li>You’re dealing with <strong>small lifts</strong> or <strong>costly sample sizes</strong></li>
-# </ul>
-#
-# <h5>How It Works</h5>
-# <ol>
-#   <li>Identify a pre-period metric <strong>correlated with your outcome</strong></li>
-#   <li>Use regression to compute an adjustment (theta)</li>
-#   <li>Subtract the correlated component from your outcome metric</li>
-#   <li>Analyze the adjusted metric instead of the raw one</li>
-# </ol>
-#
-# </details>
-#
-
-# %%
-# Apply randomization method
-if randomization_method == "simple":
-    df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
-
-elif randomization_method == "stratified":
-    df = apply_stratified_randomization(df, stratify_col='platform', group_col=group_col, seed=my_seed)
-
-elif randomization_method == "block":
-    df = apply_block_randomization(df, observation_id_col='user_id', group_col=group_col, block_size=10, seed=my_seed)
-
-elif randomization_method == "matched_pair":
-    df = apply_matched_pair_randomization(df, sort_col=outcome_metric_col, group_col=group_col, seed=my_seed)
-
-elif randomization_method == "cluster":
-    df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
-
-elif randomization_method == "cuped":
-    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=outcome_metric_col, group_col=group_col, group_labels=group_labels, seed=my_seed)
-    # Update global outcome to CUPED-adjusted version
-    outcome_metric_col = f"{outcome_metric_col}_cuped_adjusted"
-else:
-    raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
-
-df
-
-# %% [markdown]
-# <a id="sample-ratio-mismatch"></a>
-#
-# #### ⚖️ Sample Ratio Mismatch
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Is group assignment balanced?</p>
-# <ul>
-#   <li>SRM (Sample Ratio Mismatch) checks whether the observed group sizes match the expected ratio.</li>
-#   <li>In a perfect world, random assignment to 'A1' and 'A2' should give ~50/50 split.</li>
-#   <li>SRM helps catch bugs in randomization, data logging, or user eligibility filtering.</li>
-# </ul>
-#
-# <p><strong>Real-World Experiment Split Ratios</strong></p>
-# <table>
-#   <thead>
-#     <tr>
-#       <th><strong>Scenario</strong></th>
-#       <th><strong>Split</strong></th>
-#       <th><strong>Why</strong></th>
-#     </tr>
-#   </thead>
-#   <tbody>
-#     <tr>
-#       <td>Default A/B</td>
-#       <td>50 / 50</td>
-#       <td>Maximizes power and ensures fairness</td>
-#     </tr>
-#     <tr>
-#       <td>Risky feature</td>
-#       <td>10 / 90 or 20 / 80</td>
-#       <td>Limits user exposure to minimize risk</td>
-#     </tr>
-#     <tr>
-#       <td>Ramp-up</td>
-#       <td>Step-wise (1-5-25-50…)</td>
-#       <td>Gradual rollout to catch issues early</td>
-#     </tr>
-#     <tr>
-#       <td>A/B/C Test</td>
-#       <td>33 / 33 / 33 or weighted</td>
-#       <td>Compare multiple variants fairly or with bias</td>
-#     </tr>
-#     <tr>
-#       <td>High control confidence needed</td>
-#       <td>70 / 30 or 60 / 40</td>
-#       <td>More stability in baseline comparisons</td>
-#     </tr>
-#   </tbody>
-# </table>
-#
-# </details>
-
-# %%
-check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, expected_ratios=[0.5, 0.5], alpha=0.05)
-
-# %% [markdown]
-# <a id="network-effects"></a>
-# <h4>🕸️ Network Effects & SUTVA Violations</h4>
-
-# %% [markdown]
-# <details><summary><strong>📖 When Randomization Assumptions Break (Click to Expand)</strong></summary>
-#
-# Most A/B tests assume the **Stable Unit Treatment Value Assumption (SUTVA)** — meaning:
-# - A user's outcome depends *only* on their own treatment assignment.
-# - One unit's treatment **does not influence** another unit’s outcome.
-#
-# ##### 🧪 Why It Matters
-# If users in different groups interact:
-# - Control group behavior may be **influenced by treatment group exposure**.
-# - This **biases your estimates** and **dilutes treatment effect**.
-# - Standard tests may incorrectly **accept the null hypothesis** due to **spillover**.
-#
-# This assumption **breaks down** in experiments involving **social behavior**, **multi-user platforms**, or **ecosystem effects**.
-# ##### ⚠️ Common Violation Scenarios
-# - 🛍️ **Marketplace platforms** (e.g., sellers and buyers interact)
-# - 🧑‍🤝‍🧑 **Social features** (e.g., follows, likes, comments, feeds)
-# - 📲 **Referrals / network effects** (e.g., invites, rewards)
-# - 💬 **Chat and collaboration tools** (e.g., Slack, Teams)
-#
-# ##### 🧩 Solutions (If You Suspect Interference)
-# | Strategy                  | Description                                                                 |
-# |---------------------------|-----------------------------------------------------------------------------|
-# | Cluster Randomization     | Randomize **at group level** (e.g., friend group, region, org ID)          |
-# | Isolation Experiments     | Only roll out to **fully disconnected segments** (e.g., one region only)   |
-# | Network-Based Metrics     | Include **network centrality / exposure** as covariates                    |
-# | Post-Experiment Checks    | Monitor if control group was exposed indirectly (e.g., referrals, shared UIs) |
-# | Simulation-Based Designs  | Use agent-based or graph simulations to estimate contamination risk        |
-# </details>
-
-# %% [markdown]
-# [Back to the top](#table-of-contents)
-# ___
-#
-
-# %% [markdown]
 # <a id="eda"></a>
 # # 📈 EDA
 #
@@ -556,52 +257,6 @@ variance_result
 print(f"Levene’s test: p = {variance_result['p_value']:.4f} → {'Equal variances' if variance_result['equal_variance'] else 'Unequal variances'}")
 test_config['equal_variance'] = variance_result['equal_variance']
 test_config
-
-# %% [markdown]
-# <a id="test-family"></a>
-#
-# <h4>🔍 Test Family</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Selects the appropriate statistical test based on:</p>
-# <ul>
-#   <li>Outcome data type (binary, continuous, categorical)</li>
-#   <li>Distributional assumptions (normality, variance)</li>
-#   <li>Number of groups and experiment structure (independent vs paired)</li>
-# </ul>
-#
-# <p>This step <strong>automatically maps to the correct test</strong> (e.g., t-test, z-test, chi-square, ANOVA).</p>
-#
-# <h6>🧪 Experiment Type → Test Family Mapping</h6>
-#
-# <table>
-#   <tr><th>Outcome Metric</th><th>Normality</th><th>Group Count</th><th>Selected Test Family</th></tr>
-#   <tr><td><strong>binary</strong></td><td>—</td><td>2</td><td><code>z_test</code></td></tr>
-#   <tr><td><strong>binary</strong></td><td>—</td><td>3+</td><td><code>chi_square</code></td></tr>
-#   <tr><td><strong>continuous</strong></td><td>✅</td><td>2</td><td><code>t_test</code></td></tr>
-#   <tr><td><strong>continuous</strong></td><td>✅</td><td>3+</td><td><code>anova</code></td></tr>
-#   <tr><td><strong>continuous</strong></td><td>❌</td><td>2</td><td><code>non_parametric</code> (Mann-Whitney U)</td></tr>
-#   <tr><td><strong>continuous</strong></td><td>❌</td><td>3+</td><td><code>non_parametric</code> (Kruskal-Wallis)</td></tr>
-#   <tr><td><strong>categorical</strong></td><td>—</td><td>2</td><td><code>chi_square</code></td></tr>
-#   <tr><td><strong>categorical</strong></td><td>—</td><td>3+</td><td><code>chi_square</code></td></tr>
-# </table>
-#
-# </details>
-#
-#
-#
-
-# %%
-test_config['family'] = determine_test_family(test_config)
-test_config
-
-print(f"✅ Selected test family: {test_config['family']}")
-
-# %% [markdown]
-# [Back to the top](#table-of-contents)
-# ___
-#
 
 # %% [markdown]
 # <a id="power-analysis"></a>
@@ -785,6 +440,52 @@ mde = 5  # Change this based on business relevance
 
 
 # %% [markdown]
+# <a id="test-family"></a>
+#
+# <h4>🔍 Test Family</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Selects the appropriate statistical test based on:</p>
+# <ul>
+#   <li>Outcome data type (binary, continuous, categorical)</li>
+#   <li>Distributional assumptions (normality, variance)</li>
+#   <li>Number of groups and experiment structure (independent vs paired)</li>
+# </ul>
+#
+# <p>This step <strong>automatically maps to the correct test</strong> (e.g., t-test, z-test, chi-square, ANOVA).</p>
+#
+# <h6>🧪 Experiment Type → Test Family Mapping</h6>
+#
+# <table>
+#   <tr><th>Outcome Metric</th><th>Normality</th><th>Group Count</th><th>Selected Test Family</th></tr>
+#   <tr><td><strong>binary</strong></td><td>—</td><td>2</td><td><code>z_test</code></td></tr>
+#   <tr><td><strong>binary</strong></td><td>—</td><td>3+</td><td><code>chi_square</code></td></tr>
+#   <tr><td><strong>continuous</strong></td><td>✅</td><td>2</td><td><code>t_test</code></td></tr>
+#   <tr><td><strong>continuous</strong></td><td>✅</td><td>3+</td><td><code>anova</code></td></tr>
+#   <tr><td><strong>continuous</strong></td><td>❌</td><td>2</td><td><code>non_parametric</code> (Mann-Whitney U)</td></tr>
+#   <tr><td><strong>continuous</strong></td><td>❌</td><td>3+</td><td><code>non_parametric</code> (Kruskal-Wallis)</td></tr>
+#   <tr><td><strong>categorical</strong></td><td>—</td><td>2</td><td><code>chi_square</code></td></tr>
+#   <tr><td><strong>categorical</strong></td><td>—</td><td>3+</td><td><code>chi_square</code></td></tr>
+# </table>
+#
+# </details>
+#
+#
+#
+
+# %%
+test_config['family'] = determine_test_family(test_config)
+test_config
+
+print(f"✅ Selected test family: {test_config['family']}")
+
+# %% [markdown]
+# [Back to the top](#table-of-contents)
+# ___
+#
+
+# %% [markdown]
 # <a id="required-sample-size"></a>
 #
 # #### 📐 Required Sample Size
@@ -827,6 +528,278 @@ print_power_summary(
 # %% [markdown]
 # [Back to the top](#table-of-contents)
 # ___
+
+# %% [markdown]
+# <a id="randomization-methods"></a>
+# <h1>🔀 Randomization Methods</h1>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Randomization is used to ensure that observed differences in outcome metrics are due to the experiment, not pre-existing differences.</p>
+#
+# <ul>
+#   <li>Prevents <strong>selection bias</strong> (e.g., users self-selecting into groups)</li>
+#   <li>Balances <strong>confounding factors</strong> like platform, region, or past behavior</li>
+#   <li>Enables <strong>valid inference</strong> through statistical testing</li>
+# </ul>
+#
+# </details>
+#
+
+# %% [markdown]
+# <a id="simple-randomization"></a>
+#
+# #### 🔄 Simple Randomization
+#
+# <details>
+#   <summary><strong>📖 Click to Expand</strong></summary>
+#
+#   <p><strong>Each user is assigned to control or treatment with equal probability, independent of any characteristics.</strong></p>
+#
+#   <strong>✅ When to Use:</strong>
+#   <ul>
+#     <li>Sample size is <em>large enough</em> to ensure natural balance</li>
+#     <li>No strong concern about <em>confounding variables</em></li>
+#     <li>Need a <em>quick, default assignment</em> strategy</li>
+#   </ul>
+#
+#   <strong>🛠️ How It Works:</strong>
+#   <ul>
+#     <li>Assign each user randomly (e.g., 50/50 split)</li>
+#     <li>No grouping, segmentation, or blocking involved</li>
+#     <li>Groups are expected to balance out on average</li>
+#   </ul>
+# </details>
+#
+
+# %% [markdown]
+# <a id="stratified-sampling"></a>
+#
+# <h4>🔄 Stratified Sampling</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Ensures that key segments (e.g., platform, region) are evenly represented across control and treatment.</p>
+#
+# <h5>When to Use</h5>
+# <ul>
+#   <li>User base is <strong>naturally skewed</strong> (e.g., 70% mobile, 30% desktop)</li>
+#   <li>Important to control for <strong>known confounders</strong> like geography or device</li>
+#   <li>You want balance <strong>within subgroups</strong>, not just overall</li>
+# </ul>
+#
+# <h5>How It Works</h5>
+# <ul>
+#   <li>Pick a stratification variable (e.g., platform)</li>
+#   <li>Split population into strata (groups)</li>
+#   <li>Randomly assign users <strong>within each stratum</strong></li>
+# </ul>
+#
+# </details>
+#
+
+# %% [markdown]
+# <a id="block-randomization"></a>
+#
+# <h4>🔄 Block Randomization</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Groups users into fixed-size blocks and randomly assigns groups within each block.</p>
+#
+# <h5>When to Use</h5>
+# <ul>
+#   <li>Users arrive in <strong>time-based batches</strong> (e.g., daily cohorts)</li>
+#   <li>Sample size is <strong>small</strong> and needs enforced balance</li>
+#   <li>You want to minimize <strong>temporal or ordering effects</strong></li>
+# </ul>
+#
+# <h5>How It Works</h5>
+# <ul>
+#   <li>Create blocks based on order or ID (e.g., every 10 users)</li>
+#   <li>Randomize assignments <strong>within each block</strong></li>
+#   <li>Ensures near-equal split in every batch</li>
+# </ul>
+#
+# </details>
+#
+
+# %% [markdown]
+# <a id="match-pair-randomization"></a>
+#
+# <h4>🔄 Match Pair Randomization</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Participants are <strong>paired based on similar characteristics</strong> before random group assignment.  
+# This reduces variance and improves <strong>statistical power</strong> by ensuring balance on key covariates.</p>
+#
+# <h5>When to Use</h5>
+# <ul>
+#   <li>Small sample size with high risk of <strong>confounding</strong></li>
+#   <li>Outcomes influenced by user traits (e.g., <strong>age, income, tenure</strong>)</li>
+#   <li>Need to <strong>minimize variance</strong> across groups</li>
+# </ul>
+#
+# <h5>How It Works</h5>
+# <ol>
+#   <li>Identify important covariates (e.g., age, purchase history)</li>
+#   <li>Sort users by those variables</li>
+#   <li>Create matched pairs (or small groups)</li>
+#   <li>Randomly assign one to <strong>control</strong>, the other to <strong>treatment</strong></li>
+# </ol>
+#
+# </details>
+#
+
+# %% [markdown]
+# <a id="cluster-randomization"></a>
+#
+# <h4>🔄 Cluster Randomization</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Entire <strong>groups or clusters</strong> (e.g., cities, stores, schools) are assigned to control or treatment.  
+# Used when it's impractical or risky to randomize individuals within a cluster.</p>
+#
+# <h5>When to Use</h5>
+# <ul>
+#   <li>Users naturally exist in <strong>groups</strong> (e.g., teams, locations, devices)</li>
+#   <li>There's a risk of <strong>interference</strong> between users (e.g., word-of-mouth)</li>
+#   <li>Operational or tech constraints prevent individual-level randomization</li>
+# </ul>
+#
+# <h5>How It Works</h5>
+# <ol>
+#   <li>Define the cluster unit (e.g., store, city)</li>
+#   <li>Randomly assign each cluster to control or treatment</li>
+#   <li>All users within the cluster inherit the group assignment</li>
+# </ol>
+#
+# </details>
+#
+
+# %%
+# Apply randomization method
+if randomization_method == "simple":
+    df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
+
+elif randomization_method == "stratified":
+    df = apply_stratified_randomization(df, stratify_col='platform', group_col=group_col, seed=my_seed)
+
+elif randomization_method == "block":
+    df = apply_block_randomization(df, observation_id_col='user_id', group_col=group_col, block_size=10, seed=my_seed)
+
+elif randomization_method == "matched_pair":
+    df = apply_matched_pair_randomization(df, sort_col=outcome_metric_col, group_col=group_col, seed=my_seed)
+
+elif randomization_method == "cluster":
+    df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
+
+elif randomization_method == "cuped":
+    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=outcome_metric_col, group_col=group_col, group_labels=group_labels, seed=my_seed)
+    # Update global outcome to CUPED-adjusted version
+    outcome_metric_col = f"{outcome_metric_col}_cuped_adjusted"
+else:
+    raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
+
+df
+
+# %% [markdown]
+# <a id="network-effects"></a>
+# <h4>🕸️ Network Effects & SUTVA Violations</h4>
+
+# %% [markdown]
+# <details><summary><strong>📖 When Randomization Assumptions Break (Click to Expand)</strong></summary>
+#
+# Most A/B tests assume the **Stable Unit Treatment Value Assumption (SUTVA)** — meaning:
+# - A user's outcome depends *only* on their own treatment assignment.
+# - One unit's treatment **does not influence** another unit’s outcome.
+#
+# ##### 🧪 Why It Matters
+# If users in different groups interact:
+# - Control group behavior may be **influenced by treatment group exposure**.
+# - This **biases your estimates** and **dilutes treatment effect**.
+# - Standard tests may incorrectly **accept the null hypothesis** due to **spillover**.
+#
+# This assumption **breaks down** in experiments involving **social behavior**, **multi-user platforms**, or **ecosystem effects**.
+# ##### ⚠️ Common Violation Scenarios
+# - 🛍️ **Marketplace platforms** (e.g., sellers and buyers interact)
+# - 🧑‍🤝‍🧑 **Social features** (e.g., follows, likes, comments, feeds)
+# - 📲 **Referrals / network effects** (e.g., invites, rewards)
+# - 💬 **Chat and collaboration tools** (e.g., Slack, Teams)
+#
+# ##### 🧩 Solutions (If You Suspect Interference)
+# | Strategy                  | Description                                                                 |
+# |---------------------------|-----------------------------------------------------------------------------|
+# | Cluster Randomization     | Randomize **at group level** (e.g., friend group, region, org ID)          |
+# | Isolation Experiments     | Only roll out to **fully disconnected segments** (e.g., one region only)   |
+# | Network-Based Metrics     | Include **network centrality / exposure** as covariates                    |
+# | Post-Experiment Checks    | Monitor if control group was exposed indirectly (e.g., referrals, shared UIs) |
+# | Simulation-Based Designs  | Use agent-based or graph simulations to estimate contamination risk        |
+# </details>
+
+# %% [markdown]
+# [Back to the top](#table-of-contents)
+# ___
+#
+
+# %% [markdown]
+# <a id="sample-ratio-mismatch"></a>
+#
+# #### ⚖️ Sample Ratio Mismatch
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Is group assignment balanced?</p>
+# <ul>
+#   <li>SRM (Sample Ratio Mismatch) checks whether the observed group sizes match the expected ratio.</li>
+#   <li>In a perfect world, random assignment to 'A1' and 'A2' should give ~50/50 split.</li>
+#   <li>SRM helps catch bugs in randomization, data logging, or user eligibility filtering.</li>
+# </ul>
+#
+# <p><strong>Real-World Experiment Split Ratios</strong></p>
+# <table>
+#   <thead>
+#     <tr>
+#       <th><strong>Scenario</strong></th>
+#       <th><strong>Split</strong></th>
+#       <th><strong>Why</strong></th>
+#     </tr>
+#   </thead>
+#   <tbody>
+#     <tr>
+#       <td>Default A/B</td>
+#       <td>50 / 50</td>
+#       <td>Maximizes power and ensures fairness</td>
+#     </tr>
+#     <tr>
+#       <td>Risky feature</td>
+#       <td>10 / 90 or 20 / 80</td>
+#       <td>Limits user exposure to minimize risk</td>
+#     </tr>
+#     <tr>
+#       <td>Ramp-up</td>
+#       <td>Step-wise (1-5-25-50…)</td>
+#       <td>Gradual rollout to catch issues early</td>
+#     </tr>
+#     <tr>
+#       <td>A/B/C Test</td>
+#       <td>33 / 33 / 33 or weighted</td>
+#       <td>Compare multiple variants fairly or with bias</td>
+#     </tr>
+#     <tr>
+#       <td>High control confidence needed</td>
+#       <td>70 / 30 or 60 / 40</td>
+#       <td>More stability in baseline comparisons</td>
+#     </tr>
+#   </tbody>
+# </table>
+#
+# </details>
+
+# %%
+check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, expected_ratios=[0.5, 0.5], alpha=0.05)
 
 # %% [markdown]
 # <a id="aa-testing"></a>
@@ -1460,6 +1433,35 @@ evaluate_guardrail_metric(
     alpha=0.05
 )
 
+
+# %% [markdown]
+# <a id="cuped"></a>
+# <h4>🔄 CUPED</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Controlled Pre-Experiment Data: A statistical adjustment that uses <strong>pre-experiment behavior</strong> to reduce variance and improve power.  
+# It helps detect smaller effects without increasing sample size.</p>
+#
+# <h5>When to Use</h5>
+# <ul>
+#   <li>You have reliable <strong>pre-experiment metrics</strong> (e.g., past spend, engagement)</li>
+#   <li>You want to <strong>reduce variance</strong> and improve test sensitivity</li>
+#   <li>You’re dealing with <strong>small lifts</strong> or <strong>costly sample sizes</strong></li>
+# </ul>
+#
+# <h5>How It Works</h5>
+# <ol>
+#   <li>Identify a pre-period metric <strong>correlated with your outcome</strong></li>
+#   <li>Use regression to compute an adjustment (theta)</li>
+#   <li>Subtract the correlated component from your outcome metric</li>
+#   <li>Analyze the adjusted metric instead of the raw one</li>
+# </ol>
+#
+# </details>
+#
+
+# %%
 
 # %% [markdown]
 # <a id="multiple-comparisons"></a>
