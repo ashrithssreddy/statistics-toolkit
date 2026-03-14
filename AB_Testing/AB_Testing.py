@@ -25,8 +25,8 @@
 # [🗂️ Data Setup](#data-setup)  
 # - [🧾 Sample Data](#sample-data)  
 # - [🛠️ Experiment Setup](#experiment-setup)  
-# - [⚙️ Other Experiment Parameters](#other-experiment-parameters)  
 # - [🔧 Central Control Panel](#central-control-panel)
+# - [📥 Read/Generate Data](#read-data)
 #
 # [🔀 Randomization Methods](#randomization-methods)  
 # - [🔄 Simple Randomization](#simple-randomization)  
