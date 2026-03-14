@@ -260,6 +260,11 @@ test_config['equal_variance'] = variance_result['equal_variance']
 test_config
 
 # %% [markdown]
+# [Back to the top](#table-of-contents)
+# ___
+#
+
+# %% [markdown]
 # <a id="power-analysis"></a>
 #
 # <h1>⚡ Power Analysis</h1>
@@ -480,11 +485,6 @@ test_config['family'] = determine_test_family(test_config)
 test_config
 
 print(f"✅ Selected test family: {test_config['family']}")
-
-# %% [markdown]
-# [Back to the top](#table-of-contents)
-# ___
-#
 
 # %% [markdown]
 # <a id="required-sample-size"></a>
@@ -741,11 +741,6 @@ df
 # </details>
 
 # %% [markdown]
-# [Back to the top](#table-of-contents)
-# ___
-#
-
-# %% [markdown]
 # <a id="sample-ratio-mismatch"></a>
 #
 # <h4>⚖️ Sample Ratio Mismatch</h4>
@@ -801,6 +796,11 @@ df
 
 # %%
 check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, expected_ratios=[0.5, 0.5], alpha=0.05)
+
+# %% [markdown]
+# [Back to the top](#table-of-contents)
+# ___
+#
 
 # %% [markdown]
 # <a id="aa-testing"></a>
