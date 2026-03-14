@@ -21,7 +21,8 @@
 # ![Coverage](https://img.shields.io/badge/coverage-95%25-yellowgreen)
 # ![License](https://img.shields.io/badge/license-MIT-green)
 #
-# # 📖 AB Testing
+# <h1>📖 AB Testing</h1>
+#
 # [🗂️ Data Setup](#data-setup)  
 # - [🧾 Sample Data](#sample-data)  
 # - [🛠️ Experiment Setup](#experiment-setup)  
@@ -78,11 +79,11 @@
 
 # %% [markdown]
 # <a id="data-setup"></a>
-# # 🗂️ Data Setup
+# <h1>🗂️ Data Setup</h1>
 
 # %% [markdown]
 # <a id="sample-data"></a>
-# #### 🧾 Sample data
+# <h4>🧾 Sample data</h4>
 
 # %%
 # Display Settings
@@ -125,7 +126,7 @@ from Hypothesis_Testing.ht_utils import print_config_summary
 # %% [markdown]
 # <a id="experiment-setup"></a>
 #
-# #### 🛠️ Experiment Setup
+# <h4>🛠️ Experiment Setup</h4>
 
 # %%
 # 1. Main outcome variable you're testing
@@ -159,7 +160,7 @@ randomization_method = "simple"
 
 # %% [markdown]
 # <a id="central-control-panel"></a>
-# #### 🔧 Central Control Panel
+# <h4>🔧 Central Control Panel</h4>
 
 # %%
 test_config = {
@@ -182,7 +183,7 @@ print_config_summary(test_config)
 
 # %% [markdown]
 # <a id="read-data"></a>
-# #### 📥 Read/Generate Data
+# <h4>📥 Read/Generate Data</h4>
 
 # %%
 observations_count = 1000
@@ -196,7 +197,7 @@ df
 
 # %% [markdown]
 # <a id="eda"></a>
-# # 📈 EDA
+# <h1>📈 EDA</h1>
 #
 # Exploratory Data Analysis validates core statistical assumptions before testing begins.
 
@@ -488,7 +489,7 @@ print(f"✅ Selected test family: {test_config['family']}")
 # %% [markdown]
 # <a id="required-sample-size"></a>
 #
-# #### 📐 Required Sample Size
+# <h4>📐 Required Sample Size</h4>
 
 # %%
 required_sample_size = calculate_power_sample_size(
@@ -510,7 +511,7 @@ print(f"👥 Total sample size: {required_sample_size * 2}")
 # %% [markdown]
 # <a id="power-analysis-summary"></a>
 #
-# #### 📊 Power Analysis Summary
+# <h4>📊 Power Analysis Summary</h4>
 
 # %%
 print_power_summary(
@@ -549,7 +550,7 @@ print_power_summary(
 # %% [markdown]
 # <a id="simple-randomization"></a>
 #
-# #### 🔄 Simple Randomization
+# <h4>🔄 Simple Randomization</h4>
 #
 # <details>
 #   <summary><strong>📖 Click to Expand</strong></summary>
@@ -747,7 +748,7 @@ df
 # %% [markdown]
 # <a id="sample-ratio-mismatch"></a>
 #
-# #### ⚖️ Sample Ratio Mismatch
+# <h4>⚖️ Sample Ratio Mismatch</h4>
 #
 # <details><summary><strong>📖 Click to Expand</strong></summary>
 #
@@ -891,7 +892,7 @@ check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, 
 # %% [markdown]
 # <a id="aa-test-visualization"></a>
 #
-# #### 📊 AA Test Visualization
+# <h4>📊 AA Test Visualization</h4>
 
 # %%
 run_aa_testing_generalized(
@@ -1023,7 +1024,7 @@ result
 
 # %% [markdown]
 # <a id="summaries"></a>
-# #### 🧾 Summaries
+# <h4>🧾 Summaries</h4>
 
 # %%
 summarize_ab_test_result(result)
@@ -1031,7 +1032,7 @@ summarize_ab_test_result(result)
 # %% [markdown]
 # <a id="results-visualization"></a>
 #
-# #### 📊 Visualization
+# <h4>📊 Visualization</h4>
 
 # %%
 plot_ab_test_results(result)
@@ -1088,7 +1089,7 @@ compute_lift_confidence_interval(result)
 # %% [markdown]
 # <a id="final-conclusion"></a>
 #
-# #### ✅ Final Conclusion
+# <h4>✅ Final Conclusion</h4>
 #
 
 # %%
@@ -1096,7 +1097,7 @@ print_final_ab_test_summary(result)
 
 # %% [markdown]
 # <a id="how-long"></a>
-# <h4>⏱️ How Long</h1>
+# <h4>⏱️ How Long</h4>
 #
 # <details><summary><strong>📖 Click to Expand</strong></summary>
 #
@@ -1465,7 +1466,7 @@ evaluate_guardrail_metric(
 
 # %% [markdown]
 # <a id="multiple-comparisons"></a>
-# #### 🧠 Correcting for Multiple Comparisons
+# <h4>🧠 Correcting for Multiple Comparisons</h4>
 
 # %% [markdown]
 # <details>
