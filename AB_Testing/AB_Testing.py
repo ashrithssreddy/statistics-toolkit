@@ -24,7 +24,7 @@
 # <h1>📖 AB Testing</h1>
 #
 # [🗂️ Data Setup](#data-setup)  
-# - [🧾 Sample Data](#sample-data)  
+# - [⚙️ Environment Setup](#environment-setup)  
 # - [🛠️ Experiment Setup](#experiment-setup)  
 # - [🔧 Central Control Panel](#central-control-panel)
 # - [📥 Read/Generate Data](#read-data)
@@ -82,8 +82,8 @@
 # <h1>🗂️ Data Setup</h1>
 
 # %% [markdown]
-# <a id="sample-data"></a>
-# <h4>🧾 Sample data</h4>
+# <a id="environment-setup"></a>
+# <h4>⚙️ Environment Setup</h4>
 
 # %%
 # Display Settings
