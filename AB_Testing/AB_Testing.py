@@ -639,16 +639,14 @@ elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
 
 elif randomization_method == "cuped":
-    df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
+    # todo: take care of CUPED
     df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
     test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
 else:
     raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
 
-# Generate outcome metrics after assignment (not before randomization)
-if randomization_method != "cuped":
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
+# Randomization only assigns group. Outcome data is collected in the next section (Outcome data).
 df
 
 # %% [markdown]
@@ -752,6 +750,13 @@ check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['g
 # <h1>📈 EDA</h1>
 #
 # Exploratory Data Analysis validates core statistical assumptions before testing begins.
+
+# %%
+# Outcome data (post-assignment): simulate collection so we have primary outcome, converted, bounce_rate for analysis.
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
+if randomization_method == "cuped":
+    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
+    test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
 
 # %% [markdown]
 # <a id="normality"></a>
