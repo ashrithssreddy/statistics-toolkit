@@ -405,6 +405,9 @@ mde = 5  # TODO: Change this based on business relevance
 #
 
 # %%
+test_config['family']
+
+# %%
 test_config['family'] = determine_test_family(test_config)
 # test_config
 print_config_summary(test_config)

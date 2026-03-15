@@ -400,42 +400,95 @@ def test_equal_variance(df, outcome_metric_col, group_col, group_labels):
 
 def determine_test_family(test_config):
     """
-    Decide which family of statistical test to use based on:
-    - outcome data type: binary / continuous / categorical
-    - group count: 2 or 3+
-    - variant: independent or paired (optional for family level)
-    - normality assumption: passed or not
+    Determine the appropriate statistical test for an experiment.
+
+    Decision factors:
+    - outcome_metric_datatype: binary / continuous / categorical / count
+    - group_count: number of variants
+    - variant: independent or paired
+    - normality: whether normality assumption holds
+    - variance_equal: whether group variances are assumed equal
     """
 
-    # TODO: is this complete? do we need to add more tests?
+    data_type = test_config.get("outcome_metric_datatype")
+    group_count = test_config.get("group_count")
+    variant = test_config.get("variant", "independent")
+    normality = test_config.get("normality", True)
+    variance_equal = test_config.get("variance_equal", True)
 
-    data_type = test_config['outcome_metric_datatype']
-    group_count = test_config['group_count']
-    variant = test_config['variant']
-    normality = test_config['normality']
+    # -------------------------
+    # BINARY METRICS
+    # -------------------------
+    if data_type == "binary":
 
-    # Binary outcome → Z-test for 2 groups, Chi-square for 3+ groups
-    if data_type == 'binary':
+        if variant == "paired":
+            return "mcnemar_test"
+
         if group_count == 2:
-            return 'z_test'           # Compare proportions across 2 groups
-        else:
-            return 'chi_square'      # 2x3+ contingency test
+            return "two_proportion_z_test"
 
-    # Continuous outcome → check for normality and group count
-    elif data_type == 'continuous':
-        if not normality:
-            return 'non_parametric'  # Mann-Whitney U or Kruskal-Wallis
+        return "chi_square_test"
+
+
+    # -------------------------
+    # CONTINUOUS METRICS
+    # -------------------------
+    elif data_type == "continuous":
+
+        if variant == "paired":
+
+            if normality:
+                return "paired_t_test"
+            else:
+                return "wilcoxon_signed_rank_test"
+
+        else:  # independent groups
+
+            if group_count == 2:
+
+                if normality:
+                    if variance_equal:
+                        return "two_sample_t_test"
+                    else:
+                        return "welch_t_test"
+
+                else:
+                    return "mann_whitney_u_test"
+
+            else:  # 3+ groups
+
+                if normality:
+                    if variance_equal:
+                        return "anova"
+                    else:
+                        return "welch_anova"
+                else:
+                    return "kruskal_wallis_test"
+
+
+    # -------------------------
+    # CATEGORICAL METRICS
+    # -------------------------
+    elif data_type == "categorical":
+
+        return "chi_square_test"
+
+
+    # -------------------------
+    # COUNT DATA
+    # -------------------------
+    elif data_type == "count":
+
         if group_count == 2:
-            return 't_test'          # Independent or paired t-test
+            return "poisson_rate_test"
         else:
-            return 'anova'           # One-way ANOVA
+            return "poisson_regression"
 
-    # Categorical outcome → Chi-square always
-    elif data_type == 'categorical':
-        return 'chi_square'
 
     else:
-        raise ValueError(f"Unsupported outcome_metric_datatype: {data_type}")
+        raise ValueError(
+            f"Unsupported outcome_metric_datatype: {data_type}"
+        )
 # ==========================================================
 # region AA Testing
 # ==========================================================
@@ -740,11 +793,11 @@ def calculate_power_sample_size(
     variant=None,
     alpha=0.05,
     power=0.80,
-    baseline_rate=None,  # required for z-test
+    baseline_rate=None,
     mde=None,
     std_dev=None,
     effect_size=None,
-    num_groups=2  # placeholder for future ANOVA support
+    num_groups=2
 ):
     """
     Calculate required sample size per group based on test type and assumptions.
@@ -756,43 +809,71 @@ def calculate_power_sample_size(
     - 'anova'               : Not implemented (default to t-test)
     - 'chi_square'          : Categorical outcomes (not used in this version)
     """
-    # -- Z-Test for Binary Proportions --
-    if test_family == 'z_test':
+
+    # -------------------------
+    # Binary tests
+    # -------------------------
+    if test_family in [
+        "two_proportion_z_test",
+        "z_test",
+        "chi_square_test"
+    ]:
+
         if baseline_rate is None or mde is None:
-            raise ValueError("baseline_rate and mde are required for z-test (binary outcome).")
+            raise ValueError("baseline_rate and mde required for binary tests")
 
         z_alpha = stats.norm.ppf(1 - alpha / 2)
         z_beta = stats.norm.ppf(power)
+
         p1 = baseline_rate
         p2 = p1 + mde
+
         pooled_std = np.sqrt(2 * p1 * (1 - p1))
 
         n = ((z_alpha + z_beta) ** 2 * pooled_std ** 2) / (mde ** 2)
+
         return int(np.ceil(n))
 
-    # -- T-Test for Continuous (Independent or Paired) --
-    # Non-parametric (e.g. Mann-Whitney U) power approximated via independent t-test (Cohen's d).
-    elif test_family in ['t_test', 'non_parametric', 'anova']:
-        if test_family == 'non_parametric':
-            variant = 'independent'
+
+    # -------------------------
+    # Continuous tests
+    # -------------------------
+    elif test_family in [
+        "two_sample_t_test",
+        "welch_t_test",
+        "paired_t_test",
+        "mann_whitney_u_test",
+        "wilcoxon_signed_rank_test",
+        "anova",
+        "kruskal_wallis_test"
+    ]:
+
         if effect_size is None:
             if std_dev is None or mde is None:
-                raise ValueError("For continuous outcomes, provide either effect_size or both std_dev and mde.")
+                raise ValueError(
+                    "For continuous metrics provide effect_size OR (std_dev + mde)"
+                )
+
             effect_size = mde / std_dev  # Cohen's d
 
-        if variant == 'independent':
-            analysis = TTestIndPower()
-        elif variant == 'paired':
+
+        if variant == "paired":
             analysis = TTestPower()
         else:
-            raise ValueError("variant must be 'independent' or 'paired' for t-test.")
+            analysis = TTestIndPower()
 
-        n = analysis.solve_power(effect_size=effect_size, power=power, alpha=alpha)
+
+        n = analysis.solve_power(
+            effect_size=effect_size,
+            power=power,
+            alpha=alpha
+        )
+
         return int(np.ceil(n))
 
-    else:
-        raise ValueError(f"❌ Unsupported test family: {test_family}")
 
+    else:
+        raise ValueError(f"Unsupported test: {test_family}")
 
 
 
@@ -807,26 +888,52 @@ def print_power_summary(
     std_dev=None,
     required_sample_size=None
 ):
+
     print("📈 Power Analysis Summary")
     print(f"- Test: {test_family.upper()}{' (' + variant + ')' if variant else ''}")
     print(f"- Significance level (α): {alpha}")
     print(f"- Statistical power (1 - β): {power}")
 
-    if test_family == 'z_test':
+    binary_tests = [
+        "z_test",
+        "two_proportion_z_test",
+        "chi_square_test"
+    ]
+
+    continuous_tests = [
+        "t_test",
+        "two_sample_t_test",
+        "welch_t_test",
+        "paired_t_test",
+        "mann_whitney_u_test",
+        "wilcoxon_signed_rank_test",
+        "anova",
+        "welch_anova",
+        "kruskal_wallis_test"
+    ]
+
+    if test_family in binary_tests:
+
         print(f"- Baseline conversion rate: {baseline_rate:.2%}")
         print(f"- MDE: {mde:.2%}")
+
         print(f"\n✅ To detect a lift from {baseline_rate:.2%} to {(baseline_rate + mde):.2%},")
         print(f"you need {required_sample_size} users per group → total {required_sample_size * 2} users.")
 
-    elif test_family == 't_test':
-        print(f"- Std Dev (control group): {std_dev:.2f}")
+    elif test_family in continuous_tests:
+
+        print(f"- Std Dev (baseline): {std_dev:.2f}")
         print(f"- MDE (mean difference): {mde}")
         print(f"- Cohen's d: {mde / std_dev:.2f}")
+
         print(f"\n✅ To detect a {mde}-unit lift in mean outcome,")
         print(f"you need {required_sample_size} users per group → total {required_sample_size * 2} users.")
 
     else:
-        print("⚠️ Unsupported family for summary.")
+
+        print("\n⚠️ Summary not specialized for this test.")
+        print(f"Required sample size per group: {required_sample_size}")
+        print(f"Total sample size: {required_sample_size * 2}")
 # ==========================================================
 # region AB Testing
 # ==========================================================
