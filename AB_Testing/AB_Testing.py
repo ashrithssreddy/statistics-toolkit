@@ -886,9 +886,6 @@ visualize_aa_distribution(
 
 
 # %% [markdown]
-# todo: pseudo AA test
-
-# %% [markdown]
 # <a id="type-i-error-simulation"></a>
 #
 # <h4>🎲 Type I Error Simulation</h4>
@@ -942,6 +939,28 @@ _ = simulate_aa_type1_error_rate(
 
 
 # %% [markdown]
+# <details>
+# <summary><strong>📖 Pseudo A/A Test (Click to Expand) </strong></summary>
+#
+# <p>
+# A pseudo A/A test is an offline validation technique used when historical experiment data already exists. Instead of running a live A/A experiment, analysts take data from a completed experiment and temporarily treat both groups as if they received the same experience.
+# </p>
+#
+# <p>
+# The goal is to check whether the experimentation analysis pipeline behaves correctly when there is no true treatment effect. By re-running the statistical test under the assumption that both groups are identical, we can verify that the analysis does not produce systematic false positives.
+# </p>
+#
+# <p>
+# Pseudo A/A tests are commonly used to validate analysis code, experiment dashboards, or statistical tooling before running new experiments.
+# </p>
+#
+# <blockquote>
+# ⚠️ Since pseudo A/A tests reuse historical experiment data rather than live traffic, they are only a diagnostic check and do not replace proper A/A validation in a production experimentation platform.
+# </blockquote>
+#
+# </details>
+
+# %% [markdown]
 # [Back to the top](#table-of-contents)
 # ___
 #
@@ -952,7 +971,7 @@ _ = simulate_aa_type1_error_rate(
 # <h1>🧪 A/B Testing</h1>
 
 # %% [markdown]
-# 🔗 For test selection (e.g., Z-test, t-test), refer to [📖 Hypothesis Testing Notebook](https://ashrithssreddy.github.io/statistics-toolkit/Hypothesis_Testing/Hypothesis_Testing.html)
+# 🔗 For test selection (e.g., Z-test, t-test), refer to [📖 Hypothesis Testing Notebook](https://ashrithssreddy.github.io/statistics-toolkit/html_exports/Hypothesis_Testing.html)
 #
 # <details><summary><strong>📖 Click to Expand </strong></summary>
 #
