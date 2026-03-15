@@ -38,11 +38,6 @@
 # - [📊 Power Analysis Summary](#power-analysis-summary)
 #
 # [🔀 Randomization Methods](#randomization-methods)  
-# - [🔄 Simple Randomization](#simple-randomization)  
-# - [🧬 Stratified Sampling](#stratified-sampling)  
-# - [🔁 Block Randomization](#block-randomization)  
-# - [🧯 Match Pair Randomization](#match-pair-randomization)  
-# - [🗃️ Cluster Randomization](#cluster-randomization)  
 # - [🎲 Apply Randomization](#apply-randomization)  
 # - [🕸️ Network Effects](#network-effects)
 # - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
