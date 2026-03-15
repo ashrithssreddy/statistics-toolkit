@@ -41,10 +41,6 @@
 # - [🕸️ Network Effects & SUTVA Violations](#network-effects)
 # - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
 #
-# [📈 EDA](#eda)  
-# - [🔍 Normality](#normality)  
-# - [🔍 Variance Homogeneity Check](#variance-homogeneity-check)  
-#
 # [🧪 AA Testing](#aa-testing)
 # - [🧬 Outcome Similarity Test](#outcome-similarity-test)
 # - [📊 AA Test Visualization](#aa-test-visualization)
@@ -766,91 +762,6 @@ df
 #
 
 # %% [markdown]
-# <a id="eda"></a>
-# <h1>📈 EDA</h1>
-#
-# Exploratory Data Analysis validates core statistical assumptions before testing begins.
-
-# %%
-df
-
-# %%
-# TODO: In a real experiment this data comes from production logs after the
-# experiment has run. Replace add_outcome_metrics() with real outcome data.
-df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
-
-# Outcome data (post-assignment): simulate collection so we have primary outcome, converted, bounce_rate for analysis.
-if randomization_method == "cuped":
-    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
-    test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
-
-# %%
-df
-
-# %% [markdown]
-# <a id="normality"></a>
-#
-# <h4>🔍 Normality</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Checks whether your outcome metric follows a <strong>normal distribution</strong>, which is a key assumption for <strong>parametric tests</strong> like t-test or ANOVA.</p>
-#
-# <ul>
-#   <li>Use <strong>Shapiro-Wilk test</strong> or visual tools (histograms, Q-Q plots).</li>
-#   <li>Helps determine whether to use parametric or non-parametric tests.</li>
-#   <li>If data is non-normal, switch to <strong>Mann-Whitney U</strong> or <strong>Wilcoxon</strong>.</li>
-# </ul>
-#
-# </details>
-#
-
-# %%
-normality_results = test_normality(df, outcome_metric_col=test_config['outcome_metric_col'], group_col='group', group_labels=test_config['group_labels'])
-
-print("Normality test (Shapiro-Wilk) results:")
-for group, result in normality_results.items():
-    print(f"{group}: p = {result['p_value']:.4f} → {'Normal' if result['normal'] else 'Non-normal'}")
-
-# %%
-# Assume both groups must be normal to proceed with parametric tests
-test_config['normality'] = all(result['normal'] for result in normality_results.values())
-test_config
-
-
-# %% [markdown]
-# <a id="variance-homogeneity-check"></a>
-#
-# <h4>🔍 Variance Homogeneity Check</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Tests whether the <strong>variances between groups are equal</strong>, which affects the validity of t-tests and ANOVA.</p>
-#
-# <ul>
-#   <li>Performed using <strong>Levene’s test</strong> or <strong>Bartlett’s test</strong>.</li>
-#   <li>If variances are unequal, use <strong>Welch's t-test</strong> instead.</li>
-#   <li>Unequal variances do not invalidate analysis but change the test used.</li>
-# </ul>
-#
-# </details>
-#
-
-# %%
-variance_result = test_equal_variance(df, outcome_metric_col=test_config['outcome_metric_col'], group_col='group', group_labels=test_config['group_labels'])
-variance_result
-
-# %%
-print(f"Levene’s test: p = {variance_result['p_value']:.4f} → {'Equal variances' if variance_result['equal_variance'] else 'Unequal variances'}")
-test_config['equal_variance'] = variance_result['equal_variance']
-test_config
-
-# %% [markdown]
-# [Back to the top](#table-of-contents)
-# ___
-#
-
-# %% [markdown]
 # <a id="aa-testing"></a>
 #
 # <h1>🧪 AA Testing</h1>
@@ -919,6 +830,14 @@ test_config
 # </details>
 #
 
+# %%
+# Experiment has run; outcome and guardrail data come in (simulated via add_outcome_metrics).
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
+df
+
+# %%
+df.groupby("group")[test_config['outcome_metric_col']].mean()
+
 # %% [markdown]
 # <a id="outcome-similarity-test"></a>
 #
@@ -937,21 +856,32 @@ test_config
 # </details>
 #
 
+# %%
+# Outcome similarity test only (no visualization).
+_ = run_outcome_similarity_test(
+    df=df,
+    group_col='group',
+    metric_col=test_config['outcome_metric_col'],
+    test_family=test_config['family'],
+    variant=test_config.get('variant'),
+    group_labels=test_config['group_labels'],
+    alpha=0.05,
+    verbose=True
+)
+
 # %% [markdown]
 # <a id="aa-test-visualization"></a>
 #
 # <h4>📊 AA Test Visualization</h4>
 
 # %%
-# TODO: Replace simulated outcomes with real experiment logs when running a real AA test.
-run_aa_testing_generalized(
-    df=df,
+visualize_aa_distribution(
+    df,
     group_col='group',
     metric_col=test_config['outcome_metric_col'],
-    group_labels=test_config['group_labels'],
     test_family=test_config['family'],
-    variant=test_config.get('variant'),
-    alpha=0.05
+    group_labels=test_config['group_labels'],
+    variant=test_config.get('variant')
 )
 
 
