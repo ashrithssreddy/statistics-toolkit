@@ -413,7 +413,8 @@ mde = 5  # Change this based on business relevance
 
 # %%
 test_config['family'] = determine_test_family(test_config)
-test_config
+# test_config
+print_config_summary(test_config)
 
 print(f"✅ Selected test family: {test_config['family']}")
 
