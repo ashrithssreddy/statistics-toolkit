@@ -329,6 +329,16 @@ elif test_family in ['t_test', 'anova', 'non_parametric']:
     print(f"📊 Control group mean: {baseline_mean:.2f}")
     print(f"📏 Control group std dev: {std_dev:.2f}")
 
+elif test_config['outcome_metric_datatype'] == 'continuous':
+    # test_family not set yet (e.g. before Test Family cell); use full column for power inputs
+    col = df[metric_col].dropna()
+    baseline_mean = col.mean()
+    std_dev = col.std()
+    if std_dev == 0 or np.isnan(std_dev):
+        std_dev = 1.0  # avoid division by zero in power calculation
+    print(f"📊 Baseline (full sample) mean: {baseline_mean:.2f}")
+    print(f"📏 Baseline (full sample) std dev: {std_dev:.2f}")
+
 else:
     baseline_rate = None
     std_dev = None
@@ -413,6 +423,7 @@ mde = 5  # Change this based on business relevance
 
 # %%
 test_config['family'] = determine_test_family(test_config)
+test_family = test_config['family']  # keep in sync for downstream cells (Required Sample Size, etc.)
 # test_config
 print_config_summary(test_config)
 

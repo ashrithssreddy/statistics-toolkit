@@ -711,7 +711,10 @@ def calculate_power_sample_size(
         return int(np.ceil(n))
 
     # -- T-Test for Continuous (Independent or Paired) --
+    # Non-parametric (e.g. Mann-Whitney U) power approximated via independent t-test (Cohen's d).
     elif test_family in ['t_test', 'non_parametric', 'anova']:
+        if test_family == 'non_parametric':
+            variant = 'independent'
         if effect_size is None:
             if std_dev is None or mde is None:
                 raise ValueError("For continuous outcomes, provide either effect_size or both std_dev and mde.")
