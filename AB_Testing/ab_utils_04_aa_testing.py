@@ -1,4 +1,4 @@
-# AA Testing — outcome similarity test, visualization, Type I error simulation
+# 04 AA Testing — outcome similarity test, visualization, Type I error simulation
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

@@ -1,4 +1,4 @@
-# Power Analysis — EDA (normality, variance, test family) + baseline, sample size, summary
+# 02 Power Analysis — EDA (normality, variance, test family) + baseline, sample size, summary
 import numpy as np
 import pandas as pd
 from scipy import stats

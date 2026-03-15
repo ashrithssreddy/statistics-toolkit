@@ -1,4 +1,4 @@
-# A/B Testing — run test, summarize, plot, CIs, lift, final summary, estimate duration
+# 05 A/B Testing — run test, summarize, plot, CIs, lift, final summary, estimate duration
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

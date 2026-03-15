@@ -110,7 +110,12 @@ from statsmodels.stats.power import (
 from statsmodels.stats.multitest import multipletests
 from sklearn.model_selection import train_test_split
 
-from ab_utils import *
+from ab_utils_01_data_setup import *
+from ab_utils_02_power_analysis import *
+from ab_utils_03_randomization import *
+from ab_utils_04_aa_testing import *
+from ab_utils_05_ab_testing import *
+from ab_utils_06_post_hoc import *
 import sys
 sys.path.insert(0, '..')
 from Hypothesis_Testing.ht_utils import print_config_summary

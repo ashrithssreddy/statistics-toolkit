@@ -1,4 +1,4 @@
-# Post Hoc Analysis — CUPED, segment lift, guardrail, rollout simulation
+# 06 Post Hoc Analysis — CUPED, segment lift, guardrail, rollout simulation
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ from scipy import stats
 from scipy.stats import ttest_ind
 import statsmodels.api as sm
 from IPython.display import display
-from ab_utils_common import my_seed
+from ab_utils_01_data_setup import my_seed
 
 
 def apply_cuped(

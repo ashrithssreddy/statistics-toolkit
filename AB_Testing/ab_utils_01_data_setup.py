@@ -1,7 +1,8 @@
-# Data Setup — create_dummy_ab_data, create_historical_df, add_outcome_metrics
+# 01 Data Setup — create_dummy_ab_data, create_historical_df, add_outcome_metrics
 import numpy as np
 import pandas as pd
-from ab_utils_common import my_seed
+
+my_seed = 1995
 
 
 def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=None, guardrail_metric_col=None):
