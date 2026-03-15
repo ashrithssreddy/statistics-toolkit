@@ -56,8 +56,11 @@ def apply_cuped(
     y = df[outcome_metric_col].values
 
     # Step 2: Regress outcome on pre-metric to estimate correction factor (theta)
-    X = sm.add_constant(df[[pre_metric]])
-    theta = sm.OLS(y, X).fit().params[pre_metric]
+    # X = sm.add_constant(df[[pre_metric]])
+    # theta = sm.OLS(y, X).fit().params[pre_metric]
+    control_group = df[df[group_col] == group_labels[0]]
+    X = sm.add_constant(control_group[[pre_metric]])
+    theta = sm.OLS(control_group[outcome_metric_col], X).fit().params[pre_metric]
 
     # Step 3: Apply CUPED adjustment and save in new column
     if outcome_col is None:

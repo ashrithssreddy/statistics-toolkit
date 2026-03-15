@@ -1463,6 +1463,37 @@ run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05)
 #
 
 # %%
+df = apply_cuped(
+    df=df,
+    pre_metric='past_purchase_count',
+    outcome_metric_col=test_config['outcome_metric_col'],
+    group_col='group',
+    group_labels=test_config['group_labels']
+)
+
+df.head()
+
+# %%
+original_std = df[test_config['outcome_metric_col']].std()
+cuped_std = df[f"{test_config['outcome_metric_col']}_cuped_adjusted"].std()
+
+print("Variance Reduction from CUPED")
+print("--------------------------------")
+print(f"Original std dev : {original_std:.3f}")
+print(f"CUPED std dev    : {cuped_std:.3f}")
+print(f"Reduction        : {(1 - cuped_std/original_std)*100:.2f}%")
+
+# %%
+result_cuped = run_ab_test(
+    df=df,
+    group_col='group',
+    metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
+    group_labels=test_config['group_labels'],
+    test_family=test_config['family'],
+    variant=test_config.get('variant')
+)
+
+summarize_ab_test_result(result_cuped)
 
 # %% [markdown]
 # <a id="multiple-comparisons"></a>
