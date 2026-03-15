@@ -43,6 +43,7 @@
 # - [🔁 Block Randomization](#block-randomization)  
 # - [🧯 Match Pair Randomization](#match-pair-randomization)  
 # - [🗃️ Cluster Randomization](#cluster-randomization)  
+# - [🎲 Apply Randomization](#apply-randomization)  
 # - [🕸️ Network Effects](#network-effects)
 # - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
 #
@@ -618,6 +619,11 @@ print_power_summary(
 # </details>
 #
 
+# %% [markdown]
+# <a id="apply-randomization"></a>
+# <h4>🎲 Apply Randomization</h4>
+#
+
 # %%
 df
 
@@ -752,8 +758,10 @@ check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['g
 # Exploratory Data Analysis validates core statistical assumptions before testing begins.
 
 # %%
-# Outcome data (post-assignment): simulate collection so we have primary outcome, converted, bounce_rate for analysis.
+# todo: add experiment outcome
 df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
+
+# Outcome data (post-assignment): simulate collection so we have primary outcome, converted, bounce_rate for analysis.
 if randomization_method == "cuped":
     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
     test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
