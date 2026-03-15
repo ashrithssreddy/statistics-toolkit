@@ -284,10 +284,6 @@ df
 # Use values from your config or plug in manually
 alpha = 0.05  # False positive tolerance (Type I error)
 power = 0.80  # Statistical power (1 - Type II error)
-group_labels = test_config['group_labels']
-metric_col = test_config['outcome_metric_col']
-test_family = test_config['family']
-variant = test_config.get('variant')
 
 
 # %% [markdown]
@@ -316,22 +312,22 @@ variant = test_config.get('variant')
 # %%
 # 🧮 Data-Driven Baseline Metric
 
-if test_family == 'z_test':
+if test_config['family'] == 'z_test':
     # For binary outcome (e.g., conversion): baseline = conversion rate in data
-    baseline_rate = df[metric_col].mean()
+    baseline_rate = df[test_config['outcome_metric_col']].mean()
     print(f"📊 Baseline conversion rate: {baseline_rate:.2%}")
 
-elif test_family in ['t_test', 'anova', 'non_parametric']:
+elif test_config['family'] in ['t_test', 'anova', 'non_parametric']:
     # For continuous metrics (e.g., revenue, engagement)
-    control_data = df[df['group'] == group_labels[0]][metric_col]
+    control_data = df[df['group'] == test_config['group_labels'][0]][test_config['outcome_metric_col']]
     baseline_mean = control_data.mean()
     std_dev = control_data.std()
     print(f"📊 Control group mean: {baseline_mean:.2f}")
     print(f"📏 Control group std dev: {std_dev:.2f}")
 
 elif test_config['outcome_metric_datatype'] == 'continuous':
-    # test_family not set yet (e.g. before Test Family cell); use full column for power inputs
-    col = df[metric_col].dropna()
+    # test_config['family'] not set yet (e.g. before Test Family cell); use full column for power inputs
+    col = df[test_config['outcome_metric_col']].dropna()
     baseline_mean = col.mean()
     std_dev = col.std()
     if std_dev == 0 or np.isnan(std_dev):
@@ -423,7 +419,6 @@ mde = 5  # Change this based on business relevance
 
 # %%
 test_config['family'] = determine_test_family(test_config)
-test_family = test_config['family']  # keep in sync for downstream cells (Required Sample Size, etc.)
 # test_config
 print_config_summary(test_config)
 
@@ -436,13 +431,13 @@ print(f"✅ Selected test family: {test_config['family']}")
 
 # %%
 required_sample_size = calculate_power_sample_size(
-    test_family=test_family,
-    variant=variant,
+    test_family=test_config['family'],
+    variant=test_config.get('variant'),
     alpha=alpha,
     power=power,
-    baseline_rate=baseline_rate if test_family == 'z_test' else None,
+    baseline_rate=baseline_rate if test_config['family'] == 'z_test' else None,
     mde=mde,
-    std_dev=std_dev if test_family in ['t_test', 'anova', 'non_parametric'] else None,
+    std_dev=std_dev if test_config['family'] in ['t_test', 'anova', 'non_parametric'] else None,
     effect_size=None,  # Let it compute internally via mde/std
     num_groups=2
 )
@@ -458,13 +453,13 @@ print(f"👥 Total sample size: {required_sample_size * 2}")
 
 # %%
 print_power_summary(
-    test_family=test_family,
-    variant=variant,
+    test_family=test_config['family'],
+    variant=test_config.get('variant'),
     alpha=alpha,
     power=power,
-    baseline_rate=baseline_rate if test_family == 'z_test' else None,
+    baseline_rate=baseline_rate if test_config['family'] == 'z_test' else None,
     mde=mde,
-    std_dev=std_dev if test_family == 't_test' else None,
+    std_dev=std_dev if test_config['family'] == 't_test' else None,
     required_sample_size=required_sample_size
 )
 
@@ -635,22 +630,22 @@ elif randomization_method == "block":
     df = apply_block_randomization(df, observation_id_col='user_id', group_col=group_col, block_size=10, seed=my_seed)
 
 elif randomization_method == "matched_pair":
-    df = apply_matched_pair_randomization(df, sort_col=pre_experiment_metric, group_col=group_col, group_labels=group_labels)
+    df = apply_matched_pair_randomization(df, sort_col=pre_experiment_metric, group_col=group_col, group_labels=test_config['group_labels'])
 
 elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
 
 elif randomization_method == "cuped":
     df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, outcome_metric_col=outcome_metric_col, seed=my_seed)
-    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=outcome_metric_col, group_col=group_col, group_labels=group_labels, seed=my_seed)
-    outcome_metric_col = f"{outcome_metric_col}_cuped_adjusted"
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
+    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
+    test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
 else:
     raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
 
 # Generate outcome metrics after assignment (not before randomization)
 if randomization_method != "cuped":
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=group_labels, outcome_metric_col=outcome_metric_col, seed=my_seed)
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
 df
 
 # %% [markdown]
@@ -742,7 +737,7 @@ df
 # </details>
 
 # %%
-check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, expected_ratios=[0.5, 0.5], alpha=0.05)
+check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['group_labels'], expected_ratios=[0.5, 0.5], alpha=0.05)
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
@@ -774,7 +769,7 @@ check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, 
 #
 
 # %%
-normality_results = test_normality(df, outcome_metric_col=outcome_metric_col, group_col='group', group_labels=group_labels)
+normality_results = test_normality(df, outcome_metric_col=test_config['outcome_metric_col'], group_col='group', group_labels=test_config['group_labels'])
 
 print("Normality test (Shapiro-Wilk) results:")
 for group, result in normality_results.items():
@@ -805,7 +800,7 @@ test_config
 #
 
 # %%
-variance_result = test_equal_variance(df, outcome_metric_col=outcome_metric_col, group_col='group', group_labels=group_labels)
+variance_result = test_equal_variance(df, outcome_metric_col=test_config['outcome_metric_col'], group_col='group', group_labels=test_config['group_labels'])
 variance_result
 
 # %%
