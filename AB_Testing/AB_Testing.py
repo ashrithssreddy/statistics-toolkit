@@ -107,6 +107,7 @@ from statsmodels.stats.power import (
     FTestAnovaPower,
     NormalIndPower
 )
+from statsmodels.stats.multitest import multipletests
 from sklearn.model_selection import train_test_split
 
 from ab_utils import *
@@ -1426,24 +1427,7 @@ analyze_segment_lift(
 df.head(20)
 
 # %%
-# Quick average check by group (if guardrail metric is configured)
-guardrail_col = test_config.get('guardrail_metric_col')
-if guardrail_col and guardrail_col in df.columns:
-    guardrail_avg = df.groupby('group')[guardrail_col].mean()
-    print(f"🚦 Average {guardrail_col} by Group:")
-    for grp, val in guardrail_avg.items():
-        print(f"- {grp}: {val:.4f}")
-
-# %%
-if guardrail_col and guardrail_col in df.columns:
-    evaluate_guardrail_metric(
-        df=df,
-        test_config=test_config,
-        guardrail_metric_col=guardrail_col,
-        alpha=0.05
-    )
-else:
-    print("🚦 No guardrail metric configured (set guardrail_metric_col in Experiment Setup to evaluate one).")
+run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05)
 
 
 # %% [markdown]
@@ -1548,9 +1532,6 @@ else:
 # </details>
 
 # %%
-import pandas as pd
-from statsmodels.stats.multitest import multipletests
-
 # Original inputs
 segment_names = ['North', 'South', 'East', 'West']
 p_vals = [0.03, 0.06, 0.02, 0.10]

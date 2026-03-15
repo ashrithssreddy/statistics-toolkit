@@ -1083,8 +1083,8 @@ def summarize_ab_test_result(result):
     print("\n📋 Group Summary:\n")
     display(pd.DataFrame(result['summary']).T)
 
-    # ---- Lift Analysis (for Z-test or T-test (independent)) ----
-    if test_family in ['z_test', 't_test'] and (variant == 'independent' or test_family == 'z_test'):
+    # ---- Lift Analysis (for Z-test, T-test independent, or non-parametric / Mann-Whitney) ----
+    if test_family in ['z_test', 't_test', 'non_parametric', 'mann_whitney_u_test'] and (variant == 'independent' or test_family in ['z_test', 'non_parametric', 'mann_whitney_u_test']):
         group1_mean = result['summary'][group1]['mean']
         group2_mean = result['summary'][group2]['mean']
         lift = group2_mean - group1_mean
@@ -1128,7 +1128,7 @@ def plot_ab_test_results(result):
 
     print("\n📊 Visualization:")
 
-    if test_family in ['z_test', 't_test', 'non_parametric']:
+    if test_family in ['z_test', 't_test', 'non_parametric', 'mann_whitney_u_test']:
         labels = [group1, group2]
         values = [result['summary'][group1]['mean'], result['summary'][group2]['mean']]
         plt.bar(labels, values, color=['gray', 'skyblue'])
@@ -1167,7 +1167,7 @@ def plot_confidence_intervals(result, z=1.96):
     group1, group2 = result['group_labels']
     summary = result['summary']
 
-    if test_family not in ['z_test', 't_test']:
+    if test_family not in ['z_test', 't_test', 'non_parametric', 'mann_whitney_u_test']:
         print(f"⚠️ CI plotting not supported for test family: {test_family}")
         return
     if test_family == 't_test' and variant != 'independent':
@@ -1182,6 +1182,7 @@ def plot_confidence_intervals(result, z=1.96):
         se2 = np.sqrt(p2 * (1 - p2) / n2)
         ylabel = "Conversion Rate"
     else:
+        # t_test (independent), non_parametric, mann_whitney_u_test: CI for mean
         sd1 = summary[group1]['std']
         sd2 = summary[group2]['std']
         se1 = sd1 / np.sqrt(n1)
@@ -1246,6 +1247,29 @@ def compute_lift_confidence_interval(result):
         else:
             print("🤷 CI includes 0 — not statistically significant.")
 
+    elif test_family in ['non_parametric', 'mann_whitney_u_test']:
+        m1 = result['summary'][group1]['mean']
+        m2 = result['summary'][group2]['mean']
+        lift = m2 - m1
+        n1 = result['summary'][group1]['n']
+        n2 = result['summary'][group2]['n']
+        sd1 = result['summary'][group1].get('std')
+        sd2 = result['summary'][group2].get('std')
+        if sd1 is not None and sd2 is not None:
+            se = np.sqrt((sd1 ** 2) / n1 + (sd2 ** 2) / n2)
+            ci_low = lift - z * se
+            ci_high = lift + z * se
+            print(f"- Absolute Lift (diff in means): {lift:.4f}")
+            print(f"- 95% CI for difference        : [{ci_low:.4f}, {ci_high:.4f}]")
+            if ci_low > 0:
+                print("✅ Likely positive impact (CI > 0)")
+            elif ci_high < 0:
+                print("🚫 Likely negative impact (CI < 0)")
+            else:
+                print("🤷 CI includes 0 — not statistically significant.")
+        else:
+            print("- Mann-Whitney U: CI for difference in means (summary std used).")
+
     elif test_family == 't_test' and variant == 'paired':
         print("- Paired test: CI already accounted for in test logic.")
 
@@ -1283,6 +1307,18 @@ def print_final_ab_test_summary(result):
         print(f"📈  Absolute lift              :  {lift:.4f}")
         print(f"📊  Percentage lift            :  {pct_lift:.2%}")
         print(f"🧪  P-value (from {test_name}) :  {p_value:.4f}")
+
+    elif test_family in ['non_parametric', 'mann_whitney_u_test']:
+        mean1 = result['summary'][group1]['mean']
+        mean2 = result['summary'][group2]['mean']
+        lift = mean2 - mean1
+        pct_lift = lift / mean1 if mean1 else np.nan
+        test_name = result.get("test", "Mann-Whitney U test")
+        print(f"👥  {group1.capitalize()} Avg outcome         :  {mean1:.4f}")
+        print(f"🧪  {group2.capitalize()} Avg outcome         :  {mean2:.4f}")
+        print(f"📈  Absolute lift              :  {lift:.4f}")
+        print(f"📊  Percentage lift            :  {pct_lift:.2%}")
+        print(f"🧪  P-value (from {test_name}):  {p_value:.4f}")
 
     elif test_family == 't_test' and variant == 'paired':
         print("🧪 Paired T-Test was used to compare within-user outcomes.")
@@ -1452,6 +1488,18 @@ def analyze_segment_lift(
 
 
 
+def run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05):
+    """
+    Run guardrail analysis: evaluate guardrail metric (means, difference, p-value).
+    If no guardrail is configured, prints a short message.
+    """
+    guardrail_col = test_config.get('guardrail_metric_col')
+    if not guardrail_col or guardrail_col not in df.columns:
+        print("🚦 No guardrail metric configured (set guardrail_metric_col in Experiment Setup to evaluate one).")
+        return
+    evaluate_guardrail_metric(df=df, test_config=test_config, guardrail_metric_col=guardrail_col, alpha=alpha)
+
+
 def evaluate_guardrail_metric(
     df,
     test_config,
@@ -1483,7 +1531,8 @@ def evaluate_guardrail_metric(
 
     t_stat, p_val = ttest_ind(treatment_vals, control_vals)
 
-    print(f"\n🚦 Guardrail Metric Check → '{guardrail_metric_col}'\n")
+    print(f"🚦 Guardrail Metric Check → '{guardrail_metric_col}'")
+    print("Hypothesis (two-sided t-test): H₀ — no difference in mean vs H₁ — means differ.")
     print(f"- {control:10}: {mean_control:.4f}")
     print(f"- {treatment:10}: {mean_treatment:.4f}")
     print(f"- Difference   : {diff:+.4f}")
