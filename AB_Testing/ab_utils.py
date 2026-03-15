@@ -43,17 +43,17 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
     puts must-haves (user_id, outcome_metric_col, past_purchase_count) on the left."""
     np.random.seed(seed)
     users = pd.DataFrame({
-        # must-have: identifier
+        # required (from experiment setup / central control panel): identifier, pre-experiment metric, outcome placeholder
         'user_id': range(1, observations_count + 1),
-        # must-have: pre-experiment variable (e.g. for CUPED)
         'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
-        # good-to-have: segmentation / user attributes
+        # optional: segmentation (retained for stratified / segment analysis)
         'platform': np.random.choice(['iOS', 'Android'], size=observations_count, p=[0.6, 0.4]),
         'device_type': np.random.choice(['mobile', 'desktop'], size=observations_count, p=[0.7, 0.3]),
-        'user_tier': np.random.choice(['new', 'returning'], size=observations_count, p=[0.4, 0.6]),
-        'region': np.random.choice(['North', 'South', 'East', 'West'], size=observations_count, p=[0.25, 0.25, 0.25, 0.25]),
-        'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
-        'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
+        # optional: uncomment if needed for cluster or segment analysis
+        # 'user_tier': np.random.choice(['new', 'returning'], size=observations_count, p=[0.4, 0.6]),
+        # 'region': np.random.choice(['North', 'South', 'East', 'West'], size=observations_count, p=[0.25, 0.25, 0.25, 0.25]),
+        # 'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
+        # 'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
     })
     # Must-have outcome column (placeholder until filled after randomization)
     if outcome_metric_col:

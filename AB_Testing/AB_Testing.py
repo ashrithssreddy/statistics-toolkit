@@ -619,6 +619,9 @@ print_power_summary(
 #
 
 # %%
+df
+
+# %%
 # Apply randomization method
 if randomization_method == "simple":
     df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
@@ -1375,7 +1378,7 @@ test_duration_result
 analyze_segment_lift(
     df=df,
     test_config=test_config,
-    segment_cols=['platform', 'device_type', 'user_tier', 'region'],
+    segment_cols=['platform', 'device_type'], # , 'user_tier', 'region'
     min_count_per_group=30,
     visualize=True
 )
@@ -1428,6 +1431,9 @@ analyze_segment_lift(
 #
 # </details>
 #
+
+# %%
+df.head(20)
 
 # %%
 # Quick average check by group
