@@ -310,6 +310,9 @@ power = 0.80  # Statistical power (1 - Type II error)
 
 if test_config['family'] == 'z_test':
     # For binary outcome (e.g., conversion): baseline = conversion rate in data
+    # TODO: how do we have a baseline before the experiment?
+    # TODO: Replace with historical baseline metric.
+# In real experiments baseline should come from past data, not experiment outcomes.
     baseline_rate = df[test_config['outcome_metric_col']].mean()
     print(f"📊 Baseline conversion rate: {baseline_rate:.2%}")
 
@@ -318,6 +321,7 @@ elif test_config['family'] in ['t_test', 'anova', 'non_parametric']:
     control_data = df[df['group'] == test_config['group_labels'][0]][test_config['outcome_metric_col']]
     baseline_mean = control_data.mean()
     std_dev = control_data.std()
+    # TODO: In production experiments std_dev should be estimated from historical data.
     print(f"📊 Control group mean: {baseline_mean:.2f}")
     print(f"📏 Control group std dev: {std_dev:.2f}")
 
@@ -743,13 +747,20 @@ check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['g
 # Exploratory Data Analysis validates core statistical assumptions before testing begins.
 
 # %%
-# todo: add experiment outcome
+df
+
+# %%
+# TODO: In a real experiment this data comes from production logs after the
+# experiment has run. Replace add_outcome_metrics() with real outcome data.
 df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
 
 # Outcome data (post-assignment): simulate collection so we have primary outcome, converted, bounce_rate for analysis.
 if randomization_method == "cuped":
     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
     test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
+
+# %%
+df
 
 # %% [markdown]
 # <a id="normality"></a>
@@ -907,6 +918,7 @@ test_config
 # <h4>📊 AA Test Visualization</h4>
 
 # %%
+# TODO: Replace simulated outcomes with real experiment logs when running a real AA test.
 run_aa_testing_generalized(
     df=df,
     group_col='group',
