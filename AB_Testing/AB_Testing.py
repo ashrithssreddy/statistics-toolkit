@@ -489,10 +489,8 @@ print_power_summary(
 # %% [markdown]
 # <a id="simple-randomization"></a>
 #
-# <h4>🔄 Simple Randomization</h4>
-#
 # <details>
-#   <summary><strong>📖 Click to Expand</strong></summary>
+#   <summary><strong>📖 Simple Randomization (Click to Expand)</strong></summary>
 #
 #   <p><strong>Each user is assigned to control or treatment with equal probability, independent of any characteristics.</strong></p>
 #
@@ -515,9 +513,7 @@ print_power_summary(
 # %% [markdown]
 # <a id="stratified-sampling"></a>
 #
-# <h4>🔄 Stratified Sampling</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
+# <details><summary><strong>📖 Stratified Sampling (Click to Expand)</strong></summary>
 #
 # <p>Ensures that key segments (e.g., platform, region) are evenly represented across control and treatment.</p>
 #
@@ -541,9 +537,7 @@ print_power_summary(
 # %% [markdown]
 # <a id="block-randomization"></a>
 #
-# <h4>🔄 Block Randomization</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
+# <details><summary><strong>📖 Block Randomization (Click to Expand)</strong></summary>
 #
 # <p>Groups users into fixed-size blocks and randomly assigns groups within each block.</p>
 #
@@ -567,9 +561,7 @@ print_power_summary(
 # %% [markdown]
 # <a id="match-pair-randomization"></a>
 #
-# <h4>🔄 Match Pair Randomization</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
+# <details><summary><strong>📖 Match Pair Randomization (Click to Expand)</strong></summary>
 #
 # <p>Participants are <strong>paired based on similar characteristics</strong> before random group assignment.  
 # This reduces variance and improves <strong>statistical power</strong> by ensuring balance on key covariates.</p>
@@ -595,9 +587,7 @@ print_power_summary(
 # %% [markdown]
 # <a id="cluster-randomization"></a>
 #
-# <h4>🔄 Cluster Randomization</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
+# <details><summary><strong>📖 Cluster Randomization (Click to Expand)</strong></summary>
 #
 # <p>Entire <strong>groups or clusters</strong> (e.g., cities, stores, schools) are assigned to control or treatment.  
 # Used when it's impractical or risky to randomize individuals within a cluster.</p>
