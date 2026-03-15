@@ -406,9 +406,6 @@ mde = 5  # TODO: Change this based on business relevance
 #
 
 # %%
-test_config['family']
-
-# %%
 test_config['family'] = determine_test_family(test_config)
 # test_config
 print_config_summary(test_config)
@@ -637,7 +634,7 @@ print_power_summary(
 n_required = test_config['required_sample_size'] * test_config['group_count']
 df = df.sample(n=n_required, random_state=42)
 
-df
+df.head()
 
 # %%
 # Apply randomization method
@@ -656,11 +653,6 @@ elif randomization_method == "matched_pair":
 elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
 
-# TODO: remove this
-# elif randomization_method == "cuped":
-#     df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
-#     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
-#     test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
 else:
     raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
 
@@ -758,10 +750,6 @@ df
 # %%
 check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['group_labels'], expected_ratios=[0.5, 0.5], alpha=0.05)
 
-# %%
-df
-
-
 # %% [markdown]
 # [Back to the top](#table-of-contents)
 # ___
@@ -839,10 +827,7 @@ df
 # %%
 # Experiment has run; outcome and guardrail data come in (simulated via add_outcome_metrics). A/A: no treatment effect.
 df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=False, seed=my_seed)
-df
-
-# %%
-df.groupby("group")[test_config['outcome_metric_col']].mean()
+df.head()
 
 # %% [markdown]
 # <a id="outcome-similarity-test"></a>
@@ -863,7 +848,9 @@ df.groupby("group")[test_config['outcome_metric_col']].mean()
 #
 
 # %%
-# Outcome similarity test only (no visualization).
+df.groupby("group")[test_config['outcome_metric_col']].mean() # TODO, move this into function
+
+# Outcome similarity test only.
 _ = run_outcome_similarity_test(
     df=df,
     group_col='group',
@@ -1017,7 +1004,7 @@ _ = simulate_aa_type1_error_rate(
 # %%
 # Simulate experiment data (outcome + guardrail) with treatment effect for A/B analysis.
 df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=True, seed=my_seed)
-df
+df.head()
 
 # %%
 result = run_ab_test(
@@ -1029,7 +1016,7 @@ result = run_ab_test(
     variant=test_config.get('variant'),
     alpha=0.05
 )
-print_config_summary(result)
+print_config_summary(result) # TODO: Print nested json properly
 # result
 
 # %% [markdown]
@@ -1429,9 +1416,6 @@ analyze_segment_lift(
 #
 
 # %%
-df.head(20)
-
-# %%
 run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05)
 
 
@@ -1474,6 +1458,7 @@ df = apply_cuped(
 df.head()
 
 # %%
+# TODO: move these into apply_cuped()
 original_std = df[test_config['outcome_metric_col']].std()
 cuped_std = df[f"{test_config['outcome_metric_col']}_cuped_adjusted"].std()
 
@@ -1587,9 +1572,12 @@ df_pvalues['Bonferroni_Adj_pValue'] = bonf
 df_pvalues['BH_Adj_pValue'] = bh
 df_pvalues
 
-# %%
-# Plot p values - raw and adjusted
+# TODO: decision from p-value?
 
+# %%
+#TODO: club with earlier cell, function possible?
+
+# Plot p values - raw and adjusted
 plt.figure(figsize=(8, 5))
 
 # Plot lines
