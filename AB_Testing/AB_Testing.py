@@ -35,9 +35,8 @@
 # - [📈 Minimum Detectable Effect](#minimum-detectable-effect)  
 # - [🔍 Test Family](#test-family)
 # - [📐 Required Sample Size](#required-sample-size)  
-# - [📊 Power Analysis Summary](#power-analysis-summary)
 #
-# [🔀 Randomization Methods](#randomization-methods)  
+# [🔀 Randomization](#randomization)  
 # - [🎲 Apply Randomization](#apply-randomization)  
 # - [🕸️ Network Effects & SUTVA Violations](#network-effects)
 # - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
@@ -436,11 +435,6 @@ test_config['required_sample_size'] = required_sample_size
 print(f"✅ Required sample size per group: {required_sample_size}")
 print(f"👥 Total sample size: {required_sample_size * 2}")
 
-# %% [markdown]
-# <a id="power-analysis-summary"></a>
-#
-# <h4>📊 Power Analysis Summary</h4>
-
 # %%
 print_power_summary(
     test_family=test_config['family'],
@@ -459,8 +453,8 @@ print_power_summary(
 # ___
 
 # %% [markdown]
-# <a id="randomization-methods"></a>
-# <h1>🔀 Randomization Methods</h1>
+# <a id="randomization"></a>
+# <h1>🔀 Randomization</h1>
 #
 # <details><summary><strong>📖 Click to Expand</strong></summary>
 #
@@ -603,7 +597,44 @@ print_power_summary(
 # <h4>🎲 Apply Randomization</h4>
 #
 
+# %% [markdown]
+#
+# <details>
+# <summary><strong>📖 Click to Expand </strong></summary>
+#
+# <p>
+# In this notebook we randomize the <strong>entire dataset</strong> (e.g., all 1000 simulated users). 
+# This is done purely for demonstration so that downstream analysis has enough data to run.
+# </p>
+#
+# <p>
+# In real A/B experiments the workflow is different:
+# </p>
+#
+# <ul>
+# <li><strong>Power analysis</strong> determines the required sample size (e.g., 272 users per group).</li>
+# <li>Users are then <strong>randomized as they arrive in the product</strong>.</li>
+# <li>The experiment continues until the required sample size is reached.</li>
+# <li>Analysis is performed once the target sample size is collected.</li>
+# </ul>
+#
+# <p>
+# In other words, real experiments do <strong>not randomize a fixed dataset upfront</strong>. 
+# Instead, randomization happens dynamically during the experiment as new users enter the system.
+# </p>
+#
+# <blockquote>
+# ⚠️ In this notebook the dataset is simulated beforehand, so randomization is applied to all users at once. 
+# In production experimentation platforms (e.g., Optimizely, Statsig, internal experimentation systems), 
+# users are assigned to variants <strong>at runtime</strong>.
+# </blockquote>
+#
+# </details>
+
 # %%
+n_required = test_config['required_sample_size'] * test_config['group_count']
+df = df.sample(n=n_required, random_state=42)
+
 df
 
 # %%
@@ -623,10 +654,11 @@ elif randomization_method == "matched_pair":
 elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
 
-elif randomization_method == "cuped":
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
-    df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
-    test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
+# TODO: remove this
+# elif randomization_method == "cuped":
+#     df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
+#     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
+#     test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
 else:
     raise ValueError(f"❌ Unsupported randomization method: {randomization_method}")
 
@@ -723,6 +755,10 @@ df
 
 # %%
 check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['group_labels'], expected_ratios=[0.5, 0.5], alpha=0.05)
+
+# %%
+df
+
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
