@@ -29,10 +29,6 @@
 # - [🔧 Central Control Panel](#central-control-panel)
 # - [📥 Read/Generate Data](#read-data)
 #
-# [📈 EDA](#eda)  
-# - [🔍 Normality](#normality)  
-# - [🧪 Variance Homogeneity Check](#variance-homogeneity-check)  
-#
 # [⚡ Power Analysis](#power-analysis)  
 # - [⚙️ Setup Inputs + Config](#setup-inputs--config-values)  
 # - [📊 Baseline Estimation from Data](#baseline-from-data)  
@@ -49,6 +45,10 @@
 # - [🗃️ Cluster Randomization](#cluster-randomization)  
 # - [🕸️ Network Effects](#network-effects)
 # - [⚖️ Sample Ratio Mismatch](#sample-ratio-mismatch)
+#
+# [📈 EDA](#eda)  
+# - [🔍 Normality](#normality)  
+# - [🧪 Variance Homogeneity Check](#variance-homogeneity-check)  
 #
 # [🧪 AA Testing](#aa-testing)
 # - [🧬 Outcome Similarity Test](#outcome-similarity-test)
@@ -189,75 +189,6 @@ print_config_summary(test_config)
 observations_count = 1000
 df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col)
 df
-
-# %% [markdown]
-# [Back to the top](#table-of-contents)
-# ___
-#
-
-# %% [markdown]
-# <a id="eda"></a>
-# <h1>📈 EDA</h1>
-#
-# Exploratory Data Analysis validates core statistical assumptions before testing begins.
-
-# %% [markdown]
-# <a id="normality"></a>
-#
-# <h4>🔍 Normality</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Checks whether your outcome metric follows a <strong>normal distribution</strong>, which is a key assumption for <strong>parametric tests</strong> like t-test or ANOVA.</p>
-#
-# <ul>
-#   <li>Use <strong>Shapiro-Wilk test</strong> or visual tools (histograms, Q-Q plots).</li>
-#   <li>Helps determine whether to use parametric or non-parametric tests.</li>
-#   <li>If data is non-normal, switch to <strong>Mann-Whitney U</strong> or <strong>Wilcoxon</strong>.</li>
-# </ul>
-#
-# </details>
-#
-
-# %%
-normality_results = test_normality(df, outcome_metric_col=outcome_metric_col, group_col='group', group_labels=group_labels)
-
-print("Normality test (Shapiro-Wilk) results:")
-for group, result in normality_results.items():
-    print(f"{group}: p = {result['p_value']:.4f} → {'Normal' if result['normal'] else 'Non-normal'}")
-
-# %%
-# Assume both groups must be normal to proceed with parametric tests
-test_config['normality'] = all(result['normal'] for result in normality_results.values())
-test_config
-
-
-# %% [markdown]
-# <a id="variance-homogeneity-check"></a>
-#
-# <h4>🔍 Variance Homogeneity Check</h4>
-#
-# <details><summary><strong>📖 Click to Expand</strong></summary>
-#
-# <p>Tests whether the <strong>variances between groups are equal</strong>, which affects the validity of t-tests and ANOVA.</p>
-#
-# <ul>
-#   <li>Performed using <strong>Levene’s test</strong> or <strong>Bartlett’s test</strong>.</li>
-#   <li>If variances are unequal, use <strong>Welch's t-test</strong> instead.</li>
-#   <li>Unequal variances do not invalidate analysis but change the test used.</li>
-# </ul>
-#
-# </details>
-#
-
-# %%
-variance_result = test_equal_variance(df, outcome_metric_col=outcome_metric_col, group_col='group', group_labels=group_labels)
-variance_result
-
-# %%
-print(f"Levene’s test: p = {variance_result['p_value']:.4f} → {'Equal variances' if variance_result['equal_variance'] else 'Unequal variances'}")
-test_config['equal_variance'] = variance_result['equal_variance']
-test_config
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
@@ -800,6 +731,75 @@ df
 
 # %%
 check_sample_ratio_mismatch(df, group_col=group_col, group_labels=group_labels, expected_ratios=[0.5, 0.5], alpha=0.05)
+
+# %% [markdown]
+# [Back to the top](#table-of-contents)
+# ___
+#
+
+# %% [markdown]
+# <a id="eda"></a>
+# <h1>📈 EDA</h1>
+#
+# Exploratory Data Analysis validates core statistical assumptions before testing begins.
+
+# %% [markdown]
+# <a id="normality"></a>
+#
+# <h4>🔍 Normality</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Checks whether your outcome metric follows a <strong>normal distribution</strong>, which is a key assumption for <strong>parametric tests</strong> like t-test or ANOVA.</p>
+#
+# <ul>
+#   <li>Use <strong>Shapiro-Wilk test</strong> or visual tools (histograms, Q-Q plots).</li>
+#   <li>Helps determine whether to use parametric or non-parametric tests.</li>
+#   <li>If data is non-normal, switch to <strong>Mann-Whitney U</strong> or <strong>Wilcoxon</strong>.</li>
+# </ul>
+#
+# </details>
+#
+
+# %%
+normality_results = test_normality(df, outcome_metric_col=outcome_metric_col, group_col='group', group_labels=group_labels)
+
+print("Normality test (Shapiro-Wilk) results:")
+for group, result in normality_results.items():
+    print(f"{group}: p = {result['p_value']:.4f} → {'Normal' if result['normal'] else 'Non-normal'}")
+
+# %%
+# Assume both groups must be normal to proceed with parametric tests
+test_config['normality'] = all(result['normal'] for result in normality_results.values())
+test_config
+
+
+# %% [markdown]
+# <a id="variance-homogeneity-check"></a>
+#
+# <h4>🔍 Variance Homogeneity Check</h4>
+#
+# <details><summary><strong>📖 Click to Expand</strong></summary>
+#
+# <p>Tests whether the <strong>variances between groups are equal</strong>, which affects the validity of t-tests and ANOVA.</p>
+#
+# <ul>
+#   <li>Performed using <strong>Levene’s test</strong> or <strong>Bartlett’s test</strong>.</li>
+#   <li>If variances are unequal, use <strong>Welch's t-test</strong> instead.</li>
+#   <li>Unequal variances do not invalidate analysis but change the test used.</li>
+# </ul>
+#
+# </details>
+#
+
+# %%
+variance_result = test_equal_variance(df, outcome_metric_col=outcome_metric_col, group_col='group', group_labels=group_labels)
+variance_result
+
+# %%
+print(f"Levene’s test: p = {variance_result['p_value']:.4f} → {'Equal variances' if variance_result['equal_variance'] else 'Unequal variances'}")
+test_config['equal_variance'] = variance_result['equal_variance']
+test_config
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
