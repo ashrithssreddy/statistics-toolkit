@@ -984,13 +984,13 @@ def run_ab_test(
     result['summary'][group1] = {
         'n': len(data1),
         'mean': data1.mean(),
-        'std': data1.std() if test_family in ['t_test', 'non_parametric'] else None,
+        'std': data1.std() if test_family in ['t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
         'sum': data1.sum() if test_family == 'z_test' else None
     }
     result['summary'][group2] = {
         'n': len(data2),
         'mean': data2.mean(),
-        'std': data2.std() if test_family in ['t_test', 'non_parametric'] else None,
+        'std': data2.std() if test_family in ['t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
         'sum': data2.sum() if test_family == 'z_test' else None
     }
 
@@ -1021,6 +1021,12 @@ def run_ab_test(
     elif test_family == 'non_parametric':
         u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative='two-sided')
         result.update({'test': 'Mann-Whitney U Test', 'u_stat': u_stat, 'p_value': p_value})
+
+    # --- Mann-Whitney U (explicit test family) ---
+    elif test_family == 'mann_whitney_u_test':
+        alternative = variant if variant in ('two-sided', 'less', 'greater') else 'two-sided'
+        u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative=alternative)
+        result.update({'test': 'Mann-Whitney U test', 'u_stat': u_stat, 'p_value': p_value})
 
     # --- Categorical (Chi-square) ---
     elif test_family == 'chi_square':

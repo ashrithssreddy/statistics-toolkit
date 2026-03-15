@@ -1009,6 +1009,11 @@ _ = simulate_aa_type1_error_rate(
 #
 
 # %%
+# Simulate experiment data (outcome + guardrail) with treatment effect for A/B analysis.
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=True, seed=my_seed)
+df
+
+# %%
 result = run_ab_test(
     df=df,
     group_col='group',
@@ -1018,7 +1023,8 @@ result = run_ab_test(
     variant=test_config.get('variant'),
     alpha=0.05
 )
-result
+print_config_summary(result)
+# result
 
 # %% [markdown]
 # <a id="summaries"></a>
