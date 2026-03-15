@@ -72,6 +72,22 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
     return users
 
 
+def create_historical_df(df, outcome_metric_col, guardrail_metric_col=None, seed=my_seed):
+    """
+    Create a historical view of the population: same columns as df, but outcome and guardrail
+    columns (which are NaN in df at creation) are filled with baseline-only values — no experiment,
+    no group. Use this for power-analysis baseline so baselines come from historical data, not from df.
+    """
+    hist = df.copy()
+    n = len(hist)
+    np.random.seed(seed)
+    if outcome_metric_col and outcome_metric_col in hist.columns:
+        hist[outcome_metric_col] = np.random.normal(50, 15, n).clip(0, 100)
+    if guardrail_metric_col and guardrail_metric_col in hist.columns:
+        hist[guardrail_metric_col] = np.random.normal(0.5, 0.1, n).clip(0, 1)
+    return hist
+
+
 def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', guardrail_metric_col=None, seed=my_seed):
     """
     Add outcome and optional guardrail metric to a dataframe that already has group assignment.
@@ -391,6 +407,8 @@ def determine_test_family(test_config):
     - normality assumption: passed or not
     """
 
+    # TODO: is this complete? do we need to add more tests?
+
     data_type = test_config['outcome_metric_datatype']
     group_count = test_config['group_count']
     variant = test_config['variant']
@@ -682,6 +700,41 @@ def plot_p_value_distribution(p_values, alpha=0.05):
 # ==========================================================
 # region Power Analysis
 # ==========================================================
+def compute_baseline_from_data(df, test_config, verbose=True):
+    """
+    Compute baseline rate/mean and std_dev from the whole dataset for power analysis.
+    No group splitting: uses full sample so baselines are pre-experiment / design inputs.
+    Uses test_config['family'] and test_config['outcome_metric_datatype'] to decide logic.
+    Returns dict with keys: baseline_rate, baseline_mean, std_dev (None where not applicable).
+    """
+    metric_col = test_config['outcome_metric_col']
+    family = test_config.get('family')
+    data_type = test_config.get('outcome_metric_datatype')
+
+    result = {'baseline_rate': None, 'baseline_mean': None, 'std_dev': None}
+
+    if family == 'z_test':
+        result['baseline_rate'] = df[metric_col].mean()
+        if verbose:
+            print(f"📊 Baseline conversion rate (full sample): {result['baseline_rate']:.2%}")
+        return result
+
+    if family in ['t_test', 'anova', 'non_parametric'] or data_type == 'continuous':
+        col = df[metric_col].dropna()
+        result['baseline_mean'] = col.mean()
+        result['std_dev'] = col.std()
+        if result['std_dev'] == 0 or np.isnan(result['std_dev']):
+            result['std_dev'] = 1.0
+        if verbose:
+            print(f"📊 Baseline mean (historical): {result['baseline_mean']:.2f}")
+            print(f"📏 Baseline std dev (historical): {result['std_dev']:.2f}")
+        return result
+
+    if verbose:
+        print("📊 No baseline computed for this metric type.")
+    return result
+
+
 def calculate_power_sample_size(
     test_family,
     variant=None,

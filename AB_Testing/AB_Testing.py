@@ -187,7 +187,9 @@ print_config_summary(test_config)
 # %%
 observations_count = 1000
 df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col, guardrail_metric_col=guardrail_metric_col)
+historical_df = create_historical_df(df, outcome_metric_col, guardrail_metric_col, seed=my_seed)
 df
+historical_df
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
@@ -288,59 +290,41 @@ power = 0.80  # Statistical power (1 - Type II error)
 # %% [markdown]
 # <a id="baseline-from-data"></a>
 #
-# <h4>📈 Baseline Estimation from Data</h4>
+# <h4>📈 Baseline Estimation (Pre-Experiment)</h4>
 #
 # <details>
 # <summary><strong>📖 Click to Expand </strong></summary>
 #
-# <p>Before we calculate required sample size, we need a <strong>baseline value</strong> from historical or current data.</p>
+# <p>Before running power analysis, we need a <strong>baseline estimate</strong> of the outcome metric.</p>
 #
 # <ul>
-#   <li>For <strong>binary metrics</strong> (e.g., conversion), the baseline is the current <strong>conversion rate</strong>.</li>
-#   <li>For <strong>continuous metrics</strong> (e.g., revenue, engagement), we estimate the <strong>mean and standard deviation</strong> from the control group.</li>
-#   <li>These values help translate the <strong>Minimum Detectable Effect (MDE)</strong> into a usable <strong>effect size</strong>.</li>
+#   <li>These values must come from <strong>historical data collected before the experiment</strong>.</li>
+#   <li>They represent the expected behavior of users under the <strong>current system (control condition)</strong>.</li>
 # </ul>
 #
+# <ul>
+#   <li>For <strong>binary metrics</strong> (e.g., conversion), the baseline is the historical <strong>conversion rate</strong>.</li>
+#   <li>For <strong>continuous metrics</strong> (e.g., revenue, engagement), we estimate the historical <strong>mean and standard deviation</strong>.</li>
+# </ul>
+#
+# <p>
+# These estimates allow us to translate the <strong>Minimum Detectable Effect (MDE)</strong> into a statistical
+# <strong>effect size</strong> and compute the required sample size.
+# </p>
+#
 # <blockquote>
-#   ⚠️ Be cautious with outliers or extreme skew when computing baselines — they directly influence sample size estimates.
+# ⚠️ Baselines must be computed from <strong>pre-experiment data</strong>.  
+# Using outcome data from the experiment itself would introduce <strong>data leakage</strong>.
 # </blockquote>
 #
 # </details>
-#
 
 # %%
-# 🧮 Data-Driven Baseline Metric
-
-if test_config['family'] == 'z_test':
-    # For binary outcome (e.g., conversion): baseline = conversion rate in data
-    # TODO: how do we have a baseline before the experiment?
-    # TODO: Replace with historical baseline metric.
-# In real experiments baseline should come from past data, not experiment outcomes.
-    baseline_rate = df[test_config['outcome_metric_col']].mean()
-    print(f"📊 Baseline conversion rate: {baseline_rate:.2%}")
-
-elif test_config['family'] in ['t_test', 'anova', 'non_parametric']:
-    # For continuous metrics (e.g., revenue, engagement)
-    control_data = df[df['group'] == test_config['group_labels'][0]][test_config['outcome_metric_col']]
-    baseline_mean = control_data.mean()
-    std_dev = control_data.std()
-    # TODO: In production experiments std_dev should be estimated from historical data.
-    print(f"📊 Control group mean: {baseline_mean:.2f}")
-    print(f"📏 Control group std dev: {std_dev:.2f}")
-
-elif test_config['outcome_metric_datatype'] == 'continuous':
-    # test_config['family'] not set yet (e.g. before Test Family cell); use full column for power inputs
-    col = df[test_config['outcome_metric_col']].dropna()
-    baseline_mean = col.mean()
-    std_dev = col.std()
-    if std_dev == 0 or np.isnan(std_dev):
-        std_dev = 1.0  # avoid division by zero in power calculation
-    print(f"📊 Baseline (full sample) mean: {baseline_mean:.2f}")
-    print(f"📏 Baseline (full sample) std dev: {std_dev:.2f}")
-
-else:
-    baseline_rate = None
-    std_dev = None
+# 🧮 Data-Driven Baseline Metric from historical data (stored in test_config; only relevant keys are set per test family)
+_b = compute_baseline_from_data(historical_df, test_config)
+test_config['baseline_rate'] = _b['baseline_rate']
+test_config['baseline_mean'] = _b['baseline_mean']
+test_config['std_dev'] = _b['std_dev']
 
 
 # %% [markdown]
@@ -382,7 +366,7 @@ else:
 # - Categorical  : 0.05 → detect a 5% shift in plan preference (e.g., more users choosing 'premium' over 'basic')
 # - Continuous   : 3.0  → detect a 3-point gain in engagement score (e.g., from 50 to 53 avg. score)
 
-mde = 5  # Change this based on business relevance
+mde = 5  # TODO: Change this based on business relevance
 
 
 # %% [markdown]
@@ -438,9 +422,9 @@ required_sample_size = calculate_power_sample_size(
     variant=test_config.get('variant'),
     alpha=alpha,
     power=power,
-    baseline_rate=baseline_rate if test_config['family'] == 'z_test' else None,
+    baseline_rate=test_config.get('baseline_rate'),
     mde=mde,
-    std_dev=std_dev if test_config['family'] in ['t_test', 'anova', 'non_parametric'] else None,
+    std_dev=test_config.get('std_dev'),
     effect_size=None,  # Let it compute internally via mde/std
     num_groups=2
 )
@@ -460,9 +444,9 @@ print_power_summary(
     variant=test_config.get('variant'),
     alpha=alpha,
     power=power,
-    baseline_rate=baseline_rate if test_config['family'] == 'z_test' else None,
+    baseline_rate=test_config.get('baseline_rate'),
     mde=mde,
-    std_dev=std_dev if test_config['family'] == 't_test' else None,
+    std_dev=test_config.get('std_dev'),
     required_sample_size=required_sample_size
 )
 
