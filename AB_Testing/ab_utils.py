@@ -88,26 +88,33 @@ def create_historical_df(df, outcome_metric_col, guardrail_metric_col=None, seed
     return hist
 
 
-def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', guardrail_metric_col=None, seed=my_seed):
+def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', guardrail_metric_col=None, treatment_effect=True, seed=my_seed):
     """
     Add outcome and optional guardrail metric to a dataframe that already has group assignment.
     Call this after randomization so outcomes are generated post-assignment.
 
     - outcome_metric_col: primary outcome (always filled).
     - guardrail_metric_col: optional guardrail metric column name (e.g. 'bounce_rate'); None to omit.
-      Simulated so treatment has slightly better values on average (internal binary used only for this).
+    - treatment_effect: if True, treatment group gets a lift (A/B simulation). If False, both groups
+      from same distribution (A/A simulation). Guardrail also avoids treatment signal when False.
     """
     np.random.seed(seed)
     n = len(df)
     treatment_mask = df[group_col] == group_labels[1]
     # Primary outcome: baseline + optional treatment effect
     base_engagement = np.random.normal(50, 15, n)
-    treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
+    if treatment_effect:
+        treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
+    else:
+        treatment_lift = 0
     df[outcome_metric_col] = (base_engagement + treatment_lift).clip(0, 100)
-    # Optional guardrail (e.g. bounce rate): simulated lower for "converters" so guardrail is sensible
+    # Optional guardrail: no treatment signal when treatment_effect=False (A/A)
     if guardrail_metric_col:
-        # Internal binary (not a formal metric): used only to vary guardrail
-        _converted = np.random.binomial(n=1, p=0.1 + 0.02 * treatment_mask.astype(float), size=n)
+        if treatment_effect:
+            p_convert = 0.1 + 0.02 * treatment_mask.astype(float)
+        else:
+            p_convert = 0.12  # same for everyone
+        _converted = np.random.binomial(n=1, p=p_convert, size=n)
         df[guardrail_metric_col] = np.where(
             _converted == 1,
             np.random.normal(loc=0.2, scale=0.05, size=n),

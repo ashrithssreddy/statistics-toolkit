@@ -831,8 +831,8 @@ df
 #
 
 # %%
-# Experiment has run; outcome and guardrail data come in (simulated via add_outcome_metrics).
-df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
+# Experiment has run; outcome and guardrail data come in (simulated via add_outcome_metrics). A/A: no treatment effect.
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=False, seed=my_seed)
 df
 
 # %%
