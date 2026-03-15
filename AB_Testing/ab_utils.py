@@ -36,14 +36,14 @@ from sklearn.model_selection import train_test_split
 
 
 
-def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=None):
+def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=None, guardrail_metric_col=None):
     """Generate user population with attributes and pre-experiment variables only.
-    Outcome metrics are not generated here; they are created after randomization.
-    If outcome_metric_col is provided, a placeholder column (NaN) is added so column order
-    puts must-haves (user_id, outcome_metric_col, past_purchase_count) on the left."""
+    Outcome and guardrail metrics are not generated here; they are created after randomization.
+    If outcome_metric_col or guardrail_metric_col is provided, a placeholder column (NaN) is added so column order
+    puts must-haves (user_id, outcome_metric_col, guardrail_metric_col, past_purchase_count) on the left."""
     np.random.seed(seed)
     users = pd.DataFrame({
-        # required (from experiment setup / central control panel): identifier, pre-experiment metric, outcome placeholder
+        # required (from experiment setup / central control panel): identifier, pre-experiment metric, placeholders
         'user_id': range(1, observations_count + 1),
         'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
         # optional: segmentation (retained for stratified / segment analysis)
@@ -55,13 +55,17 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
         # 'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
         # 'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
     })
-    # Must-have outcome column (placeholder until filled after randomization)
+    # Placeholder columns (filled after randomization / outcome collection)
     if outcome_metric_col:
         users[outcome_metric_col] = np.nan
+    if guardrail_metric_col:
+        users[guardrail_metric_col] = np.nan
     # Order: must-haves left, extras right
     must_have = ['user_id']
     if outcome_metric_col:
         must_have.append(outcome_metric_col)
+    if guardrail_metric_col:
+        must_have.append(guardrail_metric_col)
     must_have.append('past_purchase_count')
     extras = [c for c in users.columns if c not in must_have]
     users = users[must_have + extras]

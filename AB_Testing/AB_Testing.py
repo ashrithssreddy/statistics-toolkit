@@ -186,7 +186,7 @@ print_config_summary(test_config)
 
 # %%
 observations_count = 1000
-df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col)
+df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col, guardrail_metric_col=guardrail_metric_col)
 df
 
 # %% [markdown]
