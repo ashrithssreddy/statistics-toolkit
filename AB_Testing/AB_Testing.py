@@ -121,7 +121,6 @@ from Hypothesis_Testing.ht_utils import print_config_summary
 
 # %% [markdown]
 # <a id="experiment-setup"></a>
-#
 # <h4>🛠️ Experiment Setup</h4>
 
 # %%
@@ -153,6 +152,9 @@ group_col = 'group'
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster', 'cuped'
 randomization_method = "simple"
 
+# Optional: guardrail metric column for simulated outcome data. Set to None to omit.
+guardrail_metric_col = 'bounce_rate'
+
 
 # %% [markdown]
 # <a id="central-control-panel"></a>
@@ -168,6 +170,7 @@ test_config = {
     'group_labels'           : group_labels,               # Tuple of (control, treatment) group names
     'group_count'            : group_count,                # Number of groups (usually 2 for A/B tests)
     'variant'                : variant,                    # 'independent' or 'paired'
+    'guardrail_metric_col'   : guardrail_metric_col,       # Optional: e.g. 'bounce_rate'; None to omit
 
     # Diagnostic results — filled after EDA/assumptions check
     'normality'              : None,  # Will be set based on Shapiro-Wilk or visual tests
@@ -634,8 +637,7 @@ elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
 
 elif randomization_method == "cuped":
-    # todo: take care of CUPED
-    df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
+    df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
     df = apply_cuped(df, pre_metric='past_purchase_count', outcome_metric_col=test_config['outcome_metric_col'], group_col=group_col, group_labels=test_config['group_labels'], seed=my_seed)
     test_config['outcome_metric_col'] = f"{test_config['outcome_metric_col']}_cuped_adjusted"
 else:
@@ -752,7 +754,7 @@ df
 # %%
 # TODO: In a real experiment this data comes from production logs after the
 # experiment has run. Replace add_outcome_metrics() with real outcome data.
-df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], seed=my_seed)
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, seed=my_seed)
 
 # Outcome data (post-assignment): simulate collection so we have primary outcome, converted, bounce_rate for analysis.
 if randomization_method == "cuped":
@@ -1446,20 +1448,24 @@ analyze_segment_lift(
 df.head(20)
 
 # %%
-# Quick average check by group
-guardrail_avg = df.groupby('group')['bounce_rate'].mean()
-
-print("🚦 Average Bounce Rate by Group:")
-for grp, val in guardrail_avg.items():
-    print(f"- {grp}: {val:.4f}")
+# Quick average check by group (if guardrail metric is configured)
+guardrail_col = test_config.get('guardrail_metric_col')
+if guardrail_col and guardrail_col in df.columns:
+    guardrail_avg = df.groupby('group')[guardrail_col].mean()
+    print(f"🚦 Average {guardrail_col} by Group:")
+    for grp, val in guardrail_avg.items():
+        print(f"- {grp}: {val:.4f}")
 
 # %%
-evaluate_guardrail_metric(
-    df=df,
-    test_config=test_config,
-    guardrail_metric_col='bounce_rate',
-    alpha=0.05
-)
+if guardrail_col and guardrail_col in df.columns:
+    evaluate_guardrail_metric(
+        df=df,
+        test_config=test_config,
+        guardrail_metric_col=guardrail_col,
+        alpha=0.05
+    )
+else:
+    print("🚦 No guardrail metric configured (set guardrail_metric_col in Experiment Setup to evaluate one).")
 
 
 # %% [markdown]

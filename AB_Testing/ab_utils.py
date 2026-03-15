@@ -68,12 +68,14 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
     return users
 
 
-def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', seed=my_seed):
+def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', guardrail_metric_col=None, seed=my_seed):
     """
-    Add outcome and guardrail metrics to a dataframe that already has group assignment.
+    Add outcome and optional guardrail metric to a dataframe that already has group assignment.
     Call this after randomization so outcomes are generated post-assignment.
 
-    Fills the primary outcome column (outcome_metric_col) and adds: converted, bounce_rate.
+    - outcome_metric_col: primary outcome (always filled).
+    - guardrail_metric_col: optional guardrail metric column name (e.g. 'bounce_rate'); None to omit.
+      Simulated so treatment has slightly better values on average (internal binary used only for this).
     """
     np.random.seed(seed)
     n = len(df)
@@ -82,15 +84,16 @@ def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatme
     base_engagement = np.random.normal(50, 15, n)
     treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
     df[outcome_metric_col] = (base_engagement + treatment_lift).clip(0, 100)
-    # Binary conversion
-    df['converted'] = np.random.binomial(n=1, p=0.1 + 0.02 * treatment_mask.astype(float), size=n)
-    # Guardrail: bounce rate (lower for converted)
-    df['bounce_rate'] = np.where(
-        df['converted'] == 1,
-        np.random.normal(loc=0.2, scale=0.05, size=n),
-        np.random.normal(loc=0.6, scale=0.10, size=n)
-    )
-    df['bounce_rate'] = df['bounce_rate'].clip(0, 1)
+    # Optional guardrail (e.g. bounce rate): simulated lower for "converters" so guardrail is sensible
+    if guardrail_metric_col:
+        # Internal binary (not a formal metric): used only to vary guardrail
+        _converted = np.random.binomial(n=1, p=0.1 + 0.02 * treatment_mask.astype(float), size=n)
+        df[guardrail_metric_col] = np.where(
+            _converted == 1,
+            np.random.normal(loc=0.2, scale=0.05, size=n),
+            np.random.normal(loc=0.6, scale=0.10, size=n)
+        )
+        df[guardrail_metric_col] = df[guardrail_metric_col].clip(0, 1)
     return df
 
 
