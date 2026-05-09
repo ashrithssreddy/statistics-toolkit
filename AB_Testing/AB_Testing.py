@@ -1566,12 +1566,9 @@ df_pvalues['BH_Adj_pValue'] = multipletests(
 )[1]
 df_pvalues
 
-# TODO: decision from p-value?
 
 # %%
-#TODO: club with earlier cell, function possible?
-
-# Plot p values - raw and adjusted
+# Visualization of raw vs adjusted p-values
 plt.figure(figsize=(8, 5))
 
 # Plot lines
