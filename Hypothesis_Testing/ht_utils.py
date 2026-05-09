@@ -65,6 +65,17 @@ def print_config_summary(config):
             return "\033[91mNone\033[0m"
         return value
 
+    def to_serializable(obj):
+        if isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        if isinstance(obj, (list, tuple)):
+            return [to_serializable(v) for v in obj]
+        if isinstance(obj, np.generic):
+            return obj.item()
+        if isinstance(obj, float) and np.isnan(obj):
+            return None
+        return obj
+
     print("📋 Hypothesis Test Configuration Summary\n")
 
     # Pretty key formatting
@@ -72,7 +83,14 @@ def print_config_summary(config):
 
     for key, value in config.items():
         formatted_key = key.replace('_', ' ').title()
-        print(f"🔸 {formatted_key:<{max_key_length+2}} : {highlight(value)}")
+        is_nested = isinstance(value, (dict, list, tuple))
+        if is_nested:
+            pretty_value = json.dumps(to_serializable(value), indent=2, ensure_ascii=False)
+            print(f"🔸 {formatted_key:<{max_key_length+2}} :")
+            for line in pretty_value.splitlines():
+                print(f"   {line}")
+        else:
+            print(f"🔸 {formatted_key:<{max_key_length+2}} : {highlight(value)}")
 
 
 def validate_config(config):
