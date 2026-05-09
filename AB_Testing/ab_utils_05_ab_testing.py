@@ -5,10 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 from IPython.display import display
-# endregion Imports
 
 
-# region run_ab_test
+# region Run Ab Test
 def run_ab_test(
     df,
     group_col,
@@ -100,9 +99,8 @@ def run_ab_test(
     return result
 
 
-# endregion run_ab_test
 
-# region summarize_ab_test_result
+# region Summarize Ab Test Result
 def summarize_ab_test_result(result):
     """
     Prints A/B test results summary with statistical test outputs and lift analysis.
@@ -173,9 +171,8 @@ def summarize_ab_test_result(result):
     print("="*45 + "\n")
 
 
-# endregion summarize_ab_test_result
 
-# region plot_ab_test_results
+# region Plot Ab Test Results
 def plot_ab_test_results(result):
     """
     Plots A/B test results by group mean or distribution depending on test family.
@@ -212,9 +209,8 @@ def plot_ab_test_results(result):
         plt.show()
 
 
-# endregion plot_ab_test_results
 
-# region plot_confidence_intervals
+# region Plot Confidence Intervals
 def plot_confidence_intervals(result, z=1.96):
     """
     Plot 95% confidence intervals for group means (conversion rate or continuous).
@@ -259,9 +255,8 @@ def plot_confidence_intervals(result, z=1.96):
     plt.show()
 
 
-# endregion plot_confidence_intervals
 
-# region compute_lift_confidence_interval
+# region Compute Lift Confidence Interval
 def compute_lift_confidence_interval(result):
     """
     Compute CI for lift in binary or continuous-independent tests.
@@ -335,9 +330,8 @@ def compute_lift_confidence_interval(result):
     print("="*45 + "\n")
 
 
-# endregion compute_lift_confidence_interval
 
-# region print_final_ab_test_summary
+# region Print Final Ab Test Summary
 def print_final_ab_test_summary(result):
     """
     Final wrap-up of results with summary stats and verdict.
@@ -403,9 +397,8 @@ def print_final_ab_test_summary(result):
     print("="*40 + "\n")
 
 
-# endregion print_final_ab_test_summary
 
-# region estimate_test_duration
+# region Estimate Test Duration
 def estimate_test_duration(
     required_sample_size_per_group,
     daily_eligible_users,
@@ -451,4 +444,3 @@ def estimate_test_duration(
         'longest_group_runtime': longest_group_runtime,
         'recommended_total_duration': total_with_buffer
     }
-# endregion estimate_test_duration

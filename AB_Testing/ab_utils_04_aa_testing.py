@@ -4,10 +4,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
-# endregion Imports
 
 
-# region run_outcome_similarity_test
+# region Run Outcome Similarity Test
 def run_outcome_similarity_test(
     df,
     group_col,
@@ -126,9 +125,8 @@ def run_outcome_similarity_test(
     return p_value
 
 
-# endregion run_outcome_similarity_test
 
-# region run_aa_testing_generalized
+# region Run Aa Testing Generalized
 def run_aa_testing_generalized(
     df,
     group_col,
@@ -163,9 +161,8 @@ def run_aa_testing_generalized(
         visualize_aa_distribution(df, group_col=group_col, metric_col=metric_col, test_family=test_family, group_labels=group_labels, variant=variant)
 
 
-# endregion run_aa_testing_generalized
 
-# region visualize_aa_distribution
+# region Visualize Aa Distribution
 def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labels=('control', 'treatment'), variant=None):
     """Plot A/A outcome distribution by group. group1/group2 are derived from df inside."""
     group1 = df[df[group_col] == group_labels[0]][metric_col]
@@ -203,9 +200,8 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
         plt.show()
 
 
-# endregion visualize_aa_distribution
 
-# region simulate_aa_type1_error_rate
+# region Simulate Aa Type1 Error Rate
 def simulate_aa_type1_error_rate(
     df,
     metric_col,
@@ -273,9 +269,8 @@ def simulate_aa_type1_error_rate(
     return p_values
 
 
-# endregion simulate_aa_type1_error_rate
 
-# region plot_p_value_distribution
+# region Plot P Value Distribution
 def plot_p_value_distribution(p_values, alpha=0.05):
     plt.figure(figsize=(8, 4))
     plt.hist(p_values, bins=20, edgecolor='black', alpha=0.7)
@@ -286,4 +281,3 @@ def plot_p_value_distribution(p_values, alpha=0.05):
     plt.legend()
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     plt.show()
-# endregion plot_p_value_distribution

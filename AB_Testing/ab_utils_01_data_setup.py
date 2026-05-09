@@ -2,12 +2,11 @@
 # region Imports
 import numpy as np
 import pandas as pd
-# endregion Imports
 
 my_seed = 1995
 
 
-# region create_dummy_ab_data
+# region Create Dummy Ab Data
 def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=None, guardrail_metric_col=None):
     """Generate user population with attributes and pre-experiment variables only.
     Outcome and guardrail metrics are not generated here; they are created after randomization.
@@ -44,9 +43,8 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
     return users
 
 
-# endregion create_dummy_ab_data
 
-# region create_historical_df
+# region Create Historical Df
 def create_historical_df(df, outcome_metric_col, guardrail_metric_col=None, seed=my_seed):
     """
     Create a historical view of the population: same columns as df, but outcome and guardrail
@@ -63,9 +61,8 @@ def create_historical_df(df, outcome_metric_col, guardrail_metric_col=None, seed
     return hist
 
 
-# endregion create_historical_df
 
-# region add_outcome_metrics
+# region Add Outcome Metrics
 def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', guardrail_metric_col=None, treatment_effect=True, seed=my_seed):
     """
     Add outcome and optional guardrail metric to a dataframe that already has group assignment.
@@ -100,4 +97,3 @@ def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatme
         )
         df[guardrail_metric_col] = df[guardrail_metric_col].clip(0, 1)
     return df
-# endregion add_outcome_metrics
