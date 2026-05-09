@@ -1013,7 +1013,7 @@ result = run_ab_test(
     variant=test_config.get('variant'),
     alpha=0.05
 )
-print_config_summary(result) # TODO: Print nested json properly
+print_config_summary(result)
 # result
 
 # %% [markdown]

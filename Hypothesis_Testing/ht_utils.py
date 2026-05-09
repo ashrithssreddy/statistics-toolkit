@@ -83,7 +83,7 @@ def print_config_summary(config):
 
     for key, value in config.items():
         formatted_key = key.replace('_', ' ').title()
-        is_nested = isinstance(value, (dict, list, tuple))
+        is_nested = isinstance(value, dict)
         if is_nested:
             pretty_value = json.dumps(to_serializable(value), indent=2, ensure_ascii=False)
             print(f"🔸 {formatted_key:<{max_key_length+2}} :")
