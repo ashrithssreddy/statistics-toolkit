@@ -8,9 +8,9 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.19.1
 #   kernelspec:
-#     display_name: Python [conda env:base]
+#     display_name: base
 #     language: python
-#     name: conda-base-py
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -367,7 +367,7 @@ test_config['std_dev'] = _b['std_dev']
 # - Categorical  : 0.05 → detect a 5% shift in plan preference (e.g., more users choosing 'premium' over 'basic')
 # - Continuous   : 3.0  → detect a 3-point gain in engagement score (e.g., from 50 to 53 avg. score)
 
-mde = 5  # TODO: Change this based on business relevance
+mde = 5  # Change this based on business relevance
 
 
 # %% [markdown]
