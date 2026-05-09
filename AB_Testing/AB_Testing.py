@@ -109,6 +109,7 @@ from statsmodels.stats.power import (
 )
 from statsmodels.stats.multitest import multipletests
 from sklearn.model_selection import train_test_split
+from pathlib import Path
 
 from utils.ab_utils_01_data_setup import *
 from utils.ab_utils_02_power_analysis import *
@@ -117,7 +118,9 @@ from utils.ab_utils_04_aa_testing import *
 from utils.ab_utils_05_ab_testing import *
 from utils.ab_utils_06_post_hoc import *
 import sys
-sys.path.insert(0, '..')
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 from Hypothesis_Testing.ht_utils import print_config_summary
 
 # %% [markdown]
