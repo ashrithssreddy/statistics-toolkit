@@ -846,10 +846,7 @@ df.head()
 #
 # </details>
 #
-
-# %%
-df.groupby("group")[test_config['outcome_metric_col']].mean() # TODO, move this into function
-
+#
 # Outcome similarity test only.
 _ = run_outcome_similarity_test(
     df=df,
