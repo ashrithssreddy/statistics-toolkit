@@ -138,7 +138,7 @@ group_labels = ('control', 'treatment')
 group_count = len(group_labels)
 
 # 4. Experimental design variant: independent or paired
-variant = 'independent'  # Options: 'independent' (supported), 'paired' (not supported yet, todo)
+variant = 'independent'  # Options: 'independent', 'paired'
 
 # 5. Optional: Unique identifier for each observation (can be user_id, session_id, etc.)
 observation_id_col = 'user_id'
@@ -366,8 +366,20 @@ test_config['std_dev'] = _b['std_dev']
 # - Binary       : 0.02 → detect a 2% lift in conversion rate (e.g., from 10% to 12%)
 # - Categorical  : 0.05 → detect a 5% shift in plan preference (e.g., more users choosing 'premium' over 'basic')
 # - Continuous   : 3.0  → detect a 3-point gain in engagement score (e.g., from 50 to 53 avg. score)
+#
+# Permitted MDE input values by setup:
+# - outcome_metric_datatype == 'binary'      : float in (0, 1), interpreted as absolute proportion lift
+# - outcome_metric_datatype == 'categorical' : float in (0, 1), interpreted as absolute share/ratio shift
+# - outcome_metric_datatype == 'continuous'  : positive float (> 0), interpreted in metric units
+# - Any setup                                : mde must be numeric and strictly > 0
+#
+# Example valid inputs:
+# - binary      : mde = 0.02, 0.05
+# - categorical : mde = 0.03, 0.10
+# - continuous  : mde = 1.5, 3.0, 5
+# - invalid     : mde = 0, -1, 1.2 (invalid for binary/categorical), '5'
 
-mde = 5  # TODO: Change this based on business relevance
+mde = 5  # Change this based on business relevance
 
 
 # %% [markdown]
@@ -847,9 +859,6 @@ df.head()
 # </details>
 #
 
-# %%
-df.groupby("group")[test_config['outcome_metric_col']].mean() # TODO, move this into function
-
 # Outcome similarity test only.
 _ = run_outcome_similarity_test(
     df=df,
@@ -1016,7 +1025,7 @@ result = run_ab_test(
     variant=test_config.get('variant'),
     alpha=0.05
 )
-print_config_summary(result) # TODO: Print nested json properly
+print_config_summary(result)
 # result
 
 # %% [markdown]
@@ -1458,17 +1467,6 @@ df = apply_cuped(
 df.head()
 
 # %%
-# TODO: move these into apply_cuped()
-original_std = df[test_config['outcome_metric_col']].std()
-cuped_std = df[f"{test_config['outcome_metric_col']}_cuped_adjusted"].std()
-
-print("Variance Reduction from CUPED")
-print("--------------------------------")
-print(f"Original std dev : {original_std:.3f}")
-print(f"CUPED std dev    : {cuped_std:.3f}")
-print(f"Reduction        : {(1 - cuped_std/original_std)*100:.2f}%")
-
-# %%
 result_cuped = run_ab_test(
     df=df,
     group_col='group',
@@ -1564,43 +1562,25 @@ df_pvalues = pd.DataFrame({
 }).sort_values('Raw_pValue').reset_index(drop=True)
 
 # Apply corrections to the sorted p-values
-_, bonf, _, _ = multipletests(df_pvalues['Raw_pValue'], alpha=0.05, method='bonferroni')
-_, bh, _, _ = multipletests(df_pvalues['Raw_pValue'], alpha=0.05, method='fdr_bh')
-
-# Add to DataFrame
-df_pvalues['Bonferroni_Adj_pValue'] = bonf
-df_pvalues['BH_Adj_pValue'] = bh
+# multipletests(..., method=...) also supports:
+# 'sidak', 'holm-sidak', 'holm', 'simes-hochberg', 'hommel',
+# 'fdr_by', 'fdr_tsbh', 'fdr_tsbky' (and in some versions: 'fdr_gbs')
+# Add adjusted p-values directly to DataFrame
+df_pvalues['Bonferroni_Adj_pValue'] = multipletests(
+    df_pvalues['Raw_pValue'],
+    alpha=0.05,
+    method='bonferroni'
+)[1]
+df_pvalues['BH_Adj_pValue'] = multipletests(
+    df_pvalues['Raw_pValue'],
+    alpha=0.05,
+    method='fdr_bh'
+)[1]
 df_pvalues
 
-# TODO: decision from p-value?
-
 # %%
-#TODO: club with earlier cell, function possible?
-
-# Plot p values - raw and adjusted
-plt.figure(figsize=(8, 5))
-
-# Plot lines
-plt.plot(df_pvalues.index + 1, df_pvalues['Raw_pValue'], marker='o', label='Raw p-value')
-plt.plot(df_pvalues.index + 1, df_pvalues['Bonferroni_Adj_pValue'], marker='^', label='Bonferroni Adj p-value')
-plt.plot(df_pvalues.index + 1, df_pvalues['BH_Adj_pValue'], marker='s', label='BH Adj p-value')
-
-# Add value labels next to each point
-for i in range(len(df_pvalues)):
-    x = i + 1
-    plt.text(x + 0.05, df_pvalues['Raw_pValue'][i], f"{df_pvalues['Raw_pValue'][i]:.2f}", va='center')
-    plt.text(x + 0.05, df_pvalues['Bonferroni_Adj_pValue'][i], f"{df_pvalues['Bonferroni_Adj_pValue'][i]:.2f}", va='center')
-    plt.text(x + 0.05, df_pvalues['BH_Adj_pValue'][i], f"{df_pvalues['BH_Adj_pValue'][i]:.2f}", va='center')
-
-# Axis & labels
-plt.xticks(df_pvalues.index + 1, df_pvalues['Segment']);
-plt.axhline(0.05, color='gray', linestyle='--', label='α = 0.05');
-plt.xlabel("Segment (Ranked by Significance)");
-plt.ylabel("p-value");
-plt.title("p-value Correction: Bonferroni vs Benjamini Hochberg (FDR)");
-plt.legend();
-plt.tight_layout();
-plt.show();
+# Visualization of raw vs adjusted p-values
+plot_adjusted_pvalues(df_pvalues, alpha=0.05)
 
 # %% [markdown]
 # <a id="novelty-effects"></a>

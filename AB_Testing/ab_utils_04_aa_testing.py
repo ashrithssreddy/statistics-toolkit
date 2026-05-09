@@ -31,6 +31,10 @@ def run_outcome_similarity_test(
 
     if verbose:
         print("📏 Outcome Similarity Check\n")
+        if pd.api.types.is_numeric_dtype(df[metric_col]):
+            mean_by_group = df.groupby(group_col)[metric_col].mean()
+            print(mean_by_group)
+            print()
 
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]

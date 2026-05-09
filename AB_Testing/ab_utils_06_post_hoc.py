@@ -16,7 +16,8 @@ def apply_cuped(
     outcome_col=None,
     group_col=None,
     group_labels=None,
-    seed=my_seed
+    seed=my_seed,
+    verbose=True
 ):
     """
     Applies CUPED (Controlled Pre-Experiment Data) adjustment to reduce variance
@@ -44,6 +45,8 @@ def apply_cuped(
         Tuple containing the names of the experiment groups.
     seed : int
         Random seed for reproducibility (used only if randomness is introduced later).
+    verbose : bool, default=True
+        If True, prints variance reduction summary after CUPED adjustment.
 
     Returns:
     -------
@@ -68,6 +71,22 @@ def apply_cuped(
     df[outcome_col] = y - theta * df[pre_metric]
     if group_col in df.columns:
         df = df[[group_col] + [c for c in df.columns if c != group_col]]
+
+    if verbose:
+        original_std = df[outcome_metric_col].std()
+        cuped_std = df[outcome_col].std()
+        reduction_pct = np.nan
+        if original_std and not np.isnan(original_std):
+            reduction_pct = (1 - cuped_std / original_std) * 100
+
+        print("Variance Reduction from CUPED")
+        print("--------------------------------")
+        print(f"Original std dev : {original_std:.3f}")
+        print(f"CUPED std dev    : {cuped_std:.3f}")
+        if np.isnan(reduction_pct):
+            print("Reduction        : n/a (original std dev is zero or missing)")
+        else:
+            print(f"Reduction        : {reduction_pct:.2f}%")
 
     return df
 
@@ -262,3 +281,41 @@ def simulate_rollout_impact(
     print(f"- Daily Eligible Units: {daily_eligible_observations}")
     print(f"- Estimated Daily Impact   : {daily_impact:,.0f} {metric_unit}/day")
     print(f"- Estimated Monthly Impact : {monthly_impact:,.0f} {metric_unit}/month\n")
+
+
+def plot_adjusted_pvalues(df_pvalues, alpha=0.05):
+    """
+    Plot raw and multiple-comparison-adjusted p-values by segment rank.
+
+    Expected columns in df_pvalues:
+    - Segment
+    - Raw_pValue
+    - Bonferroni_Adj_pValue
+    - BH_Adj_pValue
+    """
+    plt.figure(figsize=(8, 5))
+
+    x = df_pvalues.index + 1
+    plt.plot(x, df_pvalues['Raw_pValue'], marker='o', label='Raw p-value')
+    plt.plot(x, df_pvalues['Bonferroni_Adj_pValue'], marker='^', label='Bonferroni Adj p-value')
+    plt.plot(x, df_pvalues['BH_Adj_pValue'], marker='s', label='BH Adj p-value')
+
+    for i in range(len(df_pvalues)):
+        xi = i + 1
+        plt.text(xi + 0.05, df_pvalues['Raw_pValue'].iloc[i], f"{df_pvalues['Raw_pValue'].iloc[i]:.2f}", va='center')
+        plt.text(
+            xi + 0.05,
+            df_pvalues['Bonferroni_Adj_pValue'].iloc[i],
+            f"{df_pvalues['Bonferroni_Adj_pValue'].iloc[i]:.2f}",
+            va='center'
+        )
+        plt.text(xi + 0.05, df_pvalues['BH_Adj_pValue'].iloc[i], f"{df_pvalues['BH_Adj_pValue'].iloc[i]:.2f}", va='center')
+
+    plt.xticks(x, df_pvalues['Segment'])
+    plt.axhline(alpha, color='gray', linestyle='--', label=f'α = {alpha:.2f}')
+    plt.xlabel("Segment (Ranked by Significance)")
+    plt.ylabel("p-value")
+    plt.title("p-value Correction: Bonferroni vs Benjamini Hochberg (FDR)")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
