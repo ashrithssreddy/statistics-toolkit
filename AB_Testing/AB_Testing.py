@@ -1455,17 +1455,6 @@ df = apply_cuped(
 df.head()
 
 # %%
-# TODO: move these into apply_cuped()
-original_std = df[test_config['outcome_metric_col']].std()
-cuped_std = df[f"{test_config['outcome_metric_col']}_cuped_adjusted"].std()
-
-print("Variance Reduction from CUPED")
-print("--------------------------------")
-print(f"Original std dev : {original_std:.3f}")
-print(f"CUPED std dev    : {cuped_std:.3f}")
-print(f"Reduction        : {(1 - cuped_std/original_std)*100:.2f}%")
-
-# %%
 result_cuped = run_ab_test(
     df=df,
     group_col='group',

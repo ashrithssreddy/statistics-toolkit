@@ -16,7 +16,8 @@ def apply_cuped(
     outcome_col=None,
     group_col=None,
     group_labels=None,
-    seed=my_seed
+    seed=my_seed,
+    verbose=True
 ):
     """
     Applies CUPED (Controlled Pre-Experiment Data) adjustment to reduce variance
@@ -44,6 +45,8 @@ def apply_cuped(
         Tuple containing the names of the experiment groups.
     seed : int
         Random seed for reproducibility (used only if randomness is introduced later).
+    verbose : bool, default=True
+        If True, prints variance reduction summary after CUPED adjustment.
 
     Returns:
     -------
@@ -68,6 +71,22 @@ def apply_cuped(
     df[outcome_col] = y - theta * df[pre_metric]
     if group_col in df.columns:
         df = df[[group_col] + [c for c in df.columns if c != group_col]]
+
+    if verbose:
+        original_std = df[outcome_metric_col].std()
+        cuped_std = df[outcome_col].std()
+        reduction_pct = np.nan
+        if original_std and not np.isnan(original_std):
+            reduction_pct = (1 - cuped_std / original_std) * 100
+
+        print("Variance Reduction from CUPED")
+        print("--------------------------------")
+        print(f"Original std dev : {original_std:.3f}")
+        print(f"CUPED std dev    : {cuped_std:.3f}")
+        if np.isnan(reduction_pct):
+            print("Reduction        : n/a (original std dev is zero or missing)")
+        else:
+            print(f"Reduction        : {reduction_pct:.2f}%")
 
     return df
 
