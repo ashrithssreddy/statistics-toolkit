@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 from IPython.display import display
+from statsmodels.stats.contingency_tables import mcnemar
 
 
 def run_ab_test(
@@ -34,16 +35,22 @@ def run_ab_test(
     }
 
     # --- Summary Stats ---
+    def _safe_mean(x):
+        return x.mean() if pd.api.types.is_numeric_dtype(x) else None
+
+    def _safe_std(x):
+        return x.std() if pd.api.types.is_numeric_dtype(x) else None
+
     result['summary'][group1] = {
         'n': len(data1),
-        'mean': data1.mean(),
-        'std': data1.std() if test_family in ['t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
+        'mean': _safe_mean(data1),
+        'std': _safe_std(data1) if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
         'sum': data1.sum() if test_family == 'z_test' else None
     }
     result['summary'][group2] = {
         'n': len(data2),
-        'mean': data2.mean(),
-        'std': data2.std() if test_family in ['t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
+        'mean': _safe_mean(data2),
+        'std': _safe_std(data2) if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
         'sum': data2.sum() if test_family == 'z_test' else None
     }
 
@@ -58,13 +65,22 @@ def run_ab_test(
         result.update({'test': 'z-test for proportions', 'z_stat': z_stat, 'p_value': p_value})
 
     # --- Continuous (T-Test) ---
-    elif test_family == 't_test':
+    elif test_family in ['t_test', 'paired_t_test']:
+        if test_family == 'paired_t_test':
+            variant = 'paired'
+            result['variant'] = 'paired'
+
         if variant == 'independent':
             t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=False)
             result.update({'test': 'independent t-test', 't_stat': t_stat, 'p_value': p_value})
         elif variant == 'paired':
             if len(data1) != len(data2):
-                raise ValueError("Paired test requires equal-length matching samples.")
+                min_n = min(len(data1), len(data2))
+                data1 = data1.iloc[:min_n]
+                data2 = data2.iloc[:min_n]
+                result['pairing_warning'] = (
+                    f"Unequal group sizes for paired test; aligned to first {min_n} observations per group."
+                )
             t_stat, p_value = stats.ttest_rel(data1, data2)
             result.update({'test': 'paired t-test', 't_stat': t_stat, 'p_value': p_value})
         else:
@@ -86,6 +102,34 @@ def run_ab_test(
         contingency = pd.crosstab(df[group_col], df[metric_col])
         chi2, p_value, _, _ = stats.chi2_contingency(contingency)
         result.update({'test': 'chi-square test', 'chi2_stat': chi2, 'p_value': p_value})
+
+    # --- Paired Binary (McNemar) ---
+    elif test_family == 'mcnemar_test':
+        variant = 'paired'
+        result['variant'] = 'paired'
+
+        min_n = min(len(data1), len(data2))
+        x = data1.iloc[:min_n].astype(int).to_numpy()
+        y = data2.iloc[:min_n].astype(int).to_numpy()
+        x = np.where(x > 0, 1, 0)
+        y = np.where(y > 0, 1, 0)
+
+        table = np.zeros((2, 2), dtype=int)
+        table[0, 0] = int(np.sum((x == 0) & (y == 0)))
+        table[0, 1] = int(np.sum((x == 0) & (y == 1)))
+        table[1, 0] = int(np.sum((x == 1) & (y == 0)))
+        table[1, 1] = int(np.sum((x == 1) & (y == 1)))
+
+        mc = mcnemar(table, exact=True, correction=False)
+        result.update(
+            {
+                'test': 'McNemar test',
+                'mcnemar_stat': float(mc.statistic),
+                'p_value': float(mc.pvalue),
+                'contingency_table': table.tolist(),
+                'paired_n': int(min_n),
+            }
+        )
 
     else:
         raise ValueError(f"❌ Unsupported test_family: {test_family}")
@@ -118,6 +162,8 @@ def summarize_ab_test_result(result):
         print(f"Chi2-statistic: {result['chi2_stat']:.4f}")
     elif 'u_stat' in result:
         print(f"U-statistic: {result['u_stat']:.4f}")
+    elif 'mcnemar_stat' in result:
+        print(f"McNemar statistic: {result['mcnemar_stat']:.4f}")
 
     if p_value is not None:
         print(f"P-value    : {p_value:.4f}")
@@ -130,7 +176,7 @@ def summarize_ab_test_result(result):
     display(pd.DataFrame(result['summary']).T)
 
     # ---- Lift Analysis (for Z-test, T-test independent, or non-parametric / Mann-Whitney) ----
-    if test_family in ['z_test', 't_test', 'non_parametric', 'mann_whitney_u_test'] and (variant == 'independent' or test_family in ['z_test', 'non_parametric', 'mann_whitney_u_test']):
+    if test_family in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] and (variant == 'independent' or test_family in ['z_test', 'non_parametric', 'mann_whitney_u_test']):
         group1_mean = result['summary'][group1]['mean']
         group2_mean = result['summary'][group2]['mean']
         lift = group2_mean - group1_mean
@@ -171,7 +217,7 @@ def plot_ab_test_results(result):
 
     print("\n📊 Visualization:")
 
-    if test_family in ['z_test', 't_test', 'non_parametric', 'mann_whitney_u_test']:
+    if test_family in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test', 'mcnemar_test']:
         labels = [group1, group2]
         values = [result['summary'][group1]['mean'], result['summary'][group2]['mean']]
         plt.bar(labels, values, color=['gray', 'skyblue'])
@@ -206,10 +252,10 @@ def plot_confidence_intervals(result, z=1.96):
     group1, group2 = result['group_labels']
     summary = result['summary']
 
-    if test_family not in ['z_test', 't_test', 'non_parametric', 'mann_whitney_u_test']:
+    if test_family not in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test']:
         print(f"⚠️ CI plotting not supported for test family: {test_family}")
         return
-    if test_family == 't_test' and variant != 'independent':
+    if test_family in ['t_test', 'paired_t_test'] and variant != 'independent':
         print(f"⚠️ CI plotting only supported for independent t-tests.")
         return
 
@@ -255,7 +301,7 @@ def compute_lift_confidence_interval(result):
     print(f"📈 95% CI for Difference in Outcome [{test_family}]")
     print("="*45)
 
-    if test_family == 'z_test' or (test_family == 't_test' and variant == 'independent'):
+    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and variant == 'independent'):
         m1 = result['summary'][group1]['mean']
         m2 = result['summary'][group2]['mean']
         lift = m2 - m1
@@ -305,8 +351,11 @@ def compute_lift_confidence_interval(result):
         else:
             print("- Mann-Whitney U: CI for difference in means (summary std used).")
 
-    elif test_family == 't_test' and variant == 'paired':
+    elif test_family in ['t_test', 'paired_t_test'] and variant == 'paired':
         print("- Paired test: CI already accounted for in test logic.")
+
+    elif test_family == 'mcnemar_test':
+        print("- McNemar test: CI for paired binary shift is not implemented.")
 
     elif test_family == 'chi_square':
         print("- Categorical test: per-category lift analysis required (not implemented).")
@@ -328,7 +377,7 @@ def print_final_ab_test_summary(result):
     print("          📊 FINAL A/B TEST SUMMARY")
     print("="*40)
 
-    if test_family == 'z_test' or (test_family == 't_test' and variant == 'independent'):
+    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and variant == 'independent'):
         mean1 = result['summary'][group1]['mean']
         mean2 = result['summary'][group2]['mean']
         lift = mean2 - mean1
@@ -355,8 +404,14 @@ def print_final_ab_test_summary(result):
         print(f"📊  Percentage lift            :  {pct_lift:.2%}")
         print(f"🧪  P-value (from {test_name}):  {p_value:.4f}")
 
-    elif test_family == 't_test' and variant == 'paired':
+    elif test_family in ['t_test', 'paired_t_test'] and variant == 'paired':
         print("🧪 Paired T-Test was used to compare within-user outcomes.")
+        print(f"🧪 P-value: {p_value:.4f}")
+
+    elif test_family == 'mcnemar_test':
+        print("🧪 McNemar test was used for paired binary outcomes.")
+        if "paired_n" in result:
+            print(f"👥 Paired observations analyzed: {result['paired_n']}")
         print(f"🧪 P-value: {p_value:.4f}")
 
     elif test_family == 'chi_square':
