@@ -150,7 +150,7 @@ pre_experiment_metric = 'past_purchase_count'  # Can be None
 group_col = 'group'
 
 # Randomization method to assign users to groups
-# Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster', 'cuped'
+# Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
 randomization_method = "simple"
 
 # Optional: guardrail metric column for simulated outcome data. Set to None to omit.
