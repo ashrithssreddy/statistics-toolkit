@@ -1550,12 +1550,20 @@ df_pvalues = pd.DataFrame({
 }).sort_values('Raw_pValue').reset_index(drop=True)
 
 # Apply corrections to the sorted p-values
-_, bonf, _, _ = multipletests(df_pvalues['Raw_pValue'], alpha=0.05, method='bonferroni')
-_, bh, _, _ = multipletests(df_pvalues['Raw_pValue'], alpha=0.05, method='fdr_bh')
-
-# Add to DataFrame
-df_pvalues['Bonferroni_Adj_pValue'] = bonf
-df_pvalues['BH_Adj_pValue'] = bh
+# multipletests(..., method=...) also supports:
+# 'sidak', 'holm-sidak', 'holm', 'simes-hochberg', 'hommel',
+# 'fdr_by', 'fdr_tsbh', 'fdr_tsbky' (and in some versions: 'fdr_gbs')
+# Add adjusted p-values directly to DataFrame
+df_pvalues['Bonferroni_Adj_pValue'] = multipletests(
+    df_pvalues['Raw_pValue'],
+    alpha=0.05,
+    method='bonferroni'
+)[1]
+df_pvalues['BH_Adj_pValue'] = multipletests(
+    df_pvalues['Raw_pValue'],
+    alpha=0.05,
+    method='fdr_bh'
+)[1]
 df_pvalues
 
 # TODO: decision from p-value?
