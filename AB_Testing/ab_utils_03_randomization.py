@@ -1,10 +1,13 @@
 # 03 Randomization — assignment methods and SRM check
+# region Imports
 import numpy as np
 import pandas as pd
 from scipy import stats
 from ab_utils_01_data_setup import my_seed
+# endregion Imports
 
 
+# region apply_simple_randomization
 def apply_simple_randomization(df, group_labels=None, group_col=None, seed=my_seed):
     """
     Randomly assigns each row to one of the specified groups.
@@ -28,6 +31,9 @@ def apply_simple_randomization(df, group_labels=None, group_col=None, seed=my_se
     return df
 
 
+# endregion apply_simple_randomization
+
+# region apply_stratified_randomization
 def apply_stratified_randomization(df, stratify_col, group_labels=None, group_col=None, seed=my_seed):
     """
     Performs stratified randomization to assign rows into multiple groups while maintaining balance across strata.
@@ -60,6 +66,9 @@ def apply_stratified_randomization(df, stratify_col, group_labels=None, group_co
     return df
 
 
+# endregion apply_stratified_randomization
+
+# region apply_block_randomization
 def apply_block_randomization(df, observation_id_col, group_col=None, block_size=10, group_labels=None, seed=my_seed):
     """
     Assigns group labels using block randomization to ensure balance within fixed-size blocks.
@@ -102,6 +111,9 @@ def apply_block_randomization(df, observation_id_col, group_col=None, block_size
     return df
 
 
+# endregion apply_block_randomization
+
+# region apply_matched_pair_randomization
 def apply_matched_pair_randomization(df, sort_col, group_col=None, group_labels=None):
     """
     Assigns groups using matched-pair randomization based on a sorting variable.
@@ -129,6 +141,9 @@ def apply_matched_pair_randomization(df, sort_col, group_col=None, group_labels=
     return df
 
 
+# endregion apply_matched_pair_randomization
+
+# region apply_cluster_randomization
 def apply_cluster_randomization(df, cluster_col, group_col=None, group_labels=None, seed=my_seed):
     """
     Assigns groups using cluster-level randomization — all observations in a cluster
@@ -165,6 +180,9 @@ def apply_cluster_randomization(df, cluster_col, group_col=None, group_labels=No
     return df
 
 
+# endregion apply_cluster_randomization
+
+# region check_sample_ratio_mismatch
 def check_sample_ratio_mismatch(df, group_col, group_labels, expected_ratios=None, alpha=0.05):
     """
     Checks for Sample Ratio Mismatch (SRM) using a Chi-Square test.
@@ -205,3 +223,4 @@ def check_sample_ratio_mismatch(df, group_col, group_labels, expected_ratios=Non
         print("⚠️ SRM Detected — group assignment might be biased.\n")
     else:
         print("✅ No SRM — group sizes look balanced.\n")
+# endregion check_sample_ratio_mismatch

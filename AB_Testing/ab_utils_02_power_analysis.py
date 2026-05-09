@@ -1,11 +1,14 @@
 # 02 Power Analysis — EDA (normality, variance, test family) + baseline, sample size, summary
+# region Imports
 import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy.stats import shapiro, levene
 from statsmodels.stats.power import TTestIndPower, TTestPower
+# endregion Imports
 
 
+# region test_normality
 def test_normality(df, outcome_metric_col, group_col, group_labels):
     results = {}
     for group in group_labels:
@@ -15,12 +18,18 @@ def test_normality(df, outcome_metric_col, group_col, group_labels):
     return results
 
 
+# endregion test_normality
+
+# region test_equal_variance
 def test_equal_variance(df, outcome_metric_col, group_col, group_labels):
     group_data = [df[df[group_col] == label][outcome_metric_col] for label in group_labels]
     stat, p = levene(*group_data)
     return {'statistic': stat, 'p_value': p, 'equal_variance': p > 0.05}
 
 
+# endregion test_equal_variance
+
+# region determine_test_family
 def determine_test_family(test_config):
     """
     Determine the appropriate statistical test for an experiment.
@@ -114,6 +123,9 @@ def determine_test_family(test_config):
         )
 
 
+# endregion determine_test_family
+
+# region compute_baseline_from_data
 def compute_baseline_from_data(df, test_config, verbose=True):
     """
     Compute baseline rate/mean and std_dev from the whole dataset for power analysis.
@@ -149,6 +161,9 @@ def compute_baseline_from_data(df, test_config, verbose=True):
     return result
 
 
+# endregion compute_baseline_from_data
+
+# region calculate_power_sample_size
 def calculate_power_sample_size(
     test_family,
     variant=None,
@@ -237,6 +252,9 @@ def calculate_power_sample_size(
         raise ValueError(f"Unsupported test: {test_family}")
 
 
+# endregion calculate_power_sample_size
+
+# region print_power_summary
 def print_power_summary(
     test_family,
     variant,
@@ -293,3 +311,4 @@ def print_power_summary(
         print("\n⚠️ Summary not specialized for this test.")
         print(f"Required sample size per group: {required_sample_size}")
         print(f"Total sample size: {required_sample_size * 2}")
+# endregion print_power_summary

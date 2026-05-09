@@ -1,4 +1,5 @@
 # 06 Post Hoc Analysis — CUPED, segment lift, guardrail, rollout simulation
+# region Imports
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,8 +8,10 @@ from scipy.stats import ttest_ind
 import statsmodels.api as sm
 from IPython.display import display
 from ab_utils_01_data_setup import my_seed
+# endregion Imports
 
 
+# region apply_cuped
 def apply_cuped(
     df,
     pre_metric,
@@ -91,6 +94,9 @@ def apply_cuped(
     return df
 
 
+# endregion apply_cuped
+
+# region visualize_segment_lift
 def visualize_segment_lift(df_segment, segment_col):
     """
     Plots horizontal bar chart of mean lift per segment (Treatment - Control).
@@ -112,6 +118,9 @@ def visualize_segment_lift(df_segment, segment_col):
     plt.show()
 
 
+# endregion visualize_segment_lift
+
+# region analyze_segment_lift
 def analyze_segment_lift(
     df,
     test_config,
@@ -184,6 +193,9 @@ def analyze_segment_lift(
             visualize_segment_lift(df_segment, segment)
 
 
+# endregion analyze_segment_lift
+
+# region run_guardrail_analysis
 def run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05):
     """
     Run guardrail analysis: evaluate guardrail metric (means, difference, p-value).
@@ -196,6 +208,9 @@ def run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05):
     evaluate_guardrail_metric(df=df, test_config=test_config, guardrail_metric_col=guardrail_col, alpha=alpha)
 
 
+# endregion run_guardrail_analysis
+
+# region evaluate_guardrail_metric
 def evaluate_guardrail_metric(
     df,
     test_config,
@@ -243,6 +258,9 @@ def evaluate_guardrail_metric(
         print("🟡 No statistically significant change — guardrail looks stable.")
 
 
+# endregion evaluate_guardrail_metric
+
+# region simulate_rollout_impact
 def simulate_rollout_impact(
     experiment_result,
     daily_eligible_observations,
@@ -283,6 +301,9 @@ def simulate_rollout_impact(
     print(f"- Estimated Monthly Impact : {monthly_impact:,.0f} {metric_unit}/month\n")
 
 
+# endregion simulate_rollout_impact
+
+# region plot_adjusted_pvalues
 def plot_adjusted_pvalues(df_pvalues, alpha=0.05):
     """
     Plot raw and multiple-comparison-adjusted p-values by segment rank.
@@ -319,3 +340,4 @@ def plot_adjusted_pvalues(df_pvalues, alpha=0.05):
     plt.legend()
     plt.tight_layout()
     plt.show()
+# endregion plot_adjusted_pvalues
