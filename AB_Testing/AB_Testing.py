@@ -1569,29 +1569,7 @@ df_pvalues
 
 # %%
 # Visualization of raw vs adjusted p-values
-plt.figure(figsize=(8, 5))
-
-# Plot lines
-plt.plot(df_pvalues.index + 1, df_pvalues['Raw_pValue'], marker='o', label='Raw p-value')
-plt.plot(df_pvalues.index + 1, df_pvalues['Bonferroni_Adj_pValue'], marker='^', label='Bonferroni Adj p-value')
-plt.plot(df_pvalues.index + 1, df_pvalues['BH_Adj_pValue'], marker='s', label='BH Adj p-value')
-
-# Add value labels next to each point
-for i in range(len(df_pvalues)):
-    x = i + 1
-    plt.text(x + 0.05, df_pvalues['Raw_pValue'][i], f"{df_pvalues['Raw_pValue'][i]:.2f}", va='center')
-    plt.text(x + 0.05, df_pvalues['Bonferroni_Adj_pValue'][i], f"{df_pvalues['Bonferroni_Adj_pValue'][i]:.2f}", va='center')
-    plt.text(x + 0.05, df_pvalues['BH_Adj_pValue'][i], f"{df_pvalues['BH_Adj_pValue'][i]:.2f}", va='center')
-
-# Axis & labels
-plt.xticks(df_pvalues.index + 1, df_pvalues['Segment']);
-plt.axhline(0.05, color='gray', linestyle='--', label='α = 0.05');
-plt.xlabel("Segment (Ranked by Significance)");
-plt.ylabel("p-value");
-plt.title("p-value Correction: Bonferroni vs Benjamini Hochberg (FDR)");
-plt.legend();
-plt.tight_layout();
-plt.show();
+plot_adjusted_pvalues(df_pvalues, alpha=0.05)
 
 # %% [markdown]
 # <a id="novelty-effects"></a>

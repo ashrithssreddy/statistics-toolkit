@@ -281,3 +281,41 @@ def simulate_rollout_impact(
     print(f"- Daily Eligible Units: {daily_eligible_observations}")
     print(f"- Estimated Daily Impact   : {daily_impact:,.0f} {metric_unit}/day")
     print(f"- Estimated Monthly Impact : {monthly_impact:,.0f} {metric_unit}/month\n")
+
+
+def plot_adjusted_pvalues(df_pvalues, alpha=0.05):
+    """
+    Plot raw and multiple-comparison-adjusted p-values by segment rank.
+
+    Expected columns in df_pvalues:
+    - Segment
+    - Raw_pValue
+    - Bonferroni_Adj_pValue
+    - BH_Adj_pValue
+    """
+    plt.figure(figsize=(8, 5))
+
+    x = df_pvalues.index + 1
+    plt.plot(x, df_pvalues['Raw_pValue'], marker='o', label='Raw p-value')
+    plt.plot(x, df_pvalues['Bonferroni_Adj_pValue'], marker='^', label='Bonferroni Adj p-value')
+    plt.plot(x, df_pvalues['BH_Adj_pValue'], marker='s', label='BH Adj p-value')
+
+    for i in range(len(df_pvalues)):
+        xi = i + 1
+        plt.text(xi + 0.05, df_pvalues['Raw_pValue'].iloc[i], f"{df_pvalues['Raw_pValue'].iloc[i]:.2f}", va='center')
+        plt.text(
+            xi + 0.05,
+            df_pvalues['Bonferroni_Adj_pValue'].iloc[i],
+            f"{df_pvalues['Bonferroni_Adj_pValue'].iloc[i]:.2f}",
+            va='center'
+        )
+        plt.text(xi + 0.05, df_pvalues['BH_Adj_pValue'].iloc[i], f"{df_pvalues['BH_Adj_pValue'].iloc[i]:.2f}", va='center')
+
+    plt.xticks(x, df_pvalues['Segment'])
+    plt.axhline(alpha, color='gray', linestyle='--', label=f'α = {alpha:.2f}')
+    plt.xlabel("Segment (Ranked by Significance)")
+    plt.ylabel("p-value")
+    plt.title("p-value Correction: Bonferroni vs Benjamini Hochberg (FDR)")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
