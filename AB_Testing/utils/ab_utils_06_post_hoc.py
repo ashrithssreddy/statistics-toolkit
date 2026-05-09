@@ -6,7 +6,7 @@ from scipy import stats
 from scipy.stats import ttest_ind
 import statsmodels.api as sm
 from IPython.display import display
-from ab_utils_01_data_setup import my_seed
+from utils.ab_utils_01_data_setup import my_seed
 
 
 def apply_cuped(

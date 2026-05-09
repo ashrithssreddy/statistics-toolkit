@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
-from ab_utils_01_data_setup import my_seed
+from utils.ab_utils_01_data_setup import my_seed
 
 
 def apply_simple_randomization(df, group_labels=None, group_col=None, seed=my_seed):

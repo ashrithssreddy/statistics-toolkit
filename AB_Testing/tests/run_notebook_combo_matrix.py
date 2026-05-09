@@ -15,16 +15,16 @@ AB_TESTING_DIR = Path(__file__).resolve().parents[1]
 if str(AB_TESTING_DIR) not in sys.path:
     sys.path.insert(0, str(AB_TESTING_DIR))
 
-from ab_utils_01_data_setup import add_outcome_metrics, create_dummy_ab_data
-from ab_utils_02_power_analysis import determine_test_family
-from ab_utils_03_randomization import (
+from utils.ab_utils_01_data_setup import add_outcome_metrics, create_dummy_ab_data
+from utils.ab_utils_02_power_analysis import determine_test_family
+from utils.ab_utils_03_randomization import (
     apply_block_randomization,
     apply_cluster_randomization,
     apply_matched_pair_randomization,
     apply_simple_randomization,
     apply_stratified_randomization,
 )
-from ab_utils_05_ab_testing import run_ab_test
+from utils.ab_utils_05_ab_testing import run_ab_test
 
 
 SUPPORTED_RUN_AB_FAMILIES = {
