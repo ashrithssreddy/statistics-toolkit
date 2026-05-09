@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 import sys
+import subprocess
 from typing import Any
 
 import numpy as np
@@ -232,3 +233,18 @@ if __name__ == "__main__":
     out_path = "AB_Testing/tests/combo_matrix_report.csv"
     report.to_csv(out_path, index=False)
     print(f"\nSaved full report to: {out_path}")
+
+    # Auto-open report in default app (Excel/Sheets) when run locally.
+    out_abs = Path(out_path).resolve()
+    try:
+        if sys.platform.startswith("win"):
+            import os
+
+            os.startfile(str(out_abs))  # type: ignore[attr-defined]
+        elif sys.platform == "darwin":
+            subprocess.run(["open", str(out_abs)], check=False)
+        else:
+            subprocess.run(["xdg-open", str(out_abs)], check=False)
+        print(f"Opened report: {out_abs}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Could not auto-open report: {exc}")
