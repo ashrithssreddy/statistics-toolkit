@@ -138,7 +138,7 @@ group_labels = ('control', 'treatment')
 group_count = len(group_labels)
 
 # 4. Experimental design variant: independent or paired
-variant = 'independent'  # Options: 'independent' (supported), 'paired' (not supported yet, todo)
+variant = 'independent'  # Options: 'independent', 'paired'
 
 # 5. Optional: Unique identifier for each observation (can be user_id, session_id, etc.)
 observation_id_col = 'user_id'
