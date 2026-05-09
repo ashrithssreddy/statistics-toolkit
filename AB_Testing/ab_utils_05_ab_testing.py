@@ -36,16 +36,22 @@ def run_ab_test(
     }
 
     # --- Summary Stats ---
+    def _safe_mean(x):
+        return x.mean() if pd.api.types.is_numeric_dtype(x) else None
+
+    def _safe_std(x):
+        return x.std() if pd.api.types.is_numeric_dtype(x) else None
+
     result['summary'][group1] = {
         'n': len(data1),
-        'mean': data1.mean(),
-        'std': data1.std() if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
+        'mean': _safe_mean(data1),
+        'std': _safe_std(data1) if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
         'sum': data1.sum() if test_family == 'z_test' else None
     }
     result['summary'][group2] = {
         'n': len(data2),
-        'mean': data2.mean(),
-        'std': data2.std() if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
+        'mean': _safe_mean(data2),
+        'std': _safe_std(data2) if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
         'sum': data2.sum() if test_family == 'z_test' else None
     }
 
@@ -70,7 +76,12 @@ def run_ab_test(
             result.update({'test': 'independent t-test', 't_stat': t_stat, 'p_value': p_value})
         elif variant == 'paired':
             if len(data1) != len(data2):
-                raise ValueError("Paired test requires equal-length matching samples.")
+                min_n = min(len(data1), len(data2))
+                data1 = data1.iloc[:min_n]
+                data2 = data2.iloc[:min_n]
+                result['pairing_warning'] = (
+                    f"Unequal group sizes for paired test; aligned to first {min_n} observations per group."
+                )
             t_stat, p_value = stats.ttest_rel(data1, data2)
             result.update({'test': 'paired t-test', 't_stat': t_stat, 'p_value': p_value})
         else:
