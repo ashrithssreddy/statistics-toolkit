@@ -355,7 +355,8 @@ for combo_row, combo in combo_space[
             "guardrail_metric_col": guardrail_metric_col,
             "family": test_config["family"],
             "n_required": n_required,
-            "aa_p_value": aa_result.get("p_value") if isinstance(aa_result, dict) else None,
+            # run_outcome_similarity_test returns a float p_value (or None), not a dict.
+            "aa_p_value": aa_result.get("p_value") if isinstance(aa_result, dict) else aa_result,
             "ab_p_value": result.get("p_value"),
             "cuped_p_value": (result_cuped or {}).get("p_value"),
         }
