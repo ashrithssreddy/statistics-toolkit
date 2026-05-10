@@ -7,6 +7,40 @@ from IPython.display import display
 from statsmodels.stats.contingency_tables import mcnemar
 
 
+def print_hypothesis(test_config):
+    """
+    Print null and alternative hypotheses based on experiment setup.
+    """
+    metric = test_config['outcome_metric_col']
+    datatype = test_config['outcome_metric_datatype']
+    group1, group2 = test_config['group_labels']
+    relationship = test_config['group_relationship']
+
+    print("\n🧠 Hypothesis Definition")
+    print("-" * 40)
+
+    if datatype == 'continuous':
+        if relationship == 'paired':
+            print(f"H₀: Mean paired difference in {metric} is 0.")
+            print(f"H₁: Mean paired difference in {metric} is not 0.")
+        else:
+            print(f"H₀: Mean {metric} is equal between {group1} and {group2}.")
+            print(f"H₁: Mean {metric} differs between {group1} and {group2}.")
+
+    elif datatype == 'binary':
+        print(f"H₀: Conversion rate is equal between {group1} and {group2}.")
+        print(f"H₁: Conversion rate differs between {group1} and {group2}.")
+
+    elif datatype == 'categorical':
+        print(f"H₀: Distribution of {metric} is independent of group assignment.")
+        print(f"H₁: Distribution of {metric} depends on group assignment.")
+
+    else:
+        print("⚠️ Unsupported outcome metric datatype.")
+
+    print("-" * 40)
+
+
 def run_ab_test(
     df,
     group_col,

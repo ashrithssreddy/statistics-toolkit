@@ -27,6 +27,7 @@
 # - [⚙️ Environment Setup](#environment-setup)  
 # - [🛠️ Experiment Setup](#experiment-setup)  
 # - [🔧 Central Control Panel](#central-control-panel)
+# - [🧠 Hypothesis Definition](#hypothesis-definition)
 # - [📥 Read/Generate Data](#read-data)
 #
 # [⚡ Power Analysis](#power-analysis)  
@@ -202,6 +203,13 @@ test_config = {
 }
 
 print_config_summary(test_config)
+
+# %% [markdown]
+# <a id="hypothesis-definition"></a>
+# <h4>🧠 Hypothesis Definition</h4>
+
+# %%
+print_hypothesis(test_config)
 
 # %% [markdown]
 # <a id="read-data"></a>
@@ -572,10 +580,9 @@ mde = 5  # Change this based on business relevance
 #
 
 # %%
+# TODO: Is normality and variance equality check needed before determining the test family?
 test_config['family'] = determine_test_family(test_config)
 print_config_summary(test_config)
-
-print(f"✅ Selected test family: {test_config['family']}")
 
 # %% [markdown]
 # <a id="required-sample-size"></a>
@@ -583,7 +590,7 @@ print(f"✅ Selected test family: {test_config['family']}")
 # <h4>📐 Required Sample Size</h4>
 
 # %%
-required_sample_size = calculate_power_sample_size(
+test_config['required_sample_size'] = calculate_power_sample_size(
     test_family=test_config['family'],
     group_relationship=test_config.get('group_relationship'),
     alpha=alpha,
@@ -595,10 +602,6 @@ required_sample_size = calculate_power_sample_size(
     num_groups=2
 )
 
-test_config['required_sample_size'] = required_sample_size
-print(f"✅ Required sample size per group: {required_sample_size}")
-print(f"👥 Total sample size: {required_sample_size * 2}")
-
 # %%
 print_power_summary(
     test_family=test_config['family'],
@@ -608,7 +611,7 @@ print_power_summary(
     baseline_rate=test_config.get('baseline_rate'),
     mde=mde,
     std_dev=test_config.get('baseline_std_dev'),
-    required_sample_size=required_sample_size
+    required_sample_size=test_config['required_sample_size']
 )
 
 
@@ -796,10 +799,17 @@ print_power_summary(
 # </details>
 
 # %%
+# Ensure the dataset matches the minimum required experiment size:
+# - required_sample_size is per group
+# - multiply by group_count to get total required observations
 n_required = test_config['required_sample_size'] * test_config['group_count']
+
+# Randomly downsample/up-sample selection from current df for reproducible experiment sizing
 df = df.sample(n=n_required, random_state=42)
 
+# Preview sampled experiment dataset
 df.head()
+
 
 # %%
 # Apply randomization method
@@ -913,7 +923,7 @@ df
 # </details>
 
 # %%
-check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['group_labels'], expected_ratios=[0.5, 0.5], alpha=0.05)
+check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['group_labels'], expected_ratios=[0.5, 0.5])
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
