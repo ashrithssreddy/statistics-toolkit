@@ -89,24 +89,32 @@ def run_ab_test(
     }
 
     # --- Binary Proportions (Z-Test) ---
-    if test_family == 'z_test':
+    if test_family in ['z_test', 'two_proportion_z_test']:
         x1, n1 = data1.sum(), len(data1)
         x2, n2 = data2.sum(), len(data2)
         p_pooled = (x1 + x2) / (n1 + n2)
         se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
         z_stat = (x2/n2 - x1/n1) / se
         p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
-        result.update({'test': 'z-test for proportions', 'z_stat': z_stat, 'p_value': p_value})
+        result.update({'test': 'two-proportion z-test', 'z_stat': z_stat, 'p_value': p_value})
 
     # --- Continuous (T-Test) ---
-    elif test_family in ['t_test', 'paired_t_test']:
+    elif test_family in ['t_test', 'two_sample_t_test', 'welch_t_test', 'paired_t_test']:
         if test_family == 'paired_t_test':
             group_relationship = 'paired'
             result['group_relationship'] = 'paired'
 
         if group_relationship == 'independent':
-            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=False)
-            result.update({'test': 'independent t-test', 't_stat': t_stat, 'p_value': p_value})
+            # Welch for explicit welch_t_test, classic pooled for two_sample_t_test/t_test
+            equal_var = test_family in ['t_test', 'two_sample_t_test']
+            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=equal_var)
+            result.update(
+                {
+                    'test': 'welch t-test' if not equal_var else 'independent t-test',
+                    't_stat': t_stat,
+                    'p_value': p_value
+                }
+            )
         elif group_relationship == 'paired':
             if len(data1) != len(data2):
                 min_n = min(len(data1), len(data2))
@@ -121,18 +129,22 @@ def run_ab_test(
             raise ValueError("Missing or invalid group_relationship for t-test.")
 
     # --- Continuous (Non-parametric) ---
-    elif test_family == 'non_parametric':
+    elif test_family in ['non_parametric', 'mann_whitney_u_test']:
         u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative='two-sided')
         result.update({'test': 'Mann-Whitney U Test', 'u_stat': u_stat, 'p_value': p_value})
-
-    # --- Mann-Whitney U (explicit test family) ---
-    elif test_family == 'mann_whitney_u_test':
-        alternative = group_relationship if group_relationship in ('two-sided', 'less', 'greater') else 'two-sided'
-        u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative=alternative)
-        result.update({'test': 'Mann-Whitney U test', 'u_stat': u_stat, 'p_value': p_value})
+    elif test_family == 'wilcoxon_signed_rank_test':
+        if len(data1) != len(data2):
+            min_n = min(len(data1), len(data2))
+            data1 = data1.iloc[:min_n]
+            data2 = data2.iloc[:min_n]
+            result['pairing_warning'] = (
+                f"Unequal group sizes for paired test; aligned to first {min_n} observations per group."
+            )
+        w_stat, p_value = stats.wilcoxon(data1, data2)
+        result.update({'test': 'Wilcoxon signed-rank test', 'w_stat': w_stat, 'p_value': p_value})
 
     # --- Categorical (Chi-square) ---
-    elif test_family == 'chi_square':
+    elif test_family in ['chi_square', 'chi_square_test']:
         contingency = pd.crosstab(df[group_col], df[metric_col])
         chi2, p_value, _, _ = stats.chi2_contingency(contingency)
         result.update({'test': 'chi-square test', 'chi2_stat': chi2, 'p_value': p_value})

@@ -614,21 +614,8 @@ test_config['required_sample_size'] = calculate_power_sample_size(
     mde=mde,
     std_dev=test_config.get('baseline_std_dev'),
     effect_size=None,  # Let it compute internally via mde/std
-    num_groups=2
+    num_groups=test_config['group_count']
 )
-
-# %%
-print_power_summary(
-    test_family=test_config['family'],
-    group_relationship=test_config.get('group_relationship'),
-    alpha=alpha,
-    power=power,
-    baseline_rate=test_config.get('baseline_rate'),
-    mde=mde,
-    std_dev=test_config.get('baseline_std_dev'),
-    required_sample_size=test_config['required_sample_size']
-)
-
 
 # %% [markdown]
 # [Back to the top](#table-of-contents)
@@ -1191,6 +1178,9 @@ _ = simulate_aa_type1_error_rate(
 # Simulate experiment data (outcome + guardrail) with treatment effect for A/B analysis.
 df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=True, seed=my_seed)
 df.head()
+
+# %%
+# TODO: Use equal variance to determine if test needs to switch.
 
 # %%
 result = run_ab_test(
