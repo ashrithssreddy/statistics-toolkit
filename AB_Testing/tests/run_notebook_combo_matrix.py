@@ -150,7 +150,7 @@ def run_one_scenario(s: Scenario) -> dict[str, Any]:
             "group_count": len(s.group_labels),
             "group_relationship": s.group_relationship,
             "normality": True if s.datatype == "continuous" else None,
-            "variance_equal": True if s.datatype == "continuous" else None,
+            "equal_variance": True if s.datatype == "continuous" else None,
         }
 
         selected_family = determine_test_family(cfg)

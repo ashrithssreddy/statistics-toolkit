@@ -176,7 +176,7 @@ group_relationship = 'independent'  # Options: 'independent', 'paired'
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
 randomization_method = "simple"
 
-
+# TODO: 1 sided vs 2 sided test? For now, we'll default to 2-sided for all tests, but this can be made configurable in the future.
 
 # %% [markdown]
 # <a id="central-control-panel"></a>

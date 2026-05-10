@@ -30,14 +30,14 @@ def determine_test_family(test_config):
     - group_count: number of variants
     - group_relationship: independent or paired
     - normality: whether normality assumption holds
-    - variance_equal: whether group variances are assumed equal
+    - equal_variance: whether group variances are assumed equal
     """
 
     data_type = test_config.get("outcome_metric_datatype")
     group_count = test_config.get("group_count")
     group_relationship = test_config.get("group_relationship", "independent")
     normality = test_config.get("normality", True)
-    variance_equal = test_config.get("variance_equal", True)
+    equal_variance = test_config.get("equal_variance", True)
 
     # -------------------------
     # BINARY METRICS
@@ -70,7 +70,7 @@ def determine_test_family(test_config):
             if group_count == 2:
 
                 if normality:
-                    if variance_equal:
+                    if equal_variance:
                         return "two_sample_t_test"
                     else:
                         return "welch_t_test"
@@ -81,7 +81,7 @@ def determine_test_family(test_config):
             else:  # 3+ groups
 
                 if normality:
-                    if variance_equal:
+                    if equal_variance:
                         return "anova"
                     else:
                         return "welch_anova"
