@@ -173,7 +173,7 @@ group_count = len(group_labels)
 group_relationship = 'independent'  # Options: 'independent', 'paired'
 
 # 4b. Hypothesis direction for applicable tests
-hypothesis_type = "less"  # Options: "two_sided", "greater", "less"
+hypothesis_type = "two_sided"  # Options: "two_sided", "greater", "less"
 
 # Randomization method to assign users to groups
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
