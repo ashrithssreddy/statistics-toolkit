@@ -41,7 +41,13 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
     return users
 
 
-def create_historical_df(df, outcome_metric_col, guardrail_metric_col=None, seed=my_seed):
+def create_historical_df(
+    df,
+    outcome_metric_col,
+    guardrail_metric_col=None,
+    seed=my_seed,
+    historical_normality="normal"
+):
     """
     Create a historical view of the population: same columns as df, but outcome and guardrail
     columns (which are NaN in df at creation) are filled with baseline-only values — no experiment,
@@ -51,7 +57,13 @@ def create_historical_df(df, outcome_metric_col, guardrail_metric_col=None, seed
     n = len(hist)
     np.random.seed(seed)
     if outcome_metric_col and outcome_metric_col in hist.columns:
-        hist[outcome_metric_col] = np.random.normal(50, 15, n).clip(0, 100)
+        if historical_normality == "normal":
+            hist[outcome_metric_col] = np.random.normal(50, 15, n).clip(0, 100)
+        elif historical_normality == "non_normal":
+            # Right-skewed historical behavior (common in spend/time metrics)
+            hist[outcome_metric_col] = np.random.lognormal(mean=3.8, sigma=0.45, size=n).clip(0, 100)
+        else:
+            raise ValueError("historical_normality must be 'normal' or 'non_normal'")
     if guardrail_metric_col and guardrail_metric_col in hist.columns:
         hist[guardrail_metric_col] = np.random.normal(0.5, 0.1, n).clip(0, 1)
     return hist
