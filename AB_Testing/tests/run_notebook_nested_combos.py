@@ -127,6 +127,7 @@ for combo_row, combo in combo_space[
         seed=my_seed,
         outcome_metric_col=outcome_metric_col,
         guardrail_metric_col=guardrail_metric_col,
+        randomization_method=randomization_method,
     )
 
     historical_df = create_historical_df(

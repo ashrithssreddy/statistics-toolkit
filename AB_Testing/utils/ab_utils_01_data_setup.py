@@ -5,7 +5,14 @@ import pandas as pd
 my_seed = 1995
 
 
-def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=None, guardrail_metric_col=None):
+def create_dummy_ab_data(
+    observations_count=1000,
+    seed=1995,
+    outcome_metric_col=None,
+    guardrail_metric_col=None,
+    randomization_method=None,
+    cluster_col='city',
+):
     """Generate user population with attributes and pre-experiment variables only.
     Outcome and guardrail metrics are not generated here; they are created after randomization.
     If outcome_metric_col or guardrail_metric_col is provided, a placeholder column (NaN) is added so column order
@@ -15,15 +22,19 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
         # required (from experiment setup / central control panel): identifier, pre-experiment metric, placeholders
         'user_id': range(1, observations_count + 1),
         'past_purchase_revenue': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
-        # optional: segmentation (retained for stratified / segment analysis)
+        # optional: segmentation columns used later in the notebook
         'platform': np.random.choice(['iOS', 'Android'], size=observations_count, p=[0.6, 0.4]),
         'device_type': np.random.choice(['mobile', 'desktop'], size=observations_count, p=[0.7, 0.3]),
         # optional: uncomment if needed for cluster or segment analysis
         # 'user_tier': np.random.choice(['new', 'returning'], size=observations_count, p=[0.4, 0.6]),
         # 'region': np.random.choice(['North', 'South', 'East', 'West'], size=observations_count, p=[0.25, 0.25, 0.25, 0.25]),
         # 'plan_type': np.random.choice(['basic', 'premium', 'pro'], size=observations_count, p=[0.6, 0.3, 0.1]),
-        # 'city': np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count),
     })
+    if randomization_method == 'cluster':
+        if cluster_col == 'city':
+            users[cluster_col] = np.random.choice(['ny', 'sf', 'chicago', 'austin'], size=observations_count)
+        else:
+            users[cluster_col] = np.random.choice([f'{cluster_col}_1', f'{cluster_col}_2', f'{cluster_col}_3', f'{cluster_col}_4'], size=observations_count)
     # Placeholder columns (filled after randomization / outcome collection)
     if outcome_metric_col:
         users[outcome_metric_col] = np.nan
