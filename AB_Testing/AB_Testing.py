@@ -147,6 +147,18 @@ from Hypothesis_Testing.ht_utils import print_config_summary
 # 1. Main outcome variable you're testing
 outcome_metric_col = 'engagement_score'
 
+# 5. Optional: Unique identifier for each observation (can be user_id, session_id, etc.)
+observation_id_col = 'user_id'
+
+# 6. Optional: Pre-experiment metric for CUPED, if used
+pre_experiment_metric = 'past_purchase_count'  # Can be None
+
+# Optional: guardrail metric column for simulated outcome data. Set to None to omit.
+guardrail_metric_col = 'bounce_rate'
+
+# Column name used to store assigned group after randomization
+group_col = 'group'
+
 # 2. Metric type: 'binary', 'continuous', or 'categorical'
 outcome_metric_datatype = 'continuous'
 
@@ -159,21 +171,10 @@ group_count = len(group_labels)
 # 4. Experimental design variant: independent or paired
 variant = 'independent'  # Options: 'independent', 'paired'
 
-# 5. Optional: Unique identifier for each observation (can be user_id, session_id, etc.)
-observation_id_col = 'user_id'
-
-# 6. Optional: Pre-experiment metric for CUPED, if used
-pre_experiment_metric = 'past_purchase_count'  # Can be None
-
-# Column name used to store assigned group after randomization
-group_col = 'group'
-
 # Randomization method to assign users to groups
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
 randomization_method = "simple"
 
-# Optional: guardrail metric column for simulated outcome data. Set to None to omit.
-guardrail_metric_col = 'bounce_rate'
 
 
 # %% [markdown]
