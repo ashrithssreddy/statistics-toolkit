@@ -139,7 +139,7 @@ for combo_row, combo in combo_space[
     # ------------------------------------------------------------------
     # Read/Generate Data
     # ------------------------------------------------------------------
-    observations_count = 1000
+    observations_count = 5000
     df = create_dummy_ab_data(
         observations_count,
         seed=my_seed,
@@ -168,7 +168,10 @@ for combo_row, combo in combo_space[
     test_config["baseline_mean"] = _b["baseline_mean"]
     test_config["baseline_std_dev"] = _b["baseline_std_dev"]
 
-    mde = 5
+    if outcome_metric_datatype in ["binary", "categorical"]:
+        mde = 0.05
+    else:
+        mde = 5
 
     test_config = test_normality(
         df=historical_df,
