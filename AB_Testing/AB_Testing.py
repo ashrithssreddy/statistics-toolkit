@@ -176,6 +176,9 @@ group_relationship = 'independent'  # Options: 'independent', 'paired'
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
 randomization_method = "simple"
 
+# Historical-data shape control for continuous outcomes: 'normal' or 'non_normal'
+historical_normality = 'normal'
+
 # TODO: 1 sided vs 2 sided test? For now, we'll default to 2-sided for all tests, but this can be made configurable in the future.
 
 # %% [markdown]
@@ -220,7 +223,13 @@ observations_count = 1000
 df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col, guardrail_metric_col=guardrail_metric_col)
 df
 
-historical_df = create_historical_df(df, outcome_metric_col, guardrail_metric_col, seed=my_seed)
+historical_df = create_historical_df(
+    df,
+    outcome_metric_col,
+    guardrail_metric_col,
+    seed=my_seed,
+    historical_normality=historical_normality
+)
 historical_df
 
 # %% [markdown]

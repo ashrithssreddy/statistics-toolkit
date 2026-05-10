@@ -46,7 +46,8 @@ def create_historical_df(
     outcome_metric_col,
     guardrail_metric_col=None,
     seed=my_seed,
-    historical_normality="normal"
+    historical_normality="normal",
+    non_normal_distribution="random"
 ):
     """
     Create a historical view of the population: same columns as df, but outcome and guardrail
@@ -56,16 +57,33 @@ def create_historical_df(
     hist = df.copy()
     n = len(hist)
     np.random.seed(seed)
+    rng = np.random.default_rng(seed)
+
     if outcome_metric_col and outcome_metric_col in hist.columns:
         if historical_normality == "normal":
-            hist[outcome_metric_col] = np.random.normal(50, 15, n).clip(0, 100)
+            hist[outcome_metric_col] = rng.normal(50, 15, n).clip(0, 100)
         elif historical_normality == "non_normal":
-            # Right-skewed historical behavior (common in spend/time metrics)
-            hist[outcome_metric_col] = np.random.lognormal(mean=3.8, sigma=0.45, size=n).clip(0, 100)
+            # Right-skewed historical behavior (common in spend/time metrics).
+            # Choose one family deterministically by seed unless caller specifies one.
+            if non_normal_distribution == "random":
+                chosen = rng.choice(["lognormal", "gamma", "weibull"])
+            else:
+                chosen = non_normal_distribution
+
+            if chosen == "lognormal":
+                vals = rng.lognormal(mean=3.8, sigma=0.45, size=n)
+            elif chosen == "gamma":
+                vals = rng.gamma(shape=5.0, scale=10.0, size=n)
+            elif chosen == "weibull":
+                vals = rng.weibull(a=2.0, size=n) * 60.0
+            else:
+                raise ValueError("non_normal_distribution must be 'random', 'lognormal', 'gamma', or 'weibull'")
+
+            hist[outcome_metric_col] = np.asarray(vals).clip(0, 100)
         else:
             raise ValueError("historical_normality must be 'normal' or 'non_normal'")
     if guardrail_metric_col and guardrail_metric_col in hist.columns:
-        hist[guardrail_metric_col] = np.random.normal(0.5, 0.1, n).clip(0, 1)
+        hist[guardrail_metric_col] = rng.normal(0.5, 0.1, n).clip(0, 1)
     return hist
 
 
