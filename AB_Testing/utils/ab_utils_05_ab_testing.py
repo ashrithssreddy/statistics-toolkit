@@ -48,6 +48,7 @@ def run_ab_test(
     group_labels,
     test_family,
     group_relationship=None,
+    hypothesis_type='two_sided',
     alpha=0.05
 ):
     """
@@ -60,10 +61,15 @@ def run_ab_test(
     group1, group2 = group_labels
     data1 = df[df[group_col] == group1][metric_col]
     data2 = df[df[group_col] == group2][metric_col]
+    alt_map = {'two_sided': 'two-sided', 'greater': 'greater', 'less': 'less'}
+    if hypothesis_type not in alt_map:
+        raise ValueError("hypothesis_type must be one of: 'two_sided', 'greater', 'less'")
+    scipy_alt = alt_map[hypothesis_type]
 
     result = {
         'test_family': test_family,
         'group_relationship': group_relationship,
+        'hypothesis_type': hypothesis_type,
         'group_labels': group_labels,
         'alpha': alpha,
         'summary': {}
@@ -96,7 +102,12 @@ def run_ab_test(
         p_pooled = (x1 + x2) / (n1 + n2)
         se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
         z_stat = (x2/n2 - x1/n1) / se
-        p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+        if hypothesis_type == 'two_sided':
+            p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+        elif hypothesis_type == 'greater':
+            p_value = 1 - stats.norm.cdf(z_stat)
+        else:
+            p_value = stats.norm.cdf(z_stat)
         result.update({'test': 'two-proportion z-test', 'z_stat': z_stat, 'p_value': p_value})
 
     # --- Continuous (T-Test) ---
@@ -108,7 +119,7 @@ def run_ab_test(
         if group_relationship == 'independent':
             # Welch for explicit welch_two_sample_t_test, classic pooled for two_sample_t_test
             equal_var = test_family == 'two_sample_t_test'
-            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=equal_var)
+            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=equal_var, alternative=scipy_alt)
             result.update(
                 {
                     'test': 'welch t-test' if not equal_var else 'independent t-test',
@@ -124,14 +135,14 @@ def run_ab_test(
                 result['pairing_warning'] = (
                     f"Unequal group sizes for paired test; aligned to first {min_n} observations per group."
                 )
-            t_stat, p_value = stats.ttest_rel(data1, data2)
+            t_stat, p_value = stats.ttest_rel(data1, data2, alternative=scipy_alt)
             result.update({'test': 'paired t-test', 't_stat': t_stat, 'p_value': p_value})
         else:
             raise ValueError("Missing or invalid group_relationship for t-test.")
 
     # --- Continuous (Non-parametric) ---
     elif test_family in ['mann_whitney_u_test']:
-        u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative='two-sided')
+        u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative=scipy_alt)
         result.update({'test': 'Mann-Whitney U Test', 'u_stat': u_stat, 'p_value': p_value})
     elif test_family == 'wilcoxon_signed_rank_test':
         if len(data1) != len(data2):
@@ -141,7 +152,7 @@ def run_ab_test(
             result['pairing_warning'] = (
                 f"Unequal group sizes for paired test; aligned to first {min_n} observations per group."
             )
-        w_stat, p_value = stats.wilcoxon(data1, data2)
+        w_stat, p_value = stats.wilcoxon(data1, data2, alternative=scipy_alt)
         result.update({'test': 'Wilcoxon signed-rank test', 'w_stat': w_stat, 'p_value': p_value})
 
     # --- Categorical (Chi-square) ---
@@ -190,6 +201,7 @@ def summarize_ab_test_result(result):
     """
     test_family = result['test_family']
     group_relationship = result.get('group_relationship')
+    hypothesis_type = result.get('hypothesis_type', 'two_sided')
     group1, group2 = result['group_labels']
     p_value = result.get('p_value')
     alpha = result.get('alpha', 0.05)
@@ -201,6 +213,7 @@ def summarize_ab_test_result(result):
     # ---- Hypothesis Test Output ----
     print("\n📊 Hypothesis Test Result")
     print(f"Test used: {result.get('test', 'N/A')}")
+    print(f"Hypothesis type: {hypothesis_type}")
     if 'z_stat' in result:
         print(f"Z-statistic: {result['z_stat']:.4f}")
     elif 't_stat' in result:

@@ -11,6 +11,7 @@ def run_outcome_similarity_test(
     metric_col,
     test_family,
     group_relationship=None,
+    hypothesis_type='two_sided',
     group_labels=('control', 'treatment'),
     alpha=0.05,
     verbose=True
@@ -40,6 +41,10 @@ def run_outcome_similarity_test(
 
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]
+    alt_map = {'two_sided': 'two-sided', 'greater': 'greater', 'less': 'less'}
+    if hypothesis_type not in alt_map:
+        raise ValueError("hypothesis_type must be one of: 'two_sided', 'greater', 'less'")
+    scipy_alt = alt_map[hypothesis_type]
 
     # --- Run appropriate test ---
     # --- Binary ---
@@ -52,13 +57,18 @@ def run_outcome_similarity_test(
         pooled_prob = (group1.sum() + group2.sum()) / (n1 + n2)
         se = np.sqrt(pooled_prob * (1 - pooled_prob) * (1/n1 + 1/n2))
         z_score = (conv2 - conv1) / se
-        p_value = 2 * (1 - stats.norm.cdf(abs(z_score)))
+        if hypothesis_type == "two_sided":
+            p_value = 2 * (1 - stats.norm.cdf(abs(z_score)))
+        elif hypothesis_type == "greater":
+            p_value = 1 - stats.norm.cdf(z_score)
+        else:
+            p_value = stats.norm.cdf(z_score)
         test_name = "z-test for proportions"
         stat_label, stat_value = "Z statistic", z_score
 
     # --- T-tests ---
     elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
-        t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=(test_family == "two_sample_t_test"))
+        t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=(test_family == "two_sample_t_test"), alternative=scipy_alt)
         test_name = "independent t-test" if test_family == "two_sample_t_test" else "welch t-test"
         stat_label, stat_value = "T statistic", t_stat
 
@@ -67,7 +77,7 @@ def run_outcome_similarity_test(
             if verbose:
                 print("❌ Paired t-test requires equal-length samples.")
             return None
-        t_stat, p_value = stats.ttest_rel(group1, group2)
+        t_stat, p_value = stats.ttest_rel(group1, group2, alternative=scipy_alt)
         test_name = "paired t-test"
         stat_label, stat_value = "T statistic", t_stat
 
@@ -75,7 +85,7 @@ def run_outcome_similarity_test(
     elif test_family in [
         "mann_whitney_u_test"
     ]:
-        u_stat, p_value = stats.mannwhitneyu(group1, group2, alternative='two-sided')
+        u_stat, p_value = stats.mannwhitneyu(group1, group2, alternative=scipy_alt)
         test_name = "Mann-Whitney U test"
         stat_label, stat_value = "U statistic", u_stat
 
@@ -99,6 +109,7 @@ def run_outcome_similarity_test(
     if verbose:
         print("Hypothesis Test Summary")
         print(f"- Test chosen          : {test_name}")
+        print(f"- Hypothesis type      : {hypothesis_type}")
 
         if test_family in ["one_proportion_z_test", "two_proportion_z_test"]:
             print(f"- H₀ (null)            : Conversion rates are equal between {group_labels[0]} and {group_labels[1]}.")
@@ -141,6 +152,7 @@ def run_aa_testing_generalized(
     group_labels,
     test_family,
     group_relationship=None,
+    hypothesis_type='two_sided',
     alpha=0.05,
     visualize=True
 ):
@@ -160,6 +172,7 @@ def run_aa_testing_generalized(
         metric_col=metric_col,
         test_family=test_family,
         group_relationship=group_relationship,
+        hypothesis_type=hypothesis_type,
         group_labels=group_labels,
         alpha=alpha
     )
@@ -211,6 +224,7 @@ def simulate_aa_type1_error_rate(
     group_labels,
     test_family,
     group_relationship=None,
+    hypothesis_type='two_sided',
     runs=100,
     alpha=0.05,
     seed=42,
@@ -235,6 +249,7 @@ def simulate_aa_type1_error_rate(
             metric_col=metric_col,
             test_family=test_family,
             group_relationship=group_relationship,
+            hypothesis_type=hypothesis_type,
             group_labels=group_labels,
             alpha=alpha,
             verbose=False

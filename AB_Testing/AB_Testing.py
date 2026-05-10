@@ -172,6 +172,9 @@ group_count = len(group_labels)
 # 4. Experimental design group_relationship: independent or paired
 group_relationship = 'independent'  # Options: 'independent', 'paired'
 
+# 4b. Hypothesis direction for applicable tests
+hypothesis_type = "two_sided"  # Options: "two_sided", "greater", "less"
+
 # Randomization method to assign users to groups
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
 randomization_method = "simple"
@@ -198,6 +201,7 @@ test_config = {
     'group_labels'           : group_labels,               # Tuple of (control, treatment) group names
     'group_count'            : group_count,                # Number of groups (usually 2 for A/B tests)
     'group_relationship'     : group_relationship,         # 'independent' or 'paired'
+    'hypothesis_type'        : hypothesis_type,            # 'two_sided', 'greater', or 'less'
 
     # Diagnostic results — filled after EDA/assumptions check
     'normality'              : None,  # Will be set based on Shapiro-Wilk or visual tests
@@ -1030,6 +1034,7 @@ _ = run_outcome_similarity_test(
     metric_col=test_config['outcome_metric_col'],
     test_family=test_config['family'],
     group_relationship=test_config.get('group_relationship'),
+    hypothesis_type=test_config.get('hypothesis_type', 'two_sided'),
     group_labels=test_config['group_labels'],
     alpha=0.05,
     verbose=True
@@ -1099,6 +1104,7 @@ _ = simulate_aa_type1_error_rate(
     group_labels=test_config['group_labels'],
     test_family=test_config['family'],
     group_relationship=test_config.get('group_relationship'),
+    hypothesis_type=test_config.get('hypothesis_type', 'two_sided'),
     runs=100,
     alpha=0.05
 )
@@ -1210,6 +1216,7 @@ result = run_ab_test(
     group_labels=test_config['group_labels'],
     test_family=test_config['family'],
     group_relationship=test_config.get('group_relationship'),
+    hypothesis_type=test_config.get('hypothesis_type', 'two_sided'),
     alpha=0.05
 )
 
@@ -1652,7 +1659,8 @@ result_cuped = run_ab_test(
     metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
     group_labels=test_config['group_labels'],
     test_family=test_config['family'],
-    group_relationship=test_config.get('group_relationship')
+    group_relationship=test_config.get('group_relationship'),
+    hypothesis_type=test_config.get('hypothesis_type', 'two_sided')
 )
 
 summarize_ab_test_result(result_cuped)

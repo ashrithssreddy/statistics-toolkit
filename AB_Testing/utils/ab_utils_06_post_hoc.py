@@ -129,6 +129,9 @@ def analyze_segment_lift(
     outcome_type = test_config['outcome_metric_datatype']
     group_relationship = test_config['group_relationship']
     test_family = test_config['family']
+    hypothesis_type = test_config.get('hypothesis_type', 'two_sided')
+    alt_map = {'two_sided': 'two-sided', 'greater': 'greater', 'less': 'less'}
+    scipy_alt = alt_map.get(hypothesis_type, 'two-sided')
 
     for segment in segment_cols:
         print(f"\n🔎 Segmenting by: {segment}")
@@ -156,10 +159,12 @@ def analyze_segment_lift(
 
             elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test']:
                 if group_relationship == 'independent':
-                    _, p_value = stats.ttest_ind(g1, g2)
+                    _, p_value = stats.ttest_ind(g1, g2, alternative=scipy_alt)
                 elif group_relationship == 'paired':
                     print(f"⚠️ Paired test not supported in segmented lift — skipped '{val}' under '{segment}'.")
                     lift, p_value = np.nan, None
+            elif test_family == 'mann_whitney_u_test':
+                _, p_value = stats.mannwhitneyu(g1, g2, alternative=scipy_alt)
 
             elif test_family == 'chi_square_test':
                 print(f"⚠️ Categorical data — lift not defined for '{val}' in '{segment}'.")
@@ -225,7 +230,9 @@ def evaluate_guardrail_metric(
     mean_treatment = treatment_vals.mean()
     diff = mean_treatment - mean_control
 
-    t_stat, p_val = ttest_ind(treatment_vals, control_vals)
+    alt_map = {'two_sided': 'two-sided', 'greater': 'greater', 'less': 'less'}
+    scipy_alt = alt_map.get(test_config.get('hypothesis_type', 'two_sided'), 'two-sided')
+    t_stat, p_val = ttest_ind(treatment_vals, control_vals, alternative=scipy_alt)
 
     print(f"🚦 Guardrail Metric Check → '{guardrail_metric_col}'")
     print("Hypothesis (two-sided t-test): H₀ — no difference in mean vs H₁ — means differ.")
