@@ -1179,8 +1179,28 @@ _ = simulate_aa_type1_error_rate(
 df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=True, seed=my_seed)
 df.head()
 
+# %% [markdown]
+# <a id="ab-assumption-refresh"></a>
+# <h4>🧪 Assumption Refresh</h4>
+#
+
 # %%
-# TODO: Use equal variance and experiment normality to determine if test needs to switch.
+test_config = test_normality(
+    df=df,
+    group_col=group_col,
+    test_config=test_config,
+    update_config=True
+)
+
+test_config = test_equal_variance(
+    df=df,
+    group_col=group_col,
+    test_config=test_config,
+    update_config=True
+)
+
+test_config['family'] = determine_test_family(test_config)
+print_config_summary(test_config)
 
 # %%
 result = run_ab_test(
@@ -1192,8 +1212,9 @@ result = run_ab_test(
     group_relationship=test_config.get('group_relationship'),
     alpha=0.05
 )
+
 print_config_summary(result)
-# result
+
 
 # %% [markdown]
 # <a id="summaries"></a>

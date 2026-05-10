@@ -50,10 +50,40 @@ def test_normality(
     return results
 
 
-def test_equal_variance(df, outcome_metric_col, group_col, group_labels):
+def test_equal_variance(
+    df,
+    outcome_metric_col=None,
+    group_col=None,
+    group_labels=None,
+    test_config=None,
+    update_config=False
+):
+    """
+    Run Levene's test for equal variance.
+
+    Modes:
+    - Raw mode: provide outcome_metric_col, group_col, group_labels -> returns test result dict
+    - Config mode: provide test_config (+df, group_col) and set update_config=True
+      -> updates and returns test_config with 'equal_variance' key
+    """
+    if test_config is not None:
+        if test_config.get("outcome_metric_datatype") != "continuous" or test_config.get("group_relationship") != "independent":
+            if update_config:
+                test_config["equal_variance"] = None
+                return test_config
+            return {"statistic": None, "p_value": None, "equal_variance": None}
+        outcome_metric_col = test_config["outcome_metric_col"]
+        group_labels = test_config["group_labels"]
+
     group_data = [df[df[group_col] == label][outcome_metric_col] for label in group_labels]
     stat, p = levene(*group_data)
-    return {'statistic': stat, 'p_value': p, 'equal_variance': p > 0.05}
+    result = {'statistic': stat, 'p_value': p, 'equal_variance': p > 0.05}
+
+    if update_config and test_config is not None:
+        test_config["equal_variance"] = result["equal_variance"]
+        return test_config
+
+    return result
 
 
 def determine_test_family(test_config):
