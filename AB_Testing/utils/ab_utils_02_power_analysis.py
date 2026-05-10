@@ -119,13 +119,13 @@ def compute_baseline_from_data(df, test_config, verbose=True):
     Compute baseline rate/mean and std_dev from the whole dataset for power analysis.
     No group splitting: uses full sample so baselines are pre-experiment / design inputs.
     Uses test_config['family'] and test_config['outcome_metric_datatype'] to decide logic.
-    Returns dict with keys: baseline_rate, baseline_mean, std_dev (None where not applicable).
+    Returns dict with keys: baseline_rate, baseline_mean, baseline_std_dev (None where not applicable).
     """
     metric_col = test_config['outcome_metric_col']
     family = test_config.get('family')
     data_type = test_config.get('outcome_metric_datatype')
 
-    result = {'baseline_rate': None, 'baseline_mean': None, 'std_dev': None}
+    result = {'baseline_rate': None, 'baseline_mean': None, 'baseline_std_dev': None}
 
     if family == 'z_test':
         result['baseline_rate'] = df[metric_col].mean()
@@ -136,12 +136,12 @@ def compute_baseline_from_data(df, test_config, verbose=True):
     if family in ['t_test', 'anova', 'non_parametric'] or data_type == 'continuous':
         col = df[metric_col].dropna()
         result['baseline_mean'] = col.mean()
-        result['std_dev'] = col.std()
-        if result['std_dev'] == 0 or np.isnan(result['std_dev']):
-            result['std_dev'] = 1.0
+        result['baseline_std_dev'] = col.std()
+        if result['baseline_std_dev'] == 0 or np.isnan(result['baseline_std_dev']):
+            result['baseline_std_dev'] = 1.0
         if verbose:
             print(f"📊 Baseline mean (historical): {result['baseline_mean']:.2f}")
-            print(f"📏 Baseline std dev (historical): {result['std_dev']:.2f}")
+            print(f"📏 Baseline std dev (historical): {result['baseline_std_dev']:.2f}")
         return result
 
     if verbose:

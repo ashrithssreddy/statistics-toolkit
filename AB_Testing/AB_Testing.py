@@ -261,21 +261,50 @@ historical_df
 #   <td>Minimum detectable effect — the smallest meaningful lift (e.g., +2% or +$5)</td>
 # </tr>
 # <tr>
-#   <td><strong>Std Dev</strong></td>
-#   <td>Standard deviation of the metric (for continuous outcomes)</td>
-# </tr>
-# <tr>
 #   <td><strong>Effect Size</strong></td>
 #   <td>Optional: Cohen's d (for t-tests) or f (for ANOVA)</td>
-# </tr>
-# <tr>
-#   <td><strong>Groups</strong></td>
-#   <td>Number of groups (relevant for ANOVA)</td>
 # </tr>
 # </tbody>
 # </table>
 #
-# <p>This notebook automatically selects the correct formula based on <code>experiment_type</code> variable.</p>
+#
+# </details>
+#
+
+# %% [markdown]
+# <details><summary><strong>📖 Click to Expand (Formula) </strong></summary>
+#
+# - **Binary, independent (2-proportion z-test):**
+# $$
+# n_{\text{per-group}} \approx
+# \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,[p_1(1-p_1)+p_2(1-p_2)]}{(p_2-p_1)^2}
+# $$
+#
+# - **Continuous, independent (2-sample t-test approximation):**
+# $$
+# n_{\text{per-group}} \approx
+# 2\left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
+# $$
+#
+# - **Continuous, paired (paired t-test approximation):**
+# $$
+# n_{\text{pairs}} \approx
+# \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma_d}{\Delta}\right)^2
+# $$
+#
+# - **Categorical / chi-square (Cohen's $w$):**
+# $$
+# N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{w^2}
+# $$
+#
+# - **Binary, paired (McNemar approximation):**
+# $$
+# n_{\text{pairs}} \approx
+# \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,(p_{01}+p_{10})}{(p_{10}-p_{01})^2}
+# $$
+#
+# **Sizing convention:**  
+# For formulas returning per-group size, total is $N_{\text{total}} = n \times \text{group\_count}$.
 #
 # </details>
 #
@@ -348,7 +377,7 @@ power = 0.80  # Statistical power (1 - Type II error)
 _b = compute_baseline_from_data(historical_df, test_config)
 test_config['baseline_rate'] = _b['baseline_rate']
 test_config['baseline_mean'] = _b['baseline_mean']
-test_config['std_dev'] = _b['std_dev']
+test_config['baseline_std_dev'] = _b['baseline_std_dev']
 
 
 # %% [markdown]
@@ -460,7 +489,7 @@ required_sample_size = calculate_power_sample_size(
     power=power,
     baseline_rate=test_config.get('baseline_rate'),
     mde=mde,
-    std_dev=test_config.get('std_dev'),
+    std_dev=test_config.get('baseline_std_dev'),
     effect_size=None,  # Let it compute internally via mde/std
     num_groups=2
 )
@@ -477,7 +506,7 @@ print_power_summary(
     power=power,
     baseline_rate=test_config.get('baseline_rate'),
     mde=mde,
-    std_dev=test_config.get('std_dev'),
+    std_dev=test_config.get('baseline_std_dev'),
     required_sample_size=required_sample_size
 )
 
