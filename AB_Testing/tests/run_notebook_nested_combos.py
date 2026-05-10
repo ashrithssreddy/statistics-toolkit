@@ -77,6 +77,24 @@ os.system("cls" if os.name == "nt" else "clear")
 for combo_row, combo in combo_space[
     (combo_space.index >= START_ROW) & (combo_space["run_combo"])
 ].iterrows():
+    for _var_name in [
+        "test_config",
+        "observations_count",
+        "df",
+        "historical_df",
+        "alpha",
+        "power",
+        "_b",
+        "mde",
+        "n_required",
+        "aa_result",
+        "result",
+        "result_cuped",
+        "out_path",
+        "report",
+    ]:
+        globals().pop(_var_name, None)
+
     outcome_metric_datatype = combo["outcome_metric_datatype"]
     group_relationship = combo["group_relationship"]
     hypothesis_type = combo["hypothesis_type"]
