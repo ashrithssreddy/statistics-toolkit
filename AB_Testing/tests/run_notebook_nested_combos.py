@@ -1,6 +1,6 @@
+from itertools import product
 from pathlib import Path
 import sys
-from itertools import product
 
 import pandas as pd
 
@@ -32,7 +32,6 @@ group_count = len(group_labels)
 outcome_metric_datatype_values = ["continuous", "binary", "categorical"]
 group_relationship_values = ["independent", "paired"]
 hypothesis_type_values = ["two_sided", "greater", "less"]
-# group_labels???
 randomization_method_values = ["simple", "stratified", "block", "matched_pair", "cluster"]
 historical_normality_values = ["normal", "non_normal"]
 pre_experiment_metric_col_values = ["past_purchase_revenue", None]
@@ -94,18 +93,18 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
     # Central Control Panel
     # ------------------------------------------------------------------
     test_config = {
-                                "outcome_metric_col": outcome_metric_col,
-                                "observation_id_col": observation_id_col,
-                                "pre_experiment_metric_col": pre_experiment_metric_col,
-                                "guardrail_metric_col": guardrail_metric_col,
-                                "outcome_metric_datatype": outcome_metric_datatype,
-                                "group_labels": group_labels,
-                                "group_count": group_count,
-                                "group_relationship": group_relationship,
-                                "hypothesis_type": hypothesis_type,
-                                "normality": None,
-                                "equal_variance": None,
-                                "family": None,
+        "outcome_metric_col": outcome_metric_col,
+        "observation_id_col": observation_id_col,
+        "pre_experiment_metric_col": pre_experiment_metric_col,
+        "guardrail_metric_col": guardrail_metric_col,
+        "outcome_metric_datatype": outcome_metric_datatype,
+        "group_labels": group_labels,
+        "group_count": group_count,
+        "group_relationship": group_relationship,
+        "hypothesis_type": hypothesis_type,
+        "normality": None,
+        "equal_variance": None,
+        "family": None,
     }
 
     # ------------------------------------------------------------------
@@ -113,18 +112,18 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
     # ------------------------------------------------------------------
     observations_count = 1000
     df = create_dummy_ab_data(
-                                observations_count,
-                                seed=my_seed,
-                                outcome_metric_col=outcome_metric_col,
-                                guardrail_metric_col=guardrail_metric_col,
+        observations_count,
+        seed=my_seed,
+        outcome_metric_col=outcome_metric_col,
+        guardrail_metric_col=guardrail_metric_col,
     )
 
     historical_df = create_historical_df(
-                                df,
-                                outcome_metric_col,
-                                guardrail_metric_col,
-                                seed=my_seed,
-                                historical_normality=historical_normality,
+        df,
+        outcome_metric_col,
+        guardrail_metric_col,
+        seed=my_seed,
+        historical_normality=historical_normality,
     )
 
     # ------------------------------------------------------------------
@@ -171,138 +170,114 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
     # Apply Randomization
     # ------------------------------------------------------------------
     if randomization_method == "simple":
-        df = apply_simple_randomization(
-                                    df,
-                                    group_col=group_col,
-                                    seed=my_seed,
-        )
+        df = apply_simple_randomization(df, group_col=group_col, seed=my_seed)
 
     elif randomization_method == "stratified":
         df = apply_stratified_randomization(
-                                    df,
-                                    stratify_col="platform",
-                                    group_col=group_col,
-                                    seed=my_seed,
+            df,
+            stratify_col="platform",
+            group_col=group_col,
+            seed=my_seed,
         )
 
     elif randomization_method == "block":
         df = apply_block_randomization(
-                                    df,
-                                    observation_id_col=observation_id_col,
-                                    group_col=group_col,
-                                    block_size=10,
-                                    seed=my_seed,
+            df,
+            observation_id_col=observation_id_col,
+            group_col=group_col,
+            block_size=10,
+            seed=my_seed,
         )
 
     elif randomization_method == "matched_pair":
         df = apply_matched_pair_randomization(
-                                    df,
-                                    sort_col=pre_experiment_metric_col,
-                                    group_col=group_col,
-                                    group_labels=test_config["group_labels"],
+            df,
+            sort_col=pre_experiment_metric_col,
+            group_col=group_col,
+            group_labels=test_config["group_labels"],
         )
 
     elif randomization_method == "cluster":
         df = apply_cluster_randomization(
-                                    df,
-                                    cluster_col="city",
-                                    group_col=group_col,
-                                    seed=my_seed,
+            df,
+            cluster_col="city",
+            group_col=group_col,
+            seed=my_seed,
         )
 
     else:
-        raise ValueError(
-                                    f"Unsupported randomization method: {randomization_method}"
-        )
+        raise ValueError(f"Unsupported randomization method: {randomization_method}")
 
     check_sample_ratio_mismatch(
-                                df,
-                                group_col=group_col,
-                                group_labels=test_config["group_labels"],
-                                expected_ratios=[0.5, 0.5],
+        df,
+        group_col=group_col,
+        group_labels=test_config["group_labels"],
+        expected_ratios=[0.5, 0.5],
     )
 
     # ------------------------------------------------------------------
     # AA Testing
     # ------------------------------------------------------------------
     df = add_outcome_metrics(
-                                df,
-                                group_col=group_col,
-                                group_labels=test_config["group_labels"],
-                                outcome_metric_col=test_config["outcome_metric_col"],
-                                guardrail_metric_col=test_config.get(
-                                    "guardrail_metric_col"
-                                )
-                                or guardrail_metric_col,
-                                treatment_effect=False,
-                                seed=my_seed,
+        df,
+        group_col=group_col,
+        group_labels=test_config["group_labels"],
+        outcome_metric_col=test_config["outcome_metric_col"],
+        guardrail_metric_col=test_config.get("guardrail_metric_col") or guardrail_metric_col,
+        treatment_effect=False,
+        seed=my_seed,
     )
 
     aa_result = run_outcome_similarity_test(
-                                df=df,
-                                group_col="group",
-                                metric_col=test_config["outcome_metric_col"],
-                                test_family=test_config["family"],
-                                group_relationship=test_config.get(
-                                    "group_relationship"
-                                ),
-                                hypothesis_type=test_config.get(
-                                    "hypothesis_type",
-                                    "two_sided",
-                                ),
-                                group_labels=test_config["group_labels"],
-                                alpha=0.05,
-                                verbose=False,
+        df=df,
+        group_col="group",
+        metric_col=test_config["outcome_metric_col"],
+        test_family=test_config["family"],
+        group_relationship=test_config.get("group_relationship"),
+        hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
+        group_labels=test_config["group_labels"],
+        alpha=0.05,
+        verbose=False,
     )
 
     # ------------------------------------------------------------------
     # AB Testing
     # ------------------------------------------------------------------
     df = add_outcome_metrics(
-                                df,
-                                group_col=group_col,
-                                group_labels=test_config["group_labels"],
-                                outcome_metric_col=test_config["outcome_metric_col"],
-                                guardrail_metric_col=test_config.get(
-                                    "guardrail_metric_col"
-                                )
-                                or guardrail_metric_col,
-                                treatment_effect=True,
-                                seed=my_seed,
+        df,
+        group_col=group_col,
+        group_labels=test_config["group_labels"],
+        outcome_metric_col=test_config["outcome_metric_col"],
+        guardrail_metric_col=test_config.get("guardrail_metric_col") or guardrail_metric_col,
+        treatment_effect=True,
+        seed=my_seed,
     )
 
     test_config = test_normality(
-                                df=df,
-                                group_col=group_col,
-                                test_config=test_config,
-                                update_config=True,
+        df=df,
+        group_col=group_col,
+        test_config=test_config,
+        update_config=True,
     )
 
     test_config = test_equal_variance(
-                                df=df,
-                                group_col=group_col,
-                                test_config=test_config,
-                                update_config=True,
+        df=df,
+        group_col=group_col,
+        test_config=test_config,
+        update_config=True,
     )
 
-    test_config["family"] = determine_test_family(
-                                test_config
-    )
+    test_config["family"] = determine_test_family(test_config)
 
     result = run_ab_test(
-                                df=df,
-                                group_col="group",
-                                metric_col=test_config["outcome_metric_col"],
-                                group_labels=test_config["group_labels"],
-                                test_family=test_config["family"],
-                                group_relationship=test_config.get(
-                                    "group_relationship"
-                                ),
-                                hypothesis_type=test_config.get(
-                                    "hypothesis_type",
-                                    "two_sided",
-                                ),
-                                alpha=0.05,
+        df=df,
+        group_col="group",
+        metric_col=test_config["outcome_metric_col"],
+        group_labels=test_config["group_labels"],
+        test_family=test_config["family"],
+        group_relationship=test_config.get("group_relationship"),
+        hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
+        alpha=0.05,
     )
 
     # ------------------------------------------------------------------
@@ -311,41 +286,39 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
     run_guardrail_analysis(df, test_config, group_col="group", alpha=0.05)
 
     df = apply_cuped(
-                                df=df,
-                                pre_metric="past_purchase_revenue",
-                                outcome_metric_col=test_config["outcome_metric_col"],
-                                group_col="group",
-                                group_labels=test_config["group_labels"],
+        df=df,
+        pre_metric="past_purchase_revenue",
+        outcome_metric_col=test_config["outcome_metric_col"],
+        group_col="group",
+        group_labels=test_config["group_labels"],
     )
 
     result_cuped = run_ab_test(
-                                df=df,
-                                group_col="group",
-                                metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
-                                group_labels=test_config["group_labels"],
-                                test_family=test_config["family"],
-                                group_relationship=test_config.get("group_relationship"),
-                                hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
+        df=df,
+        group_col="group",
+        metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
+        group_labels=test_config["group_labels"],
+        test_family=test_config["family"],
+        group_relationship=test_config.get("group_relationship"),
+        hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
     )
 
     rows.append(
-                                {
-                                    "combo_row": combo_row,
-                                    "outcome_metric_datatype": outcome_metric_datatype,
-                                    "group_relationship": group_relationship,
-                                    "hypothesis_type": hypothesis_type,
-                                    "randomization_method": randomization_method,
-                                    "historical_normality": historical_normality,
-                                    "pre_experiment_metric_col": pre_experiment_metric_col,
-                                    "guardrail_metric_col": guardrail_metric_col,
-                                    "family": test_config["family"],
-                                    "n_required": n_required,
-                                    "aa_p_value": aa_result.get("p_value")
-                                    if isinstance(aa_result, dict)
-                                    else None,
-                                    "ab_p_value": result.get("p_value"),
-                                    "cuped_p_value": result_cuped.get("p_value"),
-                                }
+        {
+            "combo_row": combo_row,
+            "outcome_metric_datatype": outcome_metric_datatype,
+            "group_relationship": group_relationship,
+            "hypothesis_type": hypothesis_type,
+            "randomization_method": randomization_method,
+            "historical_normality": historical_normality,
+            "pre_experiment_metric_col": pre_experiment_metric_col,
+            "guardrail_metric_col": guardrail_metric_col,
+            "family": test_config["family"],
+            "n_required": n_required,
+            "aa_p_value": aa_result.get("p_value") if isinstance(aa_result, dict) else None,
+            "ab_p_value": result.get("p_value"),
+            "cuped_p_value": result_cuped.get("p_value"),
+        }
     )
 
 
