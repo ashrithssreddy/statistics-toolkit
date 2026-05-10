@@ -89,6 +89,15 @@ def run_outcome_similarity_test(
         test_name = "Mann-Whitney U test"
         stat_label, stat_value = "U statistic", u_stat
 
+    elif test_family == "wilcoxon_signed_rank_test":
+        if len(group1) != len(group2):
+            if verbose:
+                print("❌ Wilcoxon signed-rank test requires equal-length samples.")
+            return None
+        w_stat, p_value = stats.wilcoxon(group1, group2, alternative=scipy_alt)
+        test_name = "Wilcoxon signed-rank test"
+        stat_label, stat_value = "W statistic", w_stat
+
     # --- ANOVA ---
     elif test_family in ["anova_test", "welch_anova_test"]:
         f_stat, p_value = stats.f_oneway(group1, group2)
@@ -157,6 +166,16 @@ def run_outcome_similarity_test(
             else:
                 print(f"- H₀ (null)            : Distributions of {metric_col} are identical across groups.")
                 print(f"- H₁ (alternative)     : Distributions of {metric_col} differ across groups.")
+        elif test_family == "wilcoxon_signed_rank_test":
+            if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Median paired difference in {metric_col} is less than or equal to 0.")
+                print(f"- H₁ (alternative)     : Median paired difference in {metric_col} is > 0.")
+            elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : Median paired difference in {metric_col} is greater than or equal to 0.")
+                print(f"- H₁ (alternative)     : Median paired difference in {metric_col} is < 0.")
+            else:
+                print(f"- H₀ (null)            : Median paired difference in {metric_col} is 0.")
+                print(f"- H₁ (alternative)     : Median paired difference in {metric_col} is not 0.")
 
         if stat_label is not None:
             print(f"- {stat_label:<20}: {stat_value:.4f}")
