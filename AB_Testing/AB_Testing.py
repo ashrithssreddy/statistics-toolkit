@@ -118,7 +118,23 @@ from utils.ab_utils_04_aa_testing import *
 from utils.ab_utils_05_ab_testing import *
 from utils.ab_utils_06_post_hoc import *
 import sys
-ROOT_DIR = Path(__file__).resolve().parents[1]
+
+def _resolve_project_root() -> Path:
+    # Script context
+    if "__file__" in globals():
+        return Path(__file__).resolve().parents[1]
+
+    # Notebook/interactive context:
+    # prefer cwd if it contains project folders, otherwise cwd.parent.
+    cwd = Path.cwd().resolve()
+    if (cwd / "Hypothesis_Testing").exists():
+        return cwd
+    if (cwd / "AB_Testing").exists():
+        return cwd
+    return cwd.parent
+
+
+ROOT_DIR = _resolve_project_root()
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 from Hypothesis_Testing.ht_utils import print_config_summary
