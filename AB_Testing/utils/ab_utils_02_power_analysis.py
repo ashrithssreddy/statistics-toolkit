@@ -185,7 +185,8 @@ def calculate_power_sample_size(
     mde=None,
     std_dev=None,
     effect_size=None,
-    num_groups=2
+    num_groups=2,
+    verbose=True
 ):
     """
     Calculate required sample size per group based on test type and assumptions.
@@ -218,9 +219,17 @@ def calculate_power_sample_size(
 
         pooled_std = np.sqrt(2 * p1 * (1 - p1))
 
-        n = ((z_alpha + z_beta) ** 2 * pooled_std ** 2) / (mde ** 2)
-
-        return int(np.ceil(n))
+        n = int(np.ceil(((z_alpha + z_beta) ** 2 * pooled_std ** 2) / (mde ** 2)))
+        if verbose:
+            print("📈 Power Analysis Summary")
+            print(f"- Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}")
+            print(f"- Significance level (α): {alpha}")
+            print(f"- Statistical power (1 - β): {power}")
+            print(f"- Baseline conversion rate: {baseline_rate:.2%}")
+            print(f"- MDE: {mde:.2%}")
+            print(f"\n✅ To detect a lift from {baseline_rate:.2%} to {(baseline_rate + mde):.2%},")
+            print(f"you need {n} users per group → total {n * num_groups} users.")
+        return n
 
 
     # -------------------------
@@ -251,73 +260,27 @@ def calculate_power_sample_size(
             analysis = TTestIndPower()
 
 
-        n = analysis.solve_power(
+        n = int(np.ceil(analysis.solve_power(
             effect_size=effect_size,
             power=power,
             alpha=alpha
-        )
-
-        return int(np.ceil(n))
+        )))
+        if verbose:
+            print("📈 Power Analysis Summary")
+            print(f"- Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}")
+            print(f"- Significance level (α): {alpha}")
+            print(f"- Statistical power (1 - β): {power}")
+            if std_dev is not None:
+                print(f"- Std Dev (baseline): {std_dev:.2f}")
+            if mde is not None:
+                print(f"- MDE (mean difference): {mde}")
+            if effect_size is not None:
+                print(f"- Cohen's d: {effect_size:.2f}")
+            print(f"\n✅ To detect a {mde}-unit lift in mean outcome,")
+            print(f"you need {n} users per group → total {n * num_groups} users.")
+        return n
 
 
     else:
         raise ValueError(f"Unsupported test: {test_family}")
-
-
-def print_power_summary(
-    test_family,
-    group_relationship,
-    alpha,
-    power,
-    baseline_rate=None,
-    mde=None,
-    std_dev=None,
-    required_sample_size=None
-):
-
-    print("📈 Power Analysis Summary")
-    print(f"- Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}")
-    print(f"- Significance level (α): {alpha}")
-    print(f"- Statistical power (1 - β): {power}")
-
-    binary_tests = [
-        "z_test",
-        "two_proportion_z_test",
-        "chi_square_test"
-    ]
-
-    continuous_tests = [
-        "t_test",
-        "two_sample_t_test",
-        "welch_t_test",
-        "paired_t_test",
-        "mann_whitney_u_test",
-        "wilcoxon_signed_rank_test",
-        "anova",
-        "welch_anova",
-        "kruskal_wallis_test"
-    ]
-
-    if test_family in binary_tests:
-
-        print(f"- Baseline conversion rate: {baseline_rate:.2%}")
-        print(f"- MDE: {mde:.2%}")
-
-        print(f"\n✅ To detect a lift from {baseline_rate:.2%} to {(baseline_rate + mde):.2%},")
-        print(f"you need {required_sample_size} users per group → total {required_sample_size * 2} users.")
-
-    elif test_family in continuous_tests:
-
-        print(f"- Std Dev (baseline): {std_dev:.2f}")
-        print(f"- MDE (mean difference): {mde}")
-        print(f"- Cohen's d: {mde / std_dev:.2f}")
-
-        print(f"\n✅ To detect a {mde}-unit lift in mean outcome,")
-        print(f"you need {required_sample_size} users per group → total {required_sample_size * 2} users.")
-
-    else:
-
-        print("\n⚠️ Summary not specialized for this test.")
-        print(f"Required sample size per group: {required_sample_size}")
-        print(f"Total sample size: {required_sample_size * 2}")
 
