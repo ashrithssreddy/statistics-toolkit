@@ -22,7 +22,7 @@ def run_outcome_similarity_test(
     - df: pandas DataFrame
     - group_col: column with group assignment
     - metric_col: outcome metric
-    - test_family: one of ['z_test', 't_test', 'chi_square', 'anova', 'non_parametric']
+    - test_family: canonical test name (e.g., 'two_proportion_z_test', 'two_sample_t_test', 'chi_square_test')
     - group_relationship: 'independent' or 'paired' (required for t-test)
     - group_labels: tuple of (control, treatment)
     - alpha: significance threshold
@@ -41,7 +41,7 @@ def run_outcome_similarity_test(
 
     # --- Run appropriate test ---
     # --- Binary ---
-    if test_family in ["z_test", "two_proportion_z_test"]:
+    if test_family in ["two_proportion_z_test", "one_proportion_z_test"]:
         conv1, conv2 = group1.mean(), group2.mean()
         n1, n2 = len(group1), len(group2)
         pooled_prob = (group1.sum() + group2.sum()) / (n1 + n2)
@@ -51,9 +51,9 @@ def run_outcome_similarity_test(
         test_name = "z-test for proportions"
 
     # --- T-tests ---
-    elif test_family in ["t_test", "two_sample_t_test", "welch_t_test"]:
-        t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=False)
-        test_name = "independent t-test"
+    elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
+        t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=(test_family == "two_sample_t_test"))
+        test_name = "independent t-test" if test_family == "two_sample_t_test" else "welch t-test"
 
     elif test_family == "paired_t_test":
         if len(group1) != len(group2):
@@ -65,19 +65,18 @@ def run_outcome_similarity_test(
 
     # --- Non-parametric ---
     elif test_family in [
-        "non_parametric",
         "mann_whitney_u_test"
     ]:
         u_stat, p_value = stats.mannwhitneyu(group1, group2, alternative='two-sided')
         test_name = "Mann-Whitney U test"
 
     # --- ANOVA ---
-    elif test_family in ["anova", "welch_anova"]:
+    elif test_family in ["anova_test", "welch_anova_test"]:
         f_stat, p_value = stats.f_oneway(group1, group2)
         test_name = "ANOVA"
 
     # --- Chi-square ---
-    elif test_family in ["chi_square", "chi_square_test"]:
+    elif test_family in ["chi_square_test"]:
         contingency = pd.crosstab(df[group_col], df[metric_col])
         chi2_stat, p_value, _, _ = stats.chi2_contingency(contingency)
         test_name = "chi-square test"
@@ -89,11 +88,11 @@ def run_outcome_similarity_test(
     if verbose:
         print("\n🧠 Interpretation:")
 
-        if test_family in ["z_test", "two_proportion_z_test"]:
+        if test_family in ["one_proportion_z_test", "two_proportion_z_test"]:
             print(f"Used a {test_name} to compare conversion rates between groups.")
             print("Null Hypothesis: Conversion rates are equal across groups.")
 
-        elif test_family in ["t_test", "two_sample_t_test", "welch_t_test"]:
+        elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
             print(f"Used an {test_name} to compare means of '{metric_col}' across independent groups.")
             print("Null Hypothesis: Group means are equal.")
 
@@ -101,15 +100,15 @@ def run_outcome_similarity_test(
             print(f"Used a {test_name} to compare within-user differences in '{metric_col}'.")
             print("Null Hypothesis: Mean difference between pairs is zero.")
 
-        elif test_family in ["chi_square", "chi_square_test"]:
+        elif test_family in ["chi_square_test"]:
             print(f"Used a {test_name} to test whether '{metric_col}' distribution depends on group.")
             print("Null Hypothesis: No association between group and category.")
 
-        elif test_family in ["anova", "welch_anova"]:
+        elif test_family in ["anova_test", "welch_anova_test"]:
             print(f"Used a {test_name} to compare group means of '{metric_col}' across groups.")
             print("Null Hypothesis: All group means are equal.")
 
-        elif test_family in ["non_parametric", "mann_whitney_u_test"]:
+        elif test_family in ["mann_whitney_u_test"]:
             print(f"Used a {test_name} to compare medians of '{metric_col}' across groups (non-parametric).")
             print("Null Hypothesis: Distributions are identical across groups.")
 
@@ -162,7 +161,7 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
     group2 = df[df[group_col] == group_labels[1]][metric_col]
 
     # Continuous / non-parametric → histograms
-    if test_family in ['t_test', 'two_sample_t_test', 'welch_t_test', 'paired_t_test', 'anova', 'welch_anova', 'non_parametric', 'mann_whitney_u_test']:
+    if test_family in ['one_sample_t_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'anova_test', 'welch_anova_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test', 'kruskal_wallis_test']:
         plt.hist(group1, bins=30, alpha=0.5, label=group_labels[0])
         plt.hist(group2, bins=30, alpha=0.5, label=group_labels[1])
         plt.title(f"A/A Test: {metric_col} Distribution")
@@ -171,7 +170,7 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
         plt.legend()
         plt.show()
 
-    elif test_family in ['z_test', 'two_proportion_z_test']:
+    elif test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
         rates = [group1.mean(), group2.mean()]
         plt.bar(group_labels, rates)
         for i, rate in enumerate(rates):
@@ -182,7 +181,7 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
         plt.grid(axis='y', linestyle='--', alpha=0.7)
         plt.show()
 
-    elif test_family in ['chi_square', 'chi_square_test']:
+    elif test_family in ['chi_square_test']:
         contingency = pd.crosstab(df[group_col], df[metric_col], normalize='index')
         contingency.plot(kind='bar', stacked=True)
         plt.title(f"A/A Test: {metric_col} Distribution by Group")

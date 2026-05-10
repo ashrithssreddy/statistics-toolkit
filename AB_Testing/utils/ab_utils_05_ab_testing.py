@@ -56,6 +56,7 @@ def run_ab_test(
     Returns:
     - result dict with summary stats, test used, p-value, and test-specific values
     """
+    test_family = test_family
     group1, group2 = group_labels
     data1 = df[df[group_col] == group1][metric_col]
     data2 = df[df[group_col] == group2][metric_col]
@@ -78,18 +79,18 @@ def run_ab_test(
     result['summary'][group1] = {
         'n': len(data1),
         'mean': _safe_mean(data1),
-        'std': _safe_std(data1) if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
-        'sum': data1.sum() if test_family == 'z_test' else None
+        'std': _safe_std(data1) if test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test'] else None,
+        'sum': data1.sum() if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else None
     }
     result['summary'][group2] = {
         'n': len(data2),
         'mean': _safe_mean(data2),
-        'std': _safe_std(data2) if test_family in ['t_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] else None,
-        'sum': data2.sum() if test_family == 'z_test' else None
+        'std': _safe_std(data2) if test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test'] else None,
+        'sum': data2.sum() if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else None
     }
 
     # --- Binary Proportions (Z-Test) ---
-    if test_family in ['z_test', 'two_proportion_z_test']:
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
         x1, n1 = data1.sum(), len(data1)
         x2, n2 = data2.sum(), len(data2)
         p_pooled = (x1 + x2) / (n1 + n2)
@@ -99,14 +100,14 @@ def run_ab_test(
         result.update({'test': 'two-proportion z-test', 'z_stat': z_stat, 'p_value': p_value})
 
     # --- Continuous (T-Test) ---
-    elif test_family in ['t_test', 'two_sample_t_test', 'welch_t_test', 'paired_t_test']:
+    elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test']:
         if test_family == 'paired_t_test':
             group_relationship = 'paired'
             result['group_relationship'] = 'paired'
 
         if group_relationship == 'independent':
-            # Welch for explicit welch_t_test, classic pooled for two_sample_t_test/t_test
-            equal_var = test_family in ['t_test', 'two_sample_t_test']
+            # Welch for explicit welch_two_sample_t_test, classic pooled for two_sample_t_test
+            equal_var = test_family == 'two_sample_t_test'
             t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=equal_var)
             result.update(
                 {
@@ -129,7 +130,7 @@ def run_ab_test(
             raise ValueError("Missing or invalid group_relationship for t-test.")
 
     # --- Continuous (Non-parametric) ---
-    elif test_family in ['non_parametric', 'mann_whitney_u_test']:
+    elif test_family in ['mann_whitney_u_test']:
         u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative='two-sided')
         result.update({'test': 'Mann-Whitney U Test', 'u_stat': u_stat, 'p_value': p_value})
     elif test_family == 'wilcoxon_signed_rank_test':
@@ -144,7 +145,7 @@ def run_ab_test(
         result.update({'test': 'Wilcoxon signed-rank test', 'w_stat': w_stat, 'p_value': p_value})
 
     # --- Categorical (Chi-square) ---
-    elif test_family in ['chi_square', 'chi_square_test']:
+    elif test_family in ['chi_square_test']:
         contingency = pd.crosstab(df[group_col], df[metric_col])
         chi2, p_value, _, _ = stats.chi2_contingency(contingency)
         result.update({'test': 'chi-square test', 'chi2_stat': chi2, 'p_value': p_value})
@@ -222,7 +223,7 @@ def summarize_ab_test_result(result):
     display(pd.DataFrame(result['summary']).T)
 
     # ---- Lift Analysis (for Z-test, T-test independent, or non-parametric / Mann-Whitney) ----
-    if test_family in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] and (group_relationship == 'independent' or test_family in ['z_test', 'non_parametric', 'mann_whitney_u_test']):
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test'] and (group_relationship == 'independent' or test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'mann_whitney_u_test']):
         group1_mean = result['summary'][group1]['mean']
         group2_mean = result['summary'][group2]['mean']
         lift = group2_mean - group1_mean
@@ -236,7 +237,7 @@ def summarize_ab_test_result(result):
             n1 = result['summary'][group1]['n']
             n2 = result['summary'][group2]['n']
 
-            if test_family == 'z_test':
+            if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
                 se = np.sqrt(group1_mean * (1 - group1_mean) / n1 + group2_mean * (1 - group2_mean) / n2)
             else:
                 sd1 = result['summary'][group1].get('std')
@@ -263,23 +264,23 @@ def plot_ab_test_results(result):
 
     print("\n📊 Visualization:")
 
-    if test_family in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test', 'mcnemar_test']:
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test', 'mcnemar_test']:
         labels = [group1, group2]
         values = [result['summary'][group1]['mean'], result['summary'][group2]['mean']]
         plt.bar(labels, values, color=['gray', 'skyblue'])
 
         for i, val in enumerate(values):
-            label = f"{val:.2%}" if test_family == 'z_test' else f"{val:.2f}"
+            label = f"{val:.2%}" if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else f"{val:.2f}"
             plt.text(i, val + 0.01, label, ha='center')
 
-        ylabel = "Conversion Rate" if test_family == 'z_test' else "Average Value"
+        ylabel = "Conversion Rate" if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else "Average Value"
         plt.ylabel(ylabel)
         plt.title(f"{ylabel} by Group")
         plt.ylim(0, max(values) * 1.2)
         plt.grid(axis='y', linestyle='--', alpha=0.6)
         plt.show()
 
-    elif test_family == 'chi_square':
+    elif test_family == 'chi_square_test':
         dist = pd.DataFrame(result['summary'])
         dist.T.plot(kind='bar', stacked=True)
         plt.title(f"Categorical Distribution by Group")
@@ -298,22 +299,22 @@ def plot_confidence_intervals(result, z=1.96):
     group1, group2 = result['group_labels']
     summary = result['summary']
 
-    if test_family not in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test']:
+    if test_family not in ['one_proportion_z_test', 'two_proportion_z_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test']:
         print(f"⚠️ CI plotting not supported for test family: {test_family}")
         return
-    if test_family in ['t_test', 'paired_t_test'] and group_relationship != 'independent':
+    if test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship != 'independent':
         print(f"⚠️ CI plotting only supported for independent t-tests.")
         return
 
     p1, p2 = summary[group1]['mean'], summary[group2]['mean']
     n1, n2 = summary[group1]['n'], summary[group2]['n']
 
-    if test_family == 'z_test':
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
         se1 = np.sqrt(p1 * (1 - p1) / n1)
         se2 = np.sqrt(p2 * (1 - p2) / n2)
         ylabel = "Conversion Rate"
     else:
-        # t_test (independent), non_parametric, mann_whitney_u_test: CI for mean
+        # two-sample t / Mann-Whitney: CI for mean
         sd1 = summary[group1]['std']
         sd2 = summary[group2]['std']
         se1 = sd1 / np.sqrt(n1)
@@ -347,14 +348,14 @@ def compute_lift_confidence_interval(result):
     print(f"📈 95% CI for Difference in Outcome [{test_family}]")
     print("="*45)
 
-    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and group_relationship == 'independent'):
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] or (test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'independent'):
         m1 = result['summary'][group1]['mean']
         m2 = result['summary'][group2]['mean']
         lift = m2 - m1
         n1 = result['summary'][group1]['n']
         n2 = result['summary'][group2]['n']
 
-        if test_family == 'z_test':
+        if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
             se = np.sqrt(m1 * (1 - m1) / n1 + m2 * (1 - m2) / n2)
         else:
             sd1 = result['summary'][group1]['std']
@@ -374,7 +375,7 @@ def compute_lift_confidence_interval(result):
         else:
             print("🤷 CI includes 0 — not statistically significant.")
 
-    elif test_family in ['non_parametric', 'mann_whitney_u_test']:
+    elif test_family == 'mann_whitney_u_test':
         m1 = result['summary'][group1]['mean']
         m2 = result['summary'][group2]['mean']
         lift = m2 - m1
@@ -397,13 +398,13 @@ def compute_lift_confidence_interval(result):
         else:
             print("- Mann-Whitney U: CI for difference in means (summary std used).")
 
-    elif test_family in ['t_test', 'paired_t_test'] and group_relationship == 'paired':
+    elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'paired':
         print("- Paired test: CI already accounted for in test logic.")
 
     elif test_family == 'mcnemar_test':
         print("- McNemar test: CI for paired binary shift is not implemented.")
 
-    elif test_family == 'chi_square':
+    elif test_family == 'chi_square_test':
         print("- Categorical test: per-category lift analysis required (not implemented).")
 
     print("="*45 + "\n")
@@ -423,13 +424,13 @@ def print_final_ab_test_summary(result):
     print("          📊 FINAL A/B TEST SUMMARY")
     print("="*40)
 
-    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and group_relationship == 'independent'):
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] or (test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'independent'):
         mean1 = result['summary'][group1]['mean']
         mean2 = result['summary'][group2]['mean']
         lift = mean2 - mean1
         pct_lift = lift / mean1 if mean1 else np.nan
 
-        label = "Conversion rate" if test_family == 'z_test' else "Avg outcome"
+        label = "Conversion rate" if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else "Avg outcome"
         test_name = result.get("test", "A/B test")
 
         print(f"👥  {group1.capitalize()} {label:<20}:  {mean1:.4f}")
@@ -438,7 +439,7 @@ def print_final_ab_test_summary(result):
         print(f"📊  Percentage lift            :  {pct_lift:.2%}")
         print(f"🧪  P-value (from {test_name}) :  {p_value:.4f}")
 
-    elif test_family in ['non_parametric', 'mann_whitney_u_test']:
+    elif test_family == 'mann_whitney_u_test':
         mean1 = result['summary'][group1]['mean']
         mean2 = result['summary'][group2]['mean']
         lift = mean2 - mean1
@@ -450,7 +451,7 @@ def print_final_ab_test_summary(result):
         print(f"📊  Percentage lift            :  {pct_lift:.2%}")
         print(f"🧪  P-value (from {test_name}):  {p_value:.4f}")
 
-    elif test_family in ['t_test', 'paired_t_test'] and group_relationship == 'paired':
+    elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'paired':
         print("🧪 Paired T-Test was used to compare within-user outcomes.")
         print(f"🧪 P-value: {p_value:.4f}")
 
@@ -460,7 +461,7 @@ def print_final_ab_test_summary(result):
             print(f"👥 Paired observations analyzed: {result['paired_n']}")
         print(f"🧪 P-value: {p_value:.4f}")
 
-    elif test_family == 'chi_square':
+    elif test_family == 'chi_square_test':
         print("🧪 Chi-square test was used to compare categorical distributions.")
         print(f"🧪 P-value: {p_value:.4f}")
 

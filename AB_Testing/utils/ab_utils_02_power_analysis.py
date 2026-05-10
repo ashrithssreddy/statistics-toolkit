@@ -81,9 +81,9 @@ def determine_test_family(test_config):
             return "mcnemar_test"
 
         if group_count == 2:
-            return "z_test"
+            return "two_proportion_z_test"
 
-        return "chi_square"
+        return "chi_square_test"
 
 
     # -------------------------
@@ -103,17 +103,17 @@ def determine_test_family(test_config):
             if group_count == 2:
 
                 if normality:
-                    return "t_test"
+                    return "two_sample_t_test"
 
                 else:
-                    return "non_parametric"
+                    return "mann_whitney_u_test"
 
             else:  # 3+ groups
 
                 if normality:
-                    return "anova"
+                    return "anova_test"
                 else:
-                    return "non_parametric"
+                    return "kruskal_wallis_test"
 
 
     # -------------------------
@@ -121,7 +121,7 @@ def determine_test_family(test_config):
     # -------------------------
     elif data_type == "categorical":
 
-        return "chi_square"
+        return "chi_square_test"
 
 
     # -------------------------
@@ -154,13 +154,13 @@ def compute_baseline_from_data(df, test_config, verbose=True):
 
     result = {'baseline_rate': None, 'baseline_mean': None, 'baseline_std_dev': None}
 
-    if family == 'z_test':
+    if family in ['one_proportion_z_test', 'two_proportion_z_test']:
         result['baseline_rate'] = df[metric_col].mean()
         if verbose:
             print(f"📊 Baseline conversion rate (full sample): {result['baseline_rate']:.2%}")
         return result
 
-    if family in ['t_test', 'anova', 'non_parametric'] or data_type == 'continuous':
+    if family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'anova_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test', 'kruskal_wallis_test'] or data_type == 'continuous':
         col = df[metric_col].dropna()
         result['baseline_mean'] = col.mean()
         result['baseline_std_dev'] = col.std()
@@ -192,21 +192,26 @@ def calculate_power_sample_size(
     Calculate required sample size per group based on test type and assumptions.
 
     Supported families:
-    - 'z_test'              : Binary outcomes (proportions)
-    - 't_test'              : Continuous outcomes (independent or paired)
-    - 'non_parametric'      : Mann-Whitney (approximated as t-test)
-    - 'anova'               : Not implemented (default to t-test)
-    - 'chi_square'          : Categorical outcomes (not used in this version)
+    - 'one_proportion_z_test'
+    - 'two_proportion_z_test'
+    - 'two_sample_t_test'
+    - 'welch_two_sample_t_test'
+    - 'paired_t_test'
+    - 'mann_whitney_u_test'
+    - 'wilcoxon_signed_rank_test'
+    - 'anova_test'
+    - 'welch_anova_test'
+    - 'kruskal_wallis_test'
+    - 'chi_square_test'
     """
 
     # -------------------------
     # Binary tests
     # -------------------------
     if test_family in [
+        "one_proportion_z_test",
         "two_proportion_z_test",
-        "z_test",
-        "chi_square_test",
-        "chi_square"
+        "chi_square_test"
     ]:
 
         if baseline_rate is None or mde is None:
@@ -237,14 +242,14 @@ def calculate_power_sample_size(
     # Continuous tests
     # -------------------------
     elif test_family in [
-        "t_test",
+        "one_sample_t_test",
         "two_sample_t_test",
-        "welch_t_test",
+        "welch_two_sample_t_test",
         "paired_t_test",
-        "non_parametric",
         "mann_whitney_u_test",
         "wilcoxon_signed_rank_test",
-        "anova",
+        "anova_test",
+        "welch_anova_test",
         "kruskal_wallis_test"
     ]:
 

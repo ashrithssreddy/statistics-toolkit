@@ -146,7 +146,7 @@ def analyze_segment_lift(
             lift = g2.mean() - g1.mean()
             p_value = None
 
-            if test_family == 'z_test':
+            if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
                 # Binary: z-test on proportions
                 p1, n1 = g1.mean(), len(g1)
                 p2, n2 = g2.mean(), len(g2)
@@ -154,14 +154,14 @@ def analyze_segment_lift(
                 se = np.sqrt(pooled_p * (1 - pooled_p) * (1/n1 + 1/n2))
                 p_value = 2 * (1 - stats.norm.cdf(abs((p2 - p1) / se)))
 
-            elif test_family == 't_test':
+            elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test']:
                 if group_relationship == 'independent':
                     _, p_value = stats.ttest_ind(g1, g2)
                 elif group_relationship == 'paired':
                     print(f"⚠️ Paired test not supported in segmented lift — skipped '{val}' under '{segment}'.")
                     lift, p_value = np.nan, None
 
-            elif test_family == 'chi_square':
+            elif test_family == 'chi_square_test':
                 print(f"⚠️ Categorical data — lift not defined for '{val}' in '{segment}'.")
                 lift, p_value = np.nan, None
 
