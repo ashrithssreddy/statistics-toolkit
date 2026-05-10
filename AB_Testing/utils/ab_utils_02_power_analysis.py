@@ -6,12 +6,47 @@ from scipy.stats import shapiro, levene
 from statsmodels.stats.power import TTestIndPower, TTestPower
 
 
-def test_normality(df, outcome_metric_col, group_col, group_labels):
-    results = {}
-    for group in group_labels:
-        group_data = df[df[group_col] == group][outcome_metric_col]
-        stat, p = shapiro(group_data)
-        results[group] = {'statistic': stat, 'p_value': p, 'normal': p > 0.05}
+def test_normality(
+    df,
+    outcome_metric_col=None,
+    group_col=None,
+    group_labels=None,
+    test_config=None,
+    update_config=False
+):
+    """
+    Run Shapiro normality test by group.
+
+    Modes:
+    - Raw mode: provide outcome_metric_col, group_col, group_labels -> returns per-group normality dict
+    - Config mode: provide test_config + group_col (+df) and set update_config=True
+      -> updates and returns test_config with 'normality' key
+    """
+    if test_config is not None:
+        if test_config.get("outcome_metric_datatype") != "continuous":
+            if update_config:
+                test_config["normality"] = None
+                return test_config
+            return {}
+        outcome_metric_col = test_config["outcome_metric_col"]
+        group_labels = test_config["group_labels"]
+
+    # Historical/pre-experiment data may not have group assignment yet.
+    if group_col is None or group_col not in df.columns or group_labels is None:
+        series = df[outcome_metric_col].dropna()
+        stat, p = shapiro(series)
+        results = {"overall": {"statistic": stat, "p_value": p, "normal": p > 0.05}}
+    else:
+        results = {}
+        for group in group_labels:
+            group_data = df[df[group_col] == group][outcome_metric_col].dropna()
+            stat, p = shapiro(group_data)
+            results[group] = {'statistic': stat, 'p_value': p, 'normal': p > 0.05}
+
+    if update_config and test_config is not None:
+        test_config["normality"] = all(v["normal"] for v in results.values())
+        return test_config
+
     return results
 
 
@@ -30,14 +65,12 @@ def determine_test_family(test_config):
     - group_count: number of variants
     - group_relationship: independent or paired
     - normality: whether normality assumption holds
-    - equal_variance: whether group variances are assumed equal
     """
 
     data_type = test_config.get("outcome_metric_datatype")
     group_count = test_config.get("group_count")
     group_relationship = test_config.get("group_relationship", "independent")
     normality = test_config.get("normality", True)
-    equal_variance = test_config.get("equal_variance", True)
 
     # -------------------------
     # BINARY METRICS
@@ -70,10 +103,7 @@ def determine_test_family(test_config):
             if group_count == 2:
 
                 if normality:
-                    if equal_variance:
-                        return "two_sample_t_test"
-                    else:
-                        return "welch_t_test"
+                    return "two_sample_t_test"
 
                 else:
                     return "mann_whitney_u_test"
@@ -81,10 +111,7 @@ def determine_test_family(test_config):
             else:  # 3+ groups
 
                 if normality:
-                    if equal_variance:
-                        return "anova"
-                    else:
-                        return "welch_anova"
+                    return "anova"
                 else:
                     return "kruskal_wallis_test"
 

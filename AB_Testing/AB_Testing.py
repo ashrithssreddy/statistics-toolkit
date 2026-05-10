@@ -580,9 +580,15 @@ mde = 5  # Change this based on business relevance
 #
 
 # %%
-# TODO: Is normality and variance equality check needed before determining the test family?
+# Update normality in config (using historical/pre-experiment data)
+test_config = test_normality(df=historical_df, group_col=group_col, test_config=test_config, update_config=True)
+print_config_summary(test_config)
+
+# %%
+# Determine test family using normality key
 test_config['family'] = determine_test_family(test_config)
 print_config_summary(test_config)
+
 
 # %% [markdown]
 # <a id="required-sample-size"></a>
