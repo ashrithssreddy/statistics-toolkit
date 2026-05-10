@@ -58,7 +58,8 @@ def create_historical_df(
     guardrail_metric_col=None,
     seed=my_seed,
     historical_normality="normal",
-    non_normal_distribution="random"
+    non_normal_distribution="random",
+    outcome_metric_datatype="continuous",
 ):
     """
     Create a historical view of the population: same columns as df, but outcome and guardrail
@@ -71,7 +72,11 @@ def create_historical_df(
     rng = np.random.default_rng(seed)
 
     if outcome_metric_col and outcome_metric_col in hist.columns:
-        if historical_normality == "normal":
+        if outcome_metric_datatype == "binary":
+            hist[outcome_metric_col] = rng.binomial(n=1, p=0.12, size=n)
+        elif outcome_metric_datatype == "categorical":
+            hist[outcome_metric_col] = rng.choice(["low", "mid", "high"], size=n, p=[0.33, 0.34, 0.33])
+        elif historical_normality == "normal":
             hist[outcome_metric_col] = rng.normal(50, 15, n).clip(0, 100)
         elif historical_normality == "non_normal":
             # Right-skewed historical behavior (common in spend/time metrics).
@@ -91,14 +96,25 @@ def create_historical_df(
                 raise ValueError("non_normal_distribution must be 'random', 'lognormal', 'gamma', or 'weibull'")
 
             hist[outcome_metric_col] = np.asarray(vals).clip(0, 100)
-        else:
+        elif outcome_metric_datatype == "continuous":
             raise ValueError("historical_normality must be 'normal' or 'non_normal'")
+        else:
+            raise ValueError("outcome_metric_datatype must be 'continuous', 'binary', or 'categorical'")
     if guardrail_metric_col and guardrail_metric_col in hist.columns:
         hist[guardrail_metric_col] = rng.normal(0.5, 0.1, n).clip(0, 1)
     return hist
 
 
-def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatment'), outcome_metric_col='engagement_score', guardrail_metric_col=None, treatment_effect=True, seed=my_seed):
+def add_outcome_metrics(
+    df,
+    group_col='group',
+    group_labels=('control', 'treatment'),
+    outcome_metric_col='engagement_score',
+    guardrail_metric_col=None,
+    treatment_effect=True,
+    seed=my_seed,
+    outcome_metric_datatype='continuous',
+):
     """
     Add outcome and optional guardrail metric to a dataframe that already has group assignment.
     Call this after randomization so outcomes are generated post-assignment.
@@ -111,13 +127,26 @@ def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatme
     np.random.seed(seed)
     n = len(df)
     treatment_mask = df[group_col] == group_labels[1]
-    # Primary outcome: baseline + optional treatment effect
-    base_engagement = np.random.normal(50, 15, n)
-    if treatment_effect:
-        treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
+    # Primary outcome: generated according to metric datatype.
+    if outcome_metric_datatype == 'binary':
+        p_outcome = 0.12 + (0.03 * treatment_mask.astype(float) if treatment_effect else 0)
+        df[outcome_metric_col] = np.random.binomial(n=1, p=p_outcome, size=n)
+    elif outcome_metric_datatype == 'categorical':
+        control_probs = [0.50, 0.30, 0.20]
+        treatment_probs = [0.42, 0.33, 0.25] if treatment_effect else control_probs
+        categories = np.array(['low', 'mid', 'high'])
+        control_values = np.random.choice(categories, size=n, p=control_probs)
+        treatment_values = np.random.choice(categories, size=n, p=treatment_probs)
+        df[outcome_metric_col] = np.where(treatment_mask, treatment_values, control_values)
+    elif outcome_metric_datatype == 'continuous':
+        base_engagement = np.random.normal(50, 15, n)
+        if treatment_effect:
+            treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
+        else:
+            treatment_lift = 0
+        df[outcome_metric_col] = (base_engagement + treatment_lift).clip(0, 100)
     else:
-        treatment_lift = 0
-    df[outcome_metric_col] = (base_engagement + treatment_lift).clip(0, 100)
+        raise ValueError("outcome_metric_datatype must be 'continuous', 'binary', or 'categorical'")
     # Optional guardrail: no treatment signal when treatment_effect=False (A/A)
     if guardrail_metric_col:
         if treatment_effect:

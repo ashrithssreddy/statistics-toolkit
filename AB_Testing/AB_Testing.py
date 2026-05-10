@@ -229,7 +229,8 @@ historical_df = create_historical_df(
     outcome_metric_col,
     guardrail_metric_col,
     seed=my_seed,
-    historical_normality=historical_normality
+    historical_normality=historical_normality,
+    outcome_metric_datatype=outcome_metric_datatype
 )
 historical_df
 
@@ -1005,7 +1006,7 @@ check_sample_ratio_mismatch(df, group_col=group_col, group_labels=test_config['g
 
 # %%
 # Experiment has run; outcome and guardrail data come in (simulated via add_outcome_metrics). A/A: no treatment effect.
-df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=False, seed=my_seed)
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=False, seed=my_seed, outcome_metric_datatype=outcome_metric_datatype)
 df.head()
 
 # %% [markdown]
@@ -1180,7 +1181,7 @@ _ = simulate_aa_type1_error_rate(
 
 # %%
 # Simulate experiment data (outcome + guardrail) with treatment effect for A/B analysis.
-df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=True, seed=my_seed)
+df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['group_labels'], outcome_metric_col=test_config['outcome_metric_col'], guardrail_metric_col=test_config.get('guardrail_metric_col') or guardrail_metric_col, treatment_effect=True, seed=my_seed, outcome_metric_datatype=outcome_metric_datatype)
 df.head()
 
 # %% [markdown]

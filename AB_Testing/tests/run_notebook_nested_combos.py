@@ -154,6 +154,7 @@ for combo_row, combo in combo_space[
         guardrail_metric_col,
         seed=my_seed,
         historical_normality=historical_normality,
+        outcome_metric_datatype=outcome_metric_datatype,
     )
 
     # ------------------------------------------------------------------
@@ -256,6 +257,7 @@ for combo_row, combo in combo_space[
         guardrail_metric_col=test_config.get("guardrail_metric_col") or guardrail_metric_col,
         treatment_effect=False,
         seed=my_seed,
+        outcome_metric_datatype=outcome_metric_datatype,
     )
 
     aa_result = run_outcome_similarity_test(
@@ -281,6 +283,7 @@ for combo_row, combo in combo_space[
         guardrail_metric_col=test_config.get("guardrail_metric_col") or guardrail_metric_col,
         treatment_effect=True,
         seed=my_seed,
+        outcome_metric_datatype=outcome_metric_datatype,
     )
 
     test_config = test_normality(
