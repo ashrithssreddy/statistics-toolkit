@@ -30,9 +30,11 @@ def run_outcome_similarity_test(
     """
 
     if verbose:
-        print("📏 Outcome Similarity Check\n")
+        print("📏 Outcome Similarity Check")
+        print("-" * 50)
         if pd.api.types.is_numeric_dtype(df[metric_col]):
             mean_by_group = df.groupby(group_col)[metric_col].mean()
+            print("Group means:")
             print(mean_by_group)
             print()
 
@@ -41,6 +43,9 @@ def run_outcome_similarity_test(
 
     # --- Run appropriate test ---
     # --- Binary ---
+    stat_label = None
+    stat_value = None
+
     if test_family in ["two_proportion_z_test", "one_proportion_z_test"]:
         conv1, conv2 = group1.mean(), group2.mean()
         n1, n2 = len(group1), len(group2)
@@ -49,11 +54,13 @@ def run_outcome_similarity_test(
         z_score = (conv2 - conv1) / se
         p_value = 2 * (1 - stats.norm.cdf(abs(z_score)))
         test_name = "z-test for proportions"
+        stat_label, stat_value = "Z statistic", z_score
 
     # --- T-tests ---
     elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
         t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=(test_family == "two_sample_t_test"))
         test_name = "independent t-test" if test_family == "two_sample_t_test" else "welch t-test"
+        stat_label, stat_value = "T statistic", t_stat
 
     elif test_family == "paired_t_test":
         if len(group1) != len(group2):
@@ -62,6 +69,7 @@ def run_outcome_similarity_test(
             return None
         t_stat, p_value = stats.ttest_rel(group1, group2)
         test_name = "paired t-test"
+        stat_label, stat_value = "T statistic", t_stat
 
     # --- Non-parametric ---
     elif test_family in [
@@ -69,54 +77,59 @@ def run_outcome_similarity_test(
     ]:
         u_stat, p_value = stats.mannwhitneyu(group1, group2, alternative='two-sided')
         test_name = "Mann-Whitney U test"
+        stat_label, stat_value = "U statistic", u_stat
 
     # --- ANOVA ---
     elif test_family in ["anova_test", "welch_anova_test"]:
         f_stat, p_value = stats.f_oneway(group1, group2)
         test_name = "ANOVA"
+        stat_label, stat_value = "F statistic", f_stat
 
     # --- Chi-square ---
     elif test_family in ["chi_square_test"]:
         contingency = pd.crosstab(df[group_col], df[metric_col])
         chi2_stat, p_value, _, _ = stats.chi2_contingency(contingency)
         test_name = "chi-square test"
+        stat_label, stat_value = "Chi2 statistic", chi2_stat
 
     else:
         raise ValueError(f"❌ Unsupported test family: {test_family}")
 
     # --- Detailed Interpretation ---
     if verbose:
-        print("\n🧠 Interpretation:")
+        print("Hypothesis Test Summary")
+        print(f"- Test chosen          : {test_name}")
 
         if test_family in ["one_proportion_z_test", "two_proportion_z_test"]:
-            print(f"Used a {test_name} to compare conversion rates between groups.")
-            print("Null Hypothesis: Conversion rates are equal across groups.")
-
+            print(f"- H₀ (null)            : Conversion rates are equal between {group_labels[0]} and {group_labels[1]}.")
+            print(f"- H₁ (alternative)     : Conversion rates differ between {group_labels[0]} and {group_labels[1]}.")
         elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
-            print(f"Used an {test_name} to compare means of '{metric_col}' across independent groups.")
-            print("Null Hypothesis: Group means are equal.")
-
+            print(f"- H₀ (null)            : Mean {metric_col} is equal between {group_labels[0]} and {group_labels[1]}.")
+            print(f"- H₁ (alternative)     : Mean {metric_col} differs between {group_labels[0]} and {group_labels[1]}.")
         elif test_family == "paired_t_test":
-            print(f"Used a {test_name} to compare within-user differences in '{metric_col}'.")
-            print("Null Hypothesis: Mean difference between pairs is zero.")
-
-        elif test_family in ["chi_square_test"]:
-            print(f"Used a {test_name} to test whether '{metric_col}' distribution depends on group.")
-            print("Null Hypothesis: No association between group and category.")
-
+            print(f"- H₀ (null)            : Mean paired difference in {metric_col} is 0.")
+            print(f"- H₁ (alternative)     : Mean paired difference in {metric_col} is not 0.")
+        elif test_family == "chi_square_test":
+            print(f"- H₀ (null)            : {metric_col} is independent of {group_col}.")
+            print(f"- H₁ (alternative)     : {metric_col} depends on {group_col}.")
         elif test_family in ["anova_test", "welch_anova_test"]:
-            print(f"Used a {test_name} to compare group means of '{metric_col}' across groups.")
-            print("Null Hypothesis: All group means are equal.")
+            print(f"- H₀ (null)            : Group means of {metric_col} are equal.")
+            print(f"- H₁ (alternative)     : At least one group mean of {metric_col} differs.")
+        elif test_family == "mann_whitney_u_test":
+            print(f"- H₀ (null)            : Distributions of {metric_col} are identical across groups.")
+            print(f"- H₁ (alternative)     : Distributions of {metric_col} differ across groups.")
 
-        elif test_family in ["mann_whitney_u_test"]:
-            print(f"Used a {test_name} to compare medians of '{metric_col}' across groups (non-parametric).")
-            print("Null Hypothesis: Distributions are identical across groups.")
+        if stat_label is not None:
+            print(f"- {stat_label:<20}: {stat_value:.4f}")
+        print(f"- P-value              : {p_value:.4f}")
+        print(f"- Significance level α : {alpha:.2f}")
+        print(f"- Decision rule        : Reject H₀ if p-value < {alpha:.2f}")
 
-        print(f"\nWe use α = {alpha:.2f}")
         if p_value < alpha:
-            print(f"❌ p = {p_value:.4f} < α → Rejected the null. Significant difference (check setup).")
+            print("- Conclusion           : ❌ Reject H₀ (significant difference detected).")
         else:
-            print(f"✅ p = {p_value:.4f} ≥ α → Failed to reject null. No significant difference.")
+            print("- Conclusion           : ✅ Fail to reject H₀ (no significant difference).")
+        print("-" * 50)
 
     return p_value
 

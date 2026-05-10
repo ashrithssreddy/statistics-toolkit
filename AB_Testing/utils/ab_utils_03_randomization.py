@@ -179,6 +179,11 @@ def check_sample_ratio_mismatch(df, group_col, group_labels, expected_ratios=Non
     Prints observed vs expected distribution and test results.
     """
     print("🔍 Sample Ratio Mismatch (SRM) Check")
+    print("-" * 50)
+    print("Test: Chi-square goodness-of-fit")
+    print("H₀: Observed group allocation matches expected allocation ratios.")
+    print("H₁: Observed group allocation does NOT match expected allocation ratios.")
+    print(f"Significance level (α): {alpha:.2f}")
 
     observed_counts = df[group_col].value_counts().reindex(group_labels, fill_value=0)
 
@@ -191,17 +196,22 @@ def check_sample_ratio_mismatch(df, group_col, group_labels, expected_ratios=Non
     expected_counts = [len(df) * ratio for ratio in expected_ratios]
 
     # Print group-wise summary
+    print("\nObserved vs Expected Allocation")
     for grp, expected in zip(group_labels, expected_counts):
         observed = observed_counts.get(grp, 0)
         pct = observed / len(df) * 100
-        print(f"Group {grp}: {observed} users ({pct:.2f}%) — Expected: {expected:.1f}")
+        print(f"- Group {grp}: {observed} users ({pct:.2f}%) — Expected: {expected:.1f}")
 
     # Run Chi-square test
     chi2_stat, chi2_p = stats.chisquare(f_obs=observed_counts, f_exp=expected_counts)
-    print(f"\nChi2 Statistic: {chi2_stat:.4f}")
-    print(f"P-value       : {chi2_p:.4f}")
+    print("\nTest Statistics")
+    print(f"- Chi2 Statistic: {chi2_stat:.4f}")
+    print(f"- P-value       : {chi2_p:.4f}")
+    print(f"- Decision rule : Reject H₀ if p-value < {alpha:.2f}")
 
+    print("\nConclusion")
     if chi2_p < alpha:
-        print("⚠️ SRM Detected — group assignment might be biased.\n")
+        print("⚠️ Reject H₀: SRM detected — group assignment may be biased.")
     else:
-        print("✅ No SRM — group sizes look balanced.\n")
+        print("✅ Fail to reject H₀: No SRM detected — group sizes look balanced.")
+    print("-" * 50 + "\n")
