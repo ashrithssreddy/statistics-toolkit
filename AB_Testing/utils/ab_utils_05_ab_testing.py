@@ -222,35 +222,6 @@ def summarize_ab_test_result(result):
     print("\n📋 Group Summary:\n")
     display(pd.DataFrame(result['summary']).T)
 
-    # ---- Lift Analysis (for Z-test, T-test independent, or non-parametric / Mann-Whitney) ----
-    if test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test'] and (group_relationship == 'independent' or test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'mann_whitney_u_test']):
-        group1_mean = result['summary'][group1]['mean']
-        group2_mean = result['summary'][group2]['mean']
-        lift = group2_mean - group1_mean
-        pct_lift = lift / group1_mean if group1_mean else np.nan
-
-        print("\n📈 Lift Analysis")
-        print(f"- Absolute Lift   : {lift:.4f}")
-        print(f"- Percentage Lift : {pct_lift:.2%}")
-
-        try:
-            n1 = result['summary'][group1]['n']
-            n2 = result['summary'][group2]['n']
-
-            if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
-                se = np.sqrt(group1_mean * (1 - group1_mean) / n1 + group2_mean * (1 - group2_mean) / n2)
-            else:
-                sd1 = result['summary'][group1].get('std')
-                sd2 = result['summary'][group2].get('std')
-                se = np.sqrt((sd1 ** 2) / n1 + (sd2 ** 2) / n2)
-
-            z = 1.96
-            ci_low = lift - z * se
-            ci_high = lift + z * se
-            print(f"- 95% CI for Lift : [{ci_low:.4f}, {ci_high:.4f}]")
-        except Exception as e:
-            print(f"⚠️ Could not compute confidence interval: {e}")
-
     print("="*45 + "\n")
 
 
