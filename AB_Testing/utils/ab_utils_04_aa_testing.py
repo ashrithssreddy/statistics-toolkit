@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
+from statsmodels.stats.contingency_tables import mcnemar
 
 
 def run_outcome_similarity_test(
@@ -65,6 +66,39 @@ def run_outcome_similarity_test(
             p_value = stats.norm.cdf(z_score)
         test_name = "z-test for proportions"
         stat_label, stat_value = "Z statistic", z_score
+
+    elif test_family == "mcnemar_test":
+        # Paired binary: same discordant logic as run_ab_test (ab_utils_05_ab_testing).
+        if len(group1) != len(group2):
+            if verbose:
+                print("❌ McNemar test requires equal-length paired samples.")
+            return None
+        min_n = min(len(group1), len(group2))
+        x = group1.iloc[:min_n].astype(int).to_numpy()
+        y = group2.iloc[:min_n].astype(int).to_numpy()
+        x = np.where(x > 0, 1, 0)
+        y = np.where(y > 0, 1, 0)
+        table = np.zeros((2, 2), dtype=int)
+        table[0, 0] = int(np.sum((x == 0) & (y == 0)))
+        table[0, 1] = int(np.sum((x == 0) & (y == 1)))
+        table[1, 0] = int(np.sum((x == 1) & (y == 0)))
+        table[1, 1] = int(np.sum((x == 1) & (y == 1)))
+        b = table[0, 1]
+        c = table[1, 0]
+        mc = mcnemar(table, exact=True, correction=False)
+        if hypothesis_type == "two_sided":
+            p_value = float(mc.pvalue)
+        else:
+            disc_n = int(b + c)
+            if disc_n == 0:
+                p_value = 1.0
+            else:
+                alt = "greater" if hypothesis_type == "greater" else "less"
+                p_value = float(
+                    stats.binomtest(int(b), n=disc_n, p=0.5, alternative=alt).pvalue
+                )
+        test_name = "McNemar test (paired binary similarity)"
+        stat_label, stat_value = "McNemar statistic", float(mc.statistic)
 
     # --- T-tests ---
     elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
@@ -150,6 +184,17 @@ def run_outcome_similarity_test(
             else:
                 print(f"- H₀ (null)            : Mean paired difference in {metric_col} is 0.")
                 print(f"- H₁ (alternative)     : Mean paired difference in {metric_col} is not 0.")
+        elif test_family == "mcnemar_test":
+            g0, g1 = group_labels[0], group_labels[1]
+            if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Paired discordant probability P({g1}=1,{g0}=0) <= P({g0}=1,{g1}=0).")
+                print(f"- H₁ (alternative)     : P({g1}=1,{g0}=0) > P({g0}=1,{g1}=0).")
+            elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : P({g1}=1,{g0}=0) >= P({g0}=1,{g1}=0).")
+                print(f"- H₁ (alternative)     : P({g1}=1,{g0}=0) < P({g0}=1,{g1}=0).")
+            else:
+                print("- H₀ (null)            : Marginal disagreement is symmetric (McNemar null).")
+                print("- H₁ (alternative)     : Asymmetric discordant pairs for paired binary outcomes.")
         elif test_family == "chi_square_test":
             print(f"- H₀ (null)            : {metric_col} is independent of {group_col}.")
             print(f"- H₁ (alternative)     : {metric_col} depends on {group_col}.")
@@ -243,7 +288,7 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
         plt.legend()
         plt.show()
 
-    elif test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
+    elif test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'mcnemar_test']:
         rates = [group1.mean(), group2.mean()]
         plt.bar(group_labels, rates)
         for i, rate in enumerate(rates):
