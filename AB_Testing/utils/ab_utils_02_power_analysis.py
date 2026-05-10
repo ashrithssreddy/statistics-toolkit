@@ -192,6 +192,21 @@ def compute_baseline_from_data(df, test_config, verbose=True):
             print(f"📊 Baseline conversion rate (full sample): {result['baseline_rate']:.2%}")
         return result
 
+    # Categorical → chi-square power in this module uses the same proportion-style heuristic as
+    # binary z-tests; use dominant-category share as reference proportion.
+    if data_type == 'categorical':
+        col = df[metric_col].dropna()
+        if col.empty:
+            result['baseline_rate'] = 1.0 / 3.0
+        else:
+            result['baseline_rate'] = float(col.value_counts(normalize=True).iloc[0])
+        if verbose:
+            print(
+                f"📊 Baseline dominant category share (categorical, full sample): "
+                f"{result['baseline_rate']:.2%}"
+            )
+        return result
+
     if family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'anova_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test', 'kruskal_wallis_test'] or data_type == 'continuous':
         col = df[metric_col].dropna()
         result['baseline_mean'] = col.mean()
