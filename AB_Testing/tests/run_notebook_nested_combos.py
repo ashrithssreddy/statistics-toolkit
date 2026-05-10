@@ -2,7 +2,6 @@ from pathlib import Path
 import sys
 from itertools import product
 
-import numpy as np
 import pandas as pd
 
 
@@ -128,112 +127,43 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
                                 historical_normality=historical_normality,
     )
 
-    # The notebook is continuous by default. This inline block lets the
-    # same notebook calls run against binary/categorical combos.
-    if outcome_metric_datatype == "binary":
-        historical_df[outcome_metric_col] = (
-                                    historical_df[outcome_metric_col]
-                                    >= historical_df[outcome_metric_col].median()
-        ).astype(int)
-
-    if outcome_metric_datatype == "categorical":
-        q1 = historical_df[outcome_metric_col].quantile(0.33)
-        q2 = historical_df[outcome_metric_col].quantile(0.66)
-        historical_df[outcome_metric_col] = np.where(
-                                    historical_df[outcome_metric_col] < q1,
-                                    "low",
-                                    np.where(
-                                        historical_df[outcome_metric_col] < q2,
-                                        "mid",
-                                        "high",
-                                    ),
-        )
-
     # ------------------------------------------------------------------
     # Power Analysis
     # ------------------------------------------------------------------
-    historical_df_for_tests = apply_simple_randomization(
-                                historical_df.copy(),
-                                group_col=group_col,
-                                group_labels=group_labels,
-                                seed=my_seed,
+    alpha = 0.05
+    power = 0.80
+
+    _b = compute_baseline_from_data(historical_df, test_config)
+    test_config["baseline_rate"] = _b["baseline_rate"]
+    test_config["baseline_mean"] = _b["baseline_mean"]
+    test_config["baseline_std_dev"] = _b["baseline_std_dev"]
+
+    mde = 5
+
+    test_config = test_normality(
+        df=historical_df,
+        group_col=group_col,
+        test_config=test_config,
+        update_config=True,
     )
-
-    if outcome_metric_datatype == "continuous":
-        test_config = test_normality(
-                                    df=historical_df_for_tests,
-                                    group_col=group_col,
-                                    test_config=test_config,
-                                    update_config=True,
-        )
-
-        test_config = test_equal_variance(
-                                    df=historical_df_for_tests,
-                                    group_col=group_col,
-                                    test_config=test_config,
-                                    update_config=True,
-        )
 
     test_config["family"] = determine_test_family(test_config)
 
-    baseline = compute_baseline_from_data(
-                                historical_df,
-                                test_config,
-                                verbose=False,
+    test_config["required_sample_size"] = calculate_power_sample_size(
+        test_family=test_config["family"],
+        group_relationship=test_config.get("group_relationship"),
+        hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
+        alpha=alpha,
+        power=power,
+        baseline_rate=test_config.get("baseline_rate"),
+        mde=mde,
+        std_dev=test_config.get("baseline_std_dev"),
+        effect_size=None,
+        num_groups=test_config["group_count"],
     )
 
-    mde = 5
-    required_sample_size = None
-
-    if test_config["family"] != "mcnemar_test":
-        if outcome_metric_datatype == "continuous":
-            required_sample_size = calculate_power_sample_size(
-                                        test_family=test_config["family"],
-                                        group_relationship=group_relationship,
-                                        hypothesis_type=hypothesis_type,
-                                        alpha=0.05,
-                                        power=0.80,
-                                        std_dev=baseline["baseline_std_dev"],
-                                        mde=mde,
-                                        num_groups=group_count,
-                                        verbose=False,
-            )
-
-        if outcome_metric_datatype == "binary":
-            required_sample_size = calculate_power_sample_size(
-                                        test_family=test_config["family"],
-                                        group_relationship=group_relationship,
-                                        hypothesis_type=hypothesis_type,
-                                        alpha=0.05,
-                                        power=0.80,
-                                        baseline_rate=baseline["baseline_rate"],
-                                        mde=0.05,
-                                        num_groups=group_count,
-                                        verbose=False,
-            )
-
-        if outcome_metric_datatype == "categorical":
-            required_sample_size = calculate_power_sample_size(
-                                        test_family=test_config["family"],
-                                        group_relationship=group_relationship,
-                                        hypothesis_type=hypothesis_type,
-                                        alpha=0.05,
-                                        power=0.80,
-                                        baseline_rate=0.33,
-                                        mde=0.05,
-                                        num_groups=group_count,
-                                        verbose=False,
-            )
-
     # Ensure the dataset matches the minimum required experiment size.
-    if required_sample_size is None:
-        n_required = min(len(df), 800)
-    else:
-        n_required = min(
-                                    len(df),
-                                    required_sample_size * test_config["group_count"],
-                                    800,
-        )
+    n_required = test_config["required_sample_size"] * test_config["group_count"]
 
     df = df.sample(n=n_required, random_state=42)
 
@@ -244,7 +174,6 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
         df = apply_simple_randomization(
                                     df,
                                     group_col=group_col,
-                                    group_labels=group_labels,
                                     seed=my_seed,
         )
 
@@ -253,7 +182,6 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
                                     df,
                                     stratify_col="platform",
                                     group_col=group_col,
-                                    group_labels=group_labels,
                                     seed=my_seed,
         )
 
@@ -263,32 +191,22 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
                                     observation_id_col=observation_id_col,
                                     group_col=group_col,
                                     block_size=10,
-                                    group_labels=group_labels,
                                     seed=my_seed,
         )
 
     elif randomization_method == "matched_pair":
         df = apply_matched_pair_randomization(
                                     df,
-                                    sort_col=pre_experiment_metric_col
-                                    or "past_purchase_revenue",
+                                    sort_col=pre_experiment_metric_col,
                                     group_col=group_col,
                                     group_labels=test_config["group_labels"],
         )
 
     elif randomization_method == "cluster":
-        if "city" not in df.columns:
-            rng = np.random.default_rng(my_seed)
-            df["city"] = rng.choice(
-                                        ["ny", "sf", "chicago", "austin"],
-                                        size=len(df),
-            )
-
         df = apply_cluster_randomization(
                                     df,
                                     cluster_col="city",
                                     group_col=group_col,
-                                    group_labels=group_labels,
                                     seed=my_seed,
         )
 
@@ -320,28 +238,9 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
                                 seed=my_seed,
     )
 
-    if outcome_metric_datatype == "binary":
-        df[outcome_metric_col] = (
-                                    df[outcome_metric_col]
-                                    >= df[outcome_metric_col].median()
-        ).astype(int)
-
-    if outcome_metric_datatype == "categorical":
-        q1 = df[outcome_metric_col].quantile(0.33)
-        q2 = df[outcome_metric_col].quantile(0.66)
-        df[outcome_metric_col] = np.where(
-                                    df[outcome_metric_col] < q1,
-                                    "low",
-                                    np.where(
-                                        df[outcome_metric_col] < q2,
-                                        "mid",
-                                        "high",
-                                    ),
-        )
-
     aa_result = run_outcome_similarity_test(
                                 df=df,
-                                group_col=group_col,
+                                group_col="group",
                                 metric_col=test_config["outcome_metric_col"],
                                 test_family=test_config["family"],
                                 group_relationship=test_config.get(
@@ -372,47 +271,27 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
                                 seed=my_seed,
     )
 
-    if outcome_metric_datatype == "binary":
-        df[outcome_metric_col] = (
-                                    df[outcome_metric_col]
-                                    >= df[outcome_metric_col].median()
-        ).astype(int)
-
-    if outcome_metric_datatype == "categorical":
-        q1 = df[outcome_metric_col].quantile(0.33)
-        q2 = df[outcome_metric_col].quantile(0.66)
-        df[outcome_metric_col] = np.where(
-                                    df[outcome_metric_col] < q1,
-                                    "low",
-                                    np.where(
-                                        df[outcome_metric_col] < q2,
-                                        "mid",
-                                        "high",
-                                    ),
-        )
-
-    if outcome_metric_datatype == "continuous":
-        test_config = test_normality(
-                                    df=df,
-                                    group_col=group_col,
-                                    test_config=test_config,
-                                    update_config=True,
-        )
-
-        test_config = test_equal_variance(
-                                    df=df,
-                                    group_col=group_col,
-                                    test_config=test_config,
-                                    update_config=True,
-        )
-
-        test_config["family"] = determine_test_family(
-                                    test_config
-        )
-
-    ab_result = run_ab_test(
+    test_config = test_normality(
                                 df=df,
                                 group_col=group_col,
+                                test_config=test_config,
+                                update_config=True,
+    )
+
+    test_config = test_equal_variance(
+                                df=df,
+                                group_col=group_col,
+                                test_config=test_config,
+                                update_config=True,
+    )
+
+    test_config["family"] = determine_test_family(
+                                test_config
+    )
+
+    result = run_ab_test(
+                                df=df,
+                                group_col="group",
                                 metric_col=test_config["outcome_metric_col"],
                                 group_labels=test_config["group_labels"],
                                 test_family=test_config["family"],
@@ -429,40 +308,25 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
     # ------------------------------------------------------------------
     # Post Hoc Analysis
     # ------------------------------------------------------------------
-    if guardrail_metric_col is not None:
-        run_guardrail_analysis(
-                                    df,
-                                    test_config,
-                                    group_col=group_col,
-                                    alpha=0.05,
-        )
+    run_guardrail_analysis(df, test_config, group_col="group", alpha=0.05)
 
-    cuped_result = None
-    if (
-                                    pre_experiment_metric_col is not None
-                                    and outcome_metric_datatype == "continuous"
-    ):
-        df = apply_cuped(
-                                    df,
-                                    pre_metric=pre_experiment_metric_col,
-                                    outcome_metric=outcome_metric_col,
-        )
+    df = apply_cuped(
+                                df=df,
+                                pre_metric="past_purchase_revenue",
+                                outcome_metric_col=test_config["outcome_metric_col"],
+                                group_col="group",
+                                group_labels=test_config["group_labels"],
+    )
 
-        cuped_result = run_ab_test(
-                                    df=df,
-                                    group_col=group_col,
-                                    metric_col=f"{outcome_metric_col}_cuped",
-                                    group_labels=test_config["group_labels"],
-                                    test_family=test_config["family"],
-                                    group_relationship=test_config.get(
-                                        "group_relationship"
-                                    ),
-                                    hypothesis_type=test_config.get(
-                                        "hypothesis_type",
-                                        "two_sided",
-                                    ),
-                                    alpha=0.05,
-        )
+    result_cuped = run_ab_test(
+                                df=df,
+                                group_col="group",
+                                metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
+                                group_labels=test_config["group_labels"],
+                                test_family=test_config["family"],
+                                group_relationship=test_config.get("group_relationship"),
+                                hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
+    )
 
     rows.append(
                                 {
@@ -479,10 +343,8 @@ for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
                                     "aa_p_value": aa_result.get("p_value")
                                     if isinstance(aa_result, dict)
                                     else None,
-                                    "ab_p_value": ab_result.get("p_value"),
-                                    "cuped_p_value": cuped_result.get("p_value")
-                                    if cuped_result is not None
-                                    else None,
+                                    "ab_p_value": result.get("p_value"),
+                                    "cuped_p_value": result_cuped.get("p_value"),
                                 }
     )
 
