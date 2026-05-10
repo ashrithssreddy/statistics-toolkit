@@ -211,6 +211,7 @@ def compute_baseline_from_data(df, test_config, verbose=True):
 def calculate_power_sample_size(
     test_family,
     group_relationship=None,
+    hypothesis_type='two_sided',
     alpha=0.05,
     power=0.80,
     baseline_rate=None,
@@ -240,6 +241,9 @@ def calculate_power_sample_size(
     # -------------------------
     # Binary tests
     # -------------------------
+    if hypothesis_type not in ['two_sided', 'greater', 'less']:
+        raise ValueError("hypothesis_type must be one of: 'two_sided', 'greater', 'less'")
+
     if test_family in [
         "one_proportion_z_test",
         "two_proportion_z_test",
@@ -249,7 +253,11 @@ def calculate_power_sample_size(
         if baseline_rate is None or mde is None:
             raise ValueError("baseline_rate and mde required for binary tests")
 
-        z_alpha = stats.norm.ppf(1 - alpha / 2)
+        # Directional alpha only applies to directional proportion tests.
+        if test_family == "chi_square_test":
+            z_alpha = stats.norm.ppf(1 - alpha / 2)
+        else:
+            z_alpha = stats.norm.ppf(1 - alpha / 2) if hypothesis_type == 'two_sided' else stats.norm.ppf(1 - alpha)
         z_beta = stats.norm.ppf(power)
 
         p1 = baseline_rate
@@ -261,6 +269,7 @@ def calculate_power_sample_size(
         if verbose:
             print("📈 Power Analysis Summary")
             print(f"- Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}")
+            print(f"- Hypothesis type: {hypothesis_type}")
             print(f"- Significance level (α): {alpha}")
             print(f"- Statistical power (1 - β): {power}")
             print(f"- Baseline conversion rate: {baseline_rate:.2%}")
@@ -299,15 +308,22 @@ def calculate_power_sample_size(
         else:
             analysis = TTestIndPower()
 
+        sm_alt = {
+            "two_sided": "two-sided",
+            "greater": "larger",
+            "less": "smaller",
+        }[hypothesis_type]
 
         n = int(np.ceil(analysis.solve_power(
             effect_size=effect_size,
             power=power,
-            alpha=alpha
+            alpha=alpha,
+            alternative=sm_alt
         )))
         if verbose:
             print("📈 Power Analysis Summary")
             print(f"- Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}")
+            print(f"- Hypothesis type: {hypothesis_type}")
             print(f"- Significance level (α): {alpha}")
             print(f"- Statistical power (1 - β): {power}")
             if std_dev is not None:

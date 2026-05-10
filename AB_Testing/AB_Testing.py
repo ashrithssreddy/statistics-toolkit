@@ -610,6 +610,7 @@ print_config_summary(test_config)
 test_config['required_sample_size'] = calculate_power_sample_size(
     test_family=test_config['family'],
     group_relationship=test_config.get('group_relationship'),
+    hypothesis_type=test_config.get('hypothesis_type', 'two_sided'),
     alpha=alpha,
     power=power,
     baseline_rate=test_config.get('baseline_rate'),

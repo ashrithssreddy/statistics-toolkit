@@ -155,7 +155,13 @@ def analyze_segment_lift(
                 p2, n2 = g2.mean(), len(g2)
                 pooled_p = (g1.sum() + g2.sum()) / (n1 + n2)
                 se = np.sqrt(pooled_p * (1 - pooled_p) * (1/n1 + 1/n2))
-                p_value = 2 * (1 - stats.norm.cdf(abs((p2 - p1) / se)))
+                z_stat = (p2 - p1) / se
+                if hypothesis_type == 'greater':
+                    p_value = 1 - stats.norm.cdf(z_stat)
+                elif hypothesis_type == 'less':
+                    p_value = stats.norm.cdf(z_stat)
+                else:
+                    p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
 
             elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test']:
                 if group_relationship == 'independent':

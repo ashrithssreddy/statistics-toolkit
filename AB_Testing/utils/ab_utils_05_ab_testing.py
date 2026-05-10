@@ -200,12 +200,27 @@ def run_ab_test(
         table[1, 0] = int(np.sum((x == 1) & (y == 0)))
         table[1, 1] = int(np.sum((x == 1) & (y == 1)))
 
+        b = table[0, 1]  # control=0, treatment=1
+        c = table[1, 0]  # control=1, treatment=0
+
         mc = mcnemar(table, exact=True, correction=False)
+        if hypothesis_type == 'two_sided':
+            p_value = float(mc.pvalue)
+        else:
+            # One-sided exact test on discordant pairs under H0: b and c equally likely
+            # greater: treatment > control => b > c
+            # less   : treatment < control => b < c
+            disc_n = int(b + c)
+            if disc_n == 0:
+                p_value = 1.0
+            else:
+                alt = 'greater' if hypothesis_type == 'greater' else 'less'
+                p_value = float(stats.binomtest(int(b), n=disc_n, p=0.5, alternative=alt).pvalue)
         result.update(
             {
                 'test': 'McNemar test',
                 'mcnemar_stat': float(mc.statistic),
-                'p_value': float(mc.pvalue),
+                'p_value': p_value,
                 'contingency_table': table.tolist(),
                 'paired_n': int(min_n),
             }
