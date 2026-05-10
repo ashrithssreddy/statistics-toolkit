@@ -186,7 +186,7 @@ def compute_baseline_from_data(df, test_config, verbose=True):
 
     result = {'baseline_rate': None, 'baseline_mean': None, 'baseline_std_dev': None}
 
-    if family in ['one_proportion_z_test', 'two_proportion_z_test']:
+    if data_type == 'binary' or family in ['one_proportion_z_test', 'two_proportion_z_test']:
         result['baseline_rate'] = df[metric_col].mean()
         if verbose:
             print(f"📊 Baseline conversion rate (full sample): {result['baseline_rate']:.2%}")
