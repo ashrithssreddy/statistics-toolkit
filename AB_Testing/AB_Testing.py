@@ -274,37 +274,80 @@ historical_df
 # %% [markdown]
 # <details><summary><strong>📖 Click to Expand (Formula) </strong></summary>
 #
-# - **Binary, independent (2-proportion z-test):**
+# 1. **One-sample t-test (continuous, normal)**
 # $$
-# n_{\text{per-group}} \approx
-# \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,[p_1(1-p_1)+p_2(1-p_2)]}{(p_2-p_1)^2}
+# n \approx \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
 # $$
+# Terms: $n$ = required sample size, $z_{1-\alpha/2}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $\sigma$ = metric variability (SD), $\Delta$ = minimum business-relevant mean shift.
 #
-# - **Continuous, independent (2-sample t-test approximation):**
+# 2. **Two-sample t-test (continuous, normal, independent)**
 # $$
 # n_{\text{per-group}} \approx
 # 2\left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
 # $$
+# Terms: $n_{\text{per-group}}$ = required users in each group, $z_{1-\alpha/2}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $\sigma$ = pooled metric SD, $\Delta$ = minimum mean difference to detect.
 #
-# - **Continuous, paired (paired t-test approximation):**
+# 3. **Paired t-test (continuous, normal, paired)**
 # $$
 # n_{\text{pairs}} \approx
 # \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma_d}{\Delta}\right)^2
 # $$
+# Terms: $n_{\text{pairs}}$ = required matched pairs, $z_{1-\alpha/2}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $\sigma_d$ = SD of within-pair differences, $\Delta$ = minimum paired mean difference.
 #
-# - **Categorical / chi-square (Cohen's $w$):**
+# 4. **ANOVA (continuous, normal, 3+ groups)**
 # $$
-# N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{w^2}
+# N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{f^2}
 # $$
+# Terms: $N_{\text{total}}$ = total required sample, $z_{1-\alpha}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $f$ = ANOVA effect size (between-group signal strength).
 #
-# - **Binary, paired (McNemar approximation):**
+# 5. **Wilcoxon signed-rank (one-sample, non-normal)**
+# No stable closed-form $n$ used here; use power simulation/normal-approx methods.
+# Terms: no single closed-form symbols in this notebook; sample size comes from simulation assumptions on median shift and spread.
+#
+# 6. **Mann-Whitney U (two-sample, non-normal, independent)**
+# No single canonical closed-form in this notebook; use rank-based power methods/simulation.
+# Terms: no single closed-form symbols in this notebook; sample size depends on assumed distribution shift between groups.
+#
+# 7. **Wilcoxon signed-rank (two-sample, non-normal, paired)**
+# No stable closed-form $n$ used here; use simulation/normal-approx methods.
+# Terms: no single closed-form symbols in this notebook; sample size depends on assumed paired-difference distribution.
+#
+# 8. **Kruskal-Wallis (non-normal, 3+ groups)**
+# No single closed-form used here; use simulation or asymptotic power methods.
+# Terms: no single closed-form symbols in this notebook; sample size depends on expected rank separation across groups.
+#
+# 9. **One-proportion z-test (binary, one-sample)**
+# $$
+# n \approx \frac{\left(z_{1-\alpha/2}\sqrt{p_0(1-p_0)} + z_{1-\beta}\sqrt{p_1(1-p_1)}\right)^2}{(p_1-p_0)^2}
+# $$
+# Terms: $n$ = required sample size, $p_0$ = baseline/null conversion rate, $p_1$ = expected conversion under lift, $(p_1-p_0)$ = absolute lift to detect, $z_{1-\alpha/2}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#
+# 10. **Two-proportion z-test (binary, two-sample, independent)**
+# $$
+# n_{\text{per-group}} \approx
+# \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,[p_1(1-p_1)+p_2(1-p_2)]}{(p_2-p_1)^2}
+# $$
+# Terms: $n_{\text{per-group}}$ = required users per arm, $p_1$ = control rate, $p_2$ = treatment rate, $(p_2-p_1)$ = absolute lift, $z_{1-\alpha/2}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#
+# 11. **McNemar (binary, two-sample, paired)**
 # $$
 # n_{\text{pairs}} \approx
 # \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,(p_{01}+p_{10})}{(p_{10}-p_{01})^2}
 # $$
+# Terms: $n_{\text{pairs}}$ = required matched pairs, $p_{01}$ = probability of 0→1 switch, $p_{10}$ = probability of 1→0 switch, $(p_{10}-p_{01})$ = net directional change, $z_{1-\alpha/2}$ and $z_{1-\beta}$ = significance/power cutoffs.
 #
-# **Sizing convention:**  
-# For formulas returning per-group size, total is $N_{\text{total}} = n \times \text{group\_count}$.
+# 12. **Chi-square (categorical, multi-sample)**
+# $$
+# N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{w^2}
+# $$
+# Terms: $N_{\text{total}}$ = total required sample, $w$ = chi-square effect size (association strength), $z_{1-\alpha}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#
+# 13. **Count models (Poisson / Negative Binomial)**
+# Model-based power; no one-line universal $n$ formula in this notebook.
+# Terms: no single closed-form symbols in this notebook; power uses baseline event rate, exposure, target rate ratio, and dispersion.
+#
+# **Sizing convention:** if a formula returns per-group size, use
+# $N_{\text{total}} = n \times \text{group\_count}$.
 #
 # </details>
 #
