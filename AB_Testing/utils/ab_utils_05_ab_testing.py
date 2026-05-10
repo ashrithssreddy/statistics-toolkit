@@ -186,7 +186,7 @@ def run_ab_test(
 
 def summarize_ab_test_result(result):
     """
-    Prints A/B test results summary with statistical test outputs and lift analysis.
+    Prints A/B test results summary with statistical test outputs and final verdict.
     """
     test_family = result['test_family']
     group_relationship = result.get('group_relationship')
@@ -223,6 +223,67 @@ def summarize_ab_test_result(result):
     display(pd.DataFrame(result['summary']).T)
 
     print("="*45 + "\n")
+
+    # ---- Final Summary Block (moved from print_final_ab_test_summary) ----
+    print("="*40)
+    print("          📊 FINAL A/B TEST SUMMARY")
+    print("="*40)
+
+    if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] or (test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'independent'):
+        mean1 = result['summary'][group1]['mean']
+        mean2 = result['summary'][group2]['mean']
+        lift = mean2 - mean1
+        pct_lift = lift / mean1 if mean1 else np.nan
+
+        label = "Conversion rate" if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else "Avg outcome"
+        test_name = result.get("test", "A/B test")
+
+        print(f"👥  {group1.capitalize()} {label:<20}:  {mean1:.4f}")
+        print(f"🧪  {group2.capitalize()} {label:<20}:  {mean2:.4f}")
+        print(f"📈  Absolute lift              :  {lift:.4f}")
+        print(f"📊  Percentage lift            :  {pct_lift:.2%}")
+        print(f"🧪  P-value (from {test_name}) :  {p_value:.4f}")
+
+    elif test_family == 'mann_whitney_u_test':
+        mean1 = result['summary'][group1]['mean']
+        mean2 = result['summary'][group2]['mean']
+        lift = mean2 - mean1
+        pct_lift = lift / mean1 if mean1 else np.nan
+        test_name = result.get("test", "Mann-Whitney U test")
+        print(f"👥  {group1.capitalize()} Avg outcome         :  {mean1:.4f}")
+        print(f"🧪  {group2.capitalize()} Avg outcome         :  {mean2:.4f}")
+        print(f"📈  Absolute lift              :  {lift:.4f}")
+        print(f"📊  Percentage lift            :  {pct_lift:.2%}")
+        print(f"🧪  P-value (from {test_name}) :  {p_value:.4f}")
+
+    elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'paired':
+        print("🧪 Paired T-Test was used to compare within-user outcomes.")
+        print(f"🧪 P-value: {p_value:.4f}")
+
+    elif test_family == 'mcnemar_test':
+        print("🧪 McNemar test was used for paired binary outcomes.")
+        if "paired_n" in result:
+            print(f"👥 Paired observations analyzed: {result['paired_n']}")
+        print(f"🧪 P-value: {p_value:.4f}")
+
+    elif test_family == 'chi_square_test':
+        print("🧪 Chi-square test was used to compare categorical distributions.")
+        print(f"🧪 P-value: {p_value:.4f}")
+
+    else:
+        print("⚠️ Unsupported test type.")
+
+    print("-" * 40)
+
+    if p_value is not None:
+        if p_value < alpha:
+            print("✅ RESULT: Statistically significant difference detected.")
+        else:
+            print("❌ RESULT: No statistically significant difference detected.")
+    else:
+        print("⚠️ No p-value available.")
+
+    print("="*40 + "\n")
 
 
 def plot_ab_test_results(result):
@@ -379,77 +440,6 @@ def compute_lift_confidence_interval(result):
         print("- Categorical test: per-category lift analysis required (not implemented).")
 
     print("="*45 + "\n")
-
-
-def print_final_ab_test_summary(result):
-    """
-    Final wrap-up of results with summary stats and verdict.
-    """
-    test_family = result['test_family']
-    group_relationship = result.get('group_relationship')
-    group1, group2 = result['group_labels']
-    p_value = result.get('p_value')
-    alpha = result.get('alpha', 0.05)
-
-    print("="*40)
-    print("          📊 FINAL A/B TEST SUMMARY")
-    print("="*40)
-
-    if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] or (test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'independent'):
-        mean1 = result['summary'][group1]['mean']
-        mean2 = result['summary'][group2]['mean']
-        lift = mean2 - mean1
-        pct_lift = lift / mean1 if mean1 else np.nan
-
-        label = "Conversion rate" if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else "Avg outcome"
-        test_name = result.get("test", "A/B test")
-
-        print(f"👥  {group1.capitalize()} {label:<20}:  {mean1:.4f}")
-        print(f"🧪  {group2.capitalize()} {label:<20}:  {mean2:.4f}")
-        print(f"📈  Absolute lift              :  {lift:.4f}")
-        print(f"📊  Percentage lift            :  {pct_lift:.2%}")
-        print(f"🧪  P-value (from {test_name}) :  {p_value:.4f}")
-
-    elif test_family == 'mann_whitney_u_test':
-        mean1 = result['summary'][group1]['mean']
-        mean2 = result['summary'][group2]['mean']
-        lift = mean2 - mean1
-        pct_lift = lift / mean1 if mean1 else np.nan
-        test_name = result.get("test", "Mann-Whitney U test")
-        print(f"👥  {group1.capitalize()} Avg outcome         :  {mean1:.4f}")
-        print(f"🧪  {group2.capitalize()} Avg outcome         :  {mean2:.4f}")
-        print(f"📈  Absolute lift              :  {lift:.4f}")
-        print(f"📊  Percentage lift            :  {pct_lift:.2%}")
-        print(f"🧪  P-value (from {test_name}):  {p_value:.4f}")
-
-    elif test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test'] and group_relationship == 'paired':
-        print("🧪 Paired T-Test was used to compare within-user outcomes.")
-        print(f"🧪 P-value: {p_value:.4f}")
-
-    elif test_family == 'mcnemar_test':
-        print("🧪 McNemar test was used for paired binary outcomes.")
-        if "paired_n" in result:
-            print(f"👥 Paired observations analyzed: {result['paired_n']}")
-        print(f"🧪 P-value: {p_value:.4f}")
-
-    elif test_family == 'chi_square_test':
-        print("🧪 Chi-square test was used to compare categorical distributions.")
-        print(f"🧪 P-value: {p_value:.4f}")
-
-    else:
-        print("⚠️ Unsupported test type.")
-
-    print("-" * 40)
-
-    if p_value is not None:
-        if p_value < alpha:
-            print("✅ RESULT: Statistically significant difference detected.")
-        else:
-            print("❌ RESULT: No statistically significant difference detected.")
-    else:
-        print("⚠️ No p-value available.")
-
-    print("="*40 + "\n")
 
 
 def estimate_test_duration(

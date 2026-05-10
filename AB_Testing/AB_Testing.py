@@ -1281,17 +1281,6 @@ plot_confidence_intervals(result)
 compute_lift_confidence_interval(result)
 
 # %% [markdown]
-# <a id="final-conclusion"></a>
-#
-# <h4>✅ Final Conclusion</h4>
-#
-
-# %%
-print_final_ab_test_summary(result)
-
-# TODO: redundant 
-
-# %% [markdown]
 # <a id="how-long"></a>
 # <h4>⏱️ How Long</h4>
 #
