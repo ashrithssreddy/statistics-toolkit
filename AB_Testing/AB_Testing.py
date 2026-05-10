@@ -32,7 +32,7 @@
 #
 # [⚡ Power Analysis](#power-analysis)  
 # - [⚙️ Setup Inputs + Config Values](#setup-inputs--config-values)  
-# - [📈 Baseline Estimation from Data](#baseline-from-data)  
+# - [📈 Baseline Estimation (Pre-Experiment)](#baseline-from-data)  
 # - [📈 Minimum Detectable Effect](#minimum-detectable-effect)  
 # - [🔍 Test Family](#test-family)
 # - [📐 Required Sample Size](#required-sample-size)  
@@ -48,26 +48,25 @@
 # - [🎲 Type I Error Simulation](#type-i-error-simulation)
 #
 # [🧪 A/B Testing](#ab-testing)
+# - [🧪 Assumption Refresh](#ab-assumption-refresh)
 # - [🧾 Summaries](#summaries)  
 # - [📊 Visualization](#results-visualization)  
 # - [🎯 95% Confidence Intervals](#confidence-intervals)  
 # - [📈 Lift Analysis](#lift-analysis)  
-# - [✅ Final Conclusion](#final-conclusion)
 # - [⏱️ How Long](#how-long)
 #
 # [🔍 Post Hoc Analysis](#post-hoc-analysis)  
 # - [🧩 Segmented Lift](#segmented-lift)  
 # - [🚦 Guardrail Metrics](#guardrail-metrics)  
 # - [🔄 CUPED](#cuped)
-# - [🧠 Correcting for Multiple Comparisons](#multiple-comparisons)
-# - [🪄 Novelty Effects & Behavioral Decay](#novelty-effects)
-# - [🎯 Primacy Effect & Order Bias](#primacy-effect)
+# - [🧠 Multiple Comparisons](#multiple-comparisons)
+# - [🪄 Novelty Effects](#novelty-effects)
+# - [🎯 Primacy Effect](#primacy-effect)
 # - [🎲 Rollout Simulation](#rollout-simulation)
 # - [🧪 A/B Test Holdouts](#ab-test-holdouts)
 # - [🚫 Limits & Alteratives](#ab-test-limits)
 #
 # <hr style="border: none; height: 1px; background-color: #ddd;">
-#
 
 # %% [markdown]
 # <a id="data-setup"></a>
