@@ -15,6 +15,7 @@ def print_hypothesis(test_config):
     datatype = test_config['outcome_metric_datatype']
     group1, group2 = test_config['group_labels']
     relationship = test_config['group_relationship']
+    hypothesis_type = test_config.get('hypothesis_type', 'two_sided')
 
     print("\n🧠 Hypothesis Definition")
     print("-" * 40)
@@ -22,14 +23,29 @@ def print_hypothesis(test_config):
     if datatype == 'continuous':
         if relationship == 'paired':
             print(f"H₀: Mean paired difference in {metric} is 0.")
-            print(f"H₁: Mean paired difference in {metric} is not 0.")
+            if hypothesis_type == 'greater':
+                print(f"H₁: Mean paired difference in {metric} is > 0.")
+            elif hypothesis_type == 'less':
+                print(f"H₁: Mean paired difference in {metric} is < 0.")
+            else:
+                print(f"H₁: Mean paired difference in {metric} is not 0.")
         else:
             print(f"H₀: Mean {metric} is equal between {group1} and {group2}.")
-            print(f"H₁: Mean {metric} differs between {group1} and {group2}.")
+            if hypothesis_type == 'greater':
+                print(f"H₁: Mean {metric} in {group2} is greater than {group1}.")
+            elif hypothesis_type == 'less':
+                print(f"H₁: Mean {metric} in {group2} is less than {group1}.")
+            else:
+                print(f"H₁: Mean {metric} differs between {group1} and {group2}.")
 
     elif datatype == 'binary':
         print(f"H₀: Conversion rate is equal between {group1} and {group2}.")
-        print(f"H₁: Conversion rate differs between {group1} and {group2}.")
+        if hypothesis_type == 'greater':
+            print(f"H₁: Conversion rate in {group2} is greater than {group1}.")
+        elif hypothesis_type == 'less':
+            print(f"H₁: Conversion rate in {group2} is less than {group1}.")
+        else:
+            print(f"H₁: Conversion rate differs between {group1} and {group2}.")
 
     elif datatype == 'categorical':
         print(f"H₀: Distribution of {metric} is independent of group assignment.")

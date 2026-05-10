@@ -235,7 +235,13 @@ def evaluate_guardrail_metric(
     t_stat, p_val = ttest_ind(treatment_vals, control_vals, alternative=scipy_alt)
 
     print(f"🚦 Guardrail Metric Check → '{guardrail_metric_col}'")
-    print("Hypothesis (two-sided t-test): H₀ — no difference in mean vs H₁ — means differ.")
+    htype = test_config.get('hypothesis_type', 'two_sided')
+    if htype == 'greater':
+        print("Hypothesis (one-sided, greater): H₀ — treatment mean <= control mean; H₁ — treatment mean > control mean.")
+    elif htype == 'less':
+        print("Hypothesis (one-sided, less): H₀ — treatment mean >= control mean; H₁ — treatment mean < control mean.")
+    else:
+        print("Hypothesis (two-sided): H₀ — no difference in mean; H₁ — means differ.")
     print(f"- {control:10}: {mean_control:.4f}")
     print(f"- {treatment:10}: {mean_treatment:.4f}")
     print(f"- Difference   : {diff:+.4f}")
