@@ -1,4 +1,5 @@
 from itertools import product
+import os
 from pathlib import Path
 import sys
 
@@ -62,10 +63,20 @@ combo_space = pd.DataFrame(
         "guardrail_metric_col",
     ],
 )
+combo_space["run_combo"] = True
+combo_space.loc[
+    (combo_space["randomization_method"] == "matched_pair")
+    & (combo_space["pre_experiment_metric_col"].isna()),
+    "run_combo",
+] = False
 
 rows = []
 
-for combo_row, combo in combo_space.iloc[START_ROW:].iterrows():
+os.system("cls" if os.name == "nt" else "clear")
+
+for combo_row, combo in combo_space[
+    (combo_space.index >= START_ROW) & (combo_space["run_combo"])
+].iterrows():
     outcome_metric_datatype = combo["outcome_metric_datatype"]
     group_relationship = combo["group_relationship"]
     hypothesis_type = combo["hypothesis_type"]
