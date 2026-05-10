@@ -114,6 +114,8 @@ def add_outcome_metrics(
     treatment_effect=True,
     seed=my_seed,
     outcome_metric_datatype='continuous',
+    historical_normality='normal',
+    non_normal_distribution='random',
 ):
     """
     Add outcome and optional guardrail metric to a dataframe that already has group assignment.
@@ -123,6 +125,7 @@ def add_outcome_metrics(
     - guardrail_metric_col: optional guardrail metric column name (e.g. 'bounce_rate'); None to omit.
     - treatment_effect: if True, treatment group gets a lift (A/B simulation). If False, both groups
       from same distribution (A/A simulation). Guardrail also avoids treatment signal when False.
+    - continuous outcomes use create_historical_df (same distribution as historical baselines), then lift.
     """
     np.random.seed(seed)
     n = len(df)
@@ -139,12 +142,21 @@ def add_outcome_metrics(
         treatment_values = np.random.choice(categories, size=n, p=treatment_probs)
         df[outcome_metric_col] = np.where(treatment_mask, treatment_values, control_values)
     elif outcome_metric_datatype == 'continuous':
-        base_engagement = np.random.normal(50, 15, n)
-        if treatment_effect:
-            treatment_lift = np.where(treatment_mask, np.random.normal(5, 2, n), 0)
-        else:
-            treatment_lift = 0
-        df[outcome_metric_col] = (base_engagement + treatment_lift).clip(0, 100)
+        work = df.copy()
+        work[outcome_metric_col] = np.nan
+        baseline = create_historical_df(
+            work,
+            outcome_metric_col,
+            guardrail_metric_col=None,
+            seed=seed,
+            historical_normality=historical_normality,
+            non_normal_distribution=non_normal_distribution,
+            outcome_metric_datatype='continuous',
+        )
+        base = baseline[outcome_metric_col].to_numpy(dtype=float)
+        lift = np.random.default_rng(seed + 1)
+        treatment_lift = np.where(treatment_mask, lift.normal(5, 2, n), 0.0) if treatment_effect else 0.0
+        df[outcome_metric_col] = (base + treatment_lift).clip(0, 100)
     else:
         raise ValueError("outcome_metric_datatype must be 'continuous', 'binary', or 'categorical'")
     # Optional guardrail: no treatment signal when treatment_effect=False (A/A)

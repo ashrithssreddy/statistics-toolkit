@@ -261,6 +261,7 @@ for combo_row, combo in combo_space[
         treatment_effect=False,
         seed=my_seed,
         outcome_metric_datatype=outcome_metric_datatype,
+        historical_normality=historical_normality,
     )
 
     aa_result = run_outcome_similarity_test(
@@ -287,6 +288,7 @@ for combo_row, combo in combo_space[
         treatment_effect=True,
         seed=my_seed,
         outcome_metric_datatype=outcome_metric_datatype,
+        historical_normality=historical_normality,
     )
 
     test_config = test_normality(
