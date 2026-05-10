@@ -8,9 +8,9 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.19.1
 #   kernelspec:
-#     display_name: Python [conda env:base]
+#     display_name: base
 #     language: python
-#     name: conda-base-py
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -144,42 +144,102 @@ from Hypothesis_Testing.ht_utils import print_config_summary
 # <h4>🛠️ Experiment Setup</h4>
 
 # %%
+# # 1. Main outcome variable you're testing
+# outcome_metric_col = 'engagement_score'
+
+# # 5. Optional: Unique identifier for each observation (can be user_id, session_id, etc.)
+# observation_id_col = 'user_id'
+
+# # 6. Optional: Pre-experiment metric for CUPED, if used
+# pre_experiment_metric_col = 'past_purchase_revenue'  # Can be None
+
+# # Optional: guardrail metric column for simulated outcome data. Set to None to omit.
+# guardrail_metric_col = 'bounce_rate'
+
+# # Column name used to store assigned group after randomization
+# group_col = 'group'
+
+# # 2. Metric type: 'binary', 'continuous', or 'categorical'
+# outcome_metric_datatype = 'continuous'
+
+# # 3. Group assignment (to be generated)
+# group_labels = ('control', 'treatment')
+
+# # 3b. Number of groups in the experiment (e.g., 2 for A/B test, 3 for A/B/C test)
+# group_count = len(group_labels)
+
+# # 4. Experimental design group_relationship: independent or paired
+# group_relationship = 'independent'  # Options: 'independent', 'paired'
+
+# # 4b. Hypothesis direction for applicable tests
+# hypothesis_type = "two_sided"  # Options: "two_sided", "greater", "less"
+
+# # Randomization method to assign users to groups
+# # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
+# randomization_method = "simple"
+
+# # Historical-data shape control for continuous outcomes: 'normal' or 'non_normal'
+# historical_normality = 'normal'
+
+# %%
+# 🧪 Test Case Selector
+import json
+from pathlib import Path
+
+TEST_CASE_INDEX = 1  # 0 to 9
+TEST_CASE_FILE = Path("tests/ab_test_cases_matrix_v2.json")
+
+with open(TEST_CASE_FILE, "r") as f:
+    TEST_CASES = json.load(f)
+
+case = TEST_CASES[TEST_CASE_INDEX]
+
+print(f"🧪 Running Case {case['case_id']}: {case['case_name']}")
+print(f"💼 Business Problem: {case['business_problem']}")
+print(f"✅ Expected Test Family: {case['expected_test_family']}")
+print(f"📝 Notes: {case['notes']}")
+
 # 1. Main outcome variable you're testing
-outcome_metric_col = 'engagement_score'
+outcome_metric_col = case["outcome_metric_col"]
 
-# 5. Optional: Unique identifier for each observation (can be user_id, session_id, etc.)
-observation_id_col = 'user_id'
+# 5. Optional: Unique identifier for each observation
+observation_id_col = case["observation_id_col"]
 
-# 6. Optional: Pre-experiment metric for CUPED, if used
-pre_experiment_metric_col = 'past_purchase_revenue'  # Can be None
+# 6. Optional: Pre-experiment metric for CUPED
+pre_experiment_metric_col = case["pre_experiment_metric_col"]
 
-# Optional: guardrail metric column for simulated outcome data. Set to None to omit.
-guardrail_metric_col = 'bounce_rate'
+# Optional: guardrail metric column
+guardrail_metric_col = case["guardrail_metric_col"]
 
 # Column name used to store assigned group after randomization
-group_col = 'group'
+group_col = case["group_col"]
 
 # 2. Metric type: 'binary', 'continuous', or 'categorical'
-outcome_metric_datatype = 'continuous'
+outcome_metric_datatype = case["outcome_metric_datatype"]
 
-# 3. Group assignment (to be generated)
-group_labels = ('control', 'treatment')
+# 3. Group assignment
+group_labels = tuple(case["group_labels"])
 
-# 3b. Number of groups in the experiment (e.g., 2 for A/B test, 3 for A/B/C test)
+# 3b. Number of groups
 group_count = len(group_labels)
 
-# 4. Experimental design group_relationship: independent or paired
-group_relationship = 'independent'  # Options: 'independent', 'paired'
+# 4. Experimental design group_relationship
+group_relationship = case["group_relationship"]
 
-# 4b. Hypothesis direction for applicable tests
-hypothesis_type = "two_sided"  # Options: "two_sided", "greater", "less"
+# 4b. Hypothesis direction
+hypothesis_type = case["hypothesis_type"]
 
-# Randomization method to assign users to groups
-# Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
-randomization_method = "simple"
+# Randomization method
+randomization_method = case["randomization_method"]
 
-# Historical-data shape control for continuous outcomes: 'normal' or 'non_normal'
-historical_normality = 'normal'
+# Historical-data shape control
+historical_normality = case["historical_normality"]
+
+# Extra config values used later
+mde = case["mde"]
+observations_count = case["observations_count"]
+expected_test_family = case["expected_test_family"]
+expected_recommended_test = case["expected_recommended_test"]
 
 # %% [markdown]
 # <a id="central-control-panel"></a>
@@ -220,7 +280,7 @@ print_hypothesis(test_config)
 # <h4>📥 Read/Generate Data</h4>
 
 # %%
-observations_count = 1000
+observations_count = 5000
 df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col, guardrail_metric_col=guardrail_metric_col, randomization_method=randomization_method)
 df
 
@@ -552,7 +612,10 @@ test_config['baseline_std_dev'] = _b['baseline_std_dev']
 # - mde = 1.2 for binary/categorical
 # - mde = '5'
 
-mde = 5  # Change this based on business relevance
+if outcome_metric_datatype in ["binary", "categorical"]:
+    mde = 0.05
+else:
+    mde = 5     # Change this based on business relevance
 
 
 # %% [markdown]
