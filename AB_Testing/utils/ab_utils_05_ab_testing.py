@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from IPython.display import display
 from statsmodels.stats.contingency_tables import mcnemar
+from statsmodels.stats.oneway import anova_oneway
 
 
 def print_hypothesis(test_config):
@@ -32,7 +33,11 @@ def print_hypothesis(test_config):
                 print(f"H₀: Mean paired difference in {metric} is 0.")
                 print(f"H₁: Mean paired difference in {metric} is not 0.")
         else:
-            if hypothesis_type == 'greater':
+            labels = test_config['group_labels']
+            if len(labels) > 2:
+                print(f"H₀: Mean {metric} is equal across groups {labels}.")
+                print(f"H₁: At least one group mean of {metric} differs.")
+            elif hypothesis_type == 'greater':
                 print(f"H₀: Mean {metric} in {group2} is less than or equal to {group1}.")
                 print(f"H₁: Mean {metric} in {group2} is greater than {group1}.")
             elif hypothesis_type == 'less':
@@ -80,7 +85,7 @@ def run_ab_test(
     - result dict with summary stats, test used, p-value, and test-specific values
     """
     test_family = test_family
-    group1, group2 = group_labels
+    group1, group2 = group_labels[0], group_labels[1]
     data1 = df[df[group_col] == group1][metric_col]
     data2 = df[df[group_col] == group2][metric_col]
     alt_map = {'two_sided': 'two-sided', 'greater': 'greater', 'less': 'less'}
@@ -97,25 +102,26 @@ def run_ab_test(
         'summary': {}
     }
 
-    # --- Summary Stats ---
+    # --- Summary Stats (all arms) ---
     def _safe_mean(x):
         return x.mean() if pd.api.types.is_numeric_dtype(x) else None
 
     def _safe_std(x):
         return x.std() if pd.api.types.is_numeric_dtype(x) else None
 
-    result['summary'][group1] = {
-        'n': len(data1),
-        'mean': _safe_mean(data1),
-        'std': _safe_std(data1) if test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test'] else None,
-        'sum': data1.sum() if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else None
-    }
-    result['summary'][group2] = {
-        'n': len(data2),
-        'mean': _safe_mean(data2),
-        'std': _safe_std(data2) if test_family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test'] else None,
-        'sum': data2.sum() if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else None
-    }
+    _std_families = (
+        'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test',
+        'mann_whitney_u_test', 'wilcoxon_signed_rank_test',
+        'anova_test', 'welch_anova_test', 'kruskal_wallis_test',
+    )
+    for g in group_labels:
+        dg = df[df[group_col] == g][metric_col]
+        result['summary'][g] = {
+            'n': len(dg),
+            'mean': _safe_mean(dg),
+            'std': _safe_std(dg) if test_family in _std_families else None,
+            'sum': dg.sum() if test_family in ['one_proportion_z_test', 'two_proportion_z_test'] else None,
+        }
 
     # --- Binary Proportions (Z-Test) ---
     if test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
@@ -176,6 +182,46 @@ def run_ab_test(
             )
         w_stat, p_value = stats.wilcoxon(data1, data2, alternative=scipy_alt)
         result.update({'test': 'Wilcoxon signed-rank test', 'w_stat': w_stat, 'p_value': p_value})
+
+    # --- k-sample independent: ANOVA / Welch ANOVA / Kruskal–Wallis ---
+    elif test_family in ['anova_test', 'welch_anova_test', 'kruskal_wallis_test']:
+        if group_relationship not in (None, 'independent'):
+            raise ValueError(
+                f"{test_family} requires independent groups; got group_relationship={group_relationship!r}."
+            )
+        samples = tuple(df[df[group_col] == g][metric_col].dropna() for g in group_labels)
+        sizes = [len(s) for s in samples]
+        if min(sizes) == 0:
+            raise ValueError(
+                f"{test_family} requires every group to have at least one observation; counts={dict(zip(group_labels, sizes))}."
+            )
+        if test_family == 'anova_test':
+            aov = anova_oneway(samples, use_var='equal')
+            result.update(
+                {
+                    'test': 'one-way ANOVA (equal variances)',
+                    'f_stat': float(aov.statistic),
+                    'p_value': float(aov.pvalue),
+                }
+            )
+        elif test_family == 'welch_anova_test':
+            aov = anova_oneway(samples, use_var='unequal', welch_correction=True)
+            result.update(
+                {
+                    'test': "Welch's one-way ANOVA",
+                    'f_stat': float(aov.statistic),
+                    'p_value': float(aov.pvalue),
+                }
+            )
+        else:
+            h_stat, p_value = stats.kruskal(*samples)
+            result.update(
+                {
+                    'test': 'Kruskal-Wallis H-test',
+                    'h_stat': float(h_stat),
+                    'p_value': float(p_value),
+                }
+            )
 
     # --- Categorical (Chi-square) ---
     elif test_family in ['chi_square_test']:
@@ -255,6 +301,10 @@ def summarize_ab_test_result(result):
         print(f"Z-statistic: {result['z_stat']:.4f}")
     elif 't_stat' in result:
         print(f"T-statistic: {result['t_stat']:.4f}")
+    elif 'f_stat' in result:
+        print(f"F-statistic: {result['f_stat']:.4f}")
+    elif 'h_stat' in result:
+        print(f"H-statistic (Kruskal–Wallis): {result['h_stat']:.4f}")
     elif 'chi2_stat' in result:
         print(f"Chi2-statistic: {result['chi2_stat']:.4f}")
     elif 'u_stat' in result:
@@ -320,6 +370,13 @@ def summarize_ab_test_result(result):
         print("🧪 Chi-square test was used to compare categorical distributions.")
         print(f"🧪 P-value: {p_value:.4f}")
 
+    elif test_family in ['anova_test', 'welch_anova_test', 'kruskal_wallis_test']:
+        which = {'anova_test': 'one-way ANOVA (equal variances)', 'welch_anova_test': "Welch's ANOVA", 'kruskal_wallis_test': 'Kruskal-Wallis'}
+        print(f"🧪 {which.get(test_family, test_family)} — omnibus test across all groups.")
+        print(f"🧪 P-value: {p_value:.4f}")
+        if len(result['group_labels']) > 2:
+            print("ℹ️  For which pair(s) differ, follow up with pairwise tests (not run here).")
+
     else:
         print("⚠️ Unsupported test type.")
 
@@ -359,6 +416,17 @@ def plot_ab_test_results(result):
         plt.ylabel(ylabel)
         plt.title(f"{ylabel} by Group")
         plt.ylim(0, max(values) * 1.2)
+        plt.grid(axis='y', linestyle='--', alpha=0.6)
+        plt.show()
+
+    elif test_family in ['anova_test', 'welch_anova_test', 'kruskal_wallis_test']:
+        lbls = list(result['summary'].keys())
+        vals = [result['summary'][g]['mean'] for g in lbls]
+        plt.bar(lbls, vals, color=plt.cm.tab10(np.linspace(0, 1, len(lbls))))
+        for i, val in enumerate(vals):
+            plt.text(i, val + 0.01 * (max(vals) or 1), f"{val:.2f}", ha='center')
+        plt.ylabel("Average value")
+        plt.title("Mean outcome by group (omnibus test)")
         plt.grid(axis='y', linestyle='--', alpha=0.6)
         plt.show()
 
@@ -488,6 +556,9 @@ def compute_lift_confidence_interval(result):
 
     elif test_family == 'chi_square_test':
         print("- Categorical test: per-category lift analysis required (not implemented).")
+
+    elif test_family in ['anova_test', 'welch_anova_test', 'kruskal_wallis_test']:
+        print("- Omnibus test: pairwise lift / CI not computed here (use post-hoc contrasts).")
 
     print("="*45 + "\n")
 

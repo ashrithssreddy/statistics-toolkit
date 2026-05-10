@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 from statsmodels.stats.contingency_tables import mcnemar
+from statsmodels.stats.oneway import anova_oneway
 
 
 def run_outcome_similarity_test(
@@ -132,11 +133,32 @@ def run_outcome_similarity_test(
         test_name = "Wilcoxon signed-rank test"
         stat_label, stat_value = "W statistic", w_stat
 
-    # --- ANOVA ---
+    # --- ANOVA / Kruskal–Wallis (all arms in group_labels) ---
     elif test_family in ["anova_test", "welch_anova_test"]:
-        f_stat, p_value = stats.f_oneway(group1, group2)
-        test_name = "ANOVA"
-        stat_label, stat_value = "F statistic", f_stat
+        samples = [df[df[group_col] == gl][metric_col].dropna() for gl in group_labels]
+        if len(samples) < 2 or min(len(s) for s in samples) == 0:
+            if verbose:
+                print("❌ ANOVA requires every listed group to have at least one observation.")
+            return None
+        if test_family == "anova_test":
+            aov = anova_oneway(tuple(samples), use_var="equal")
+            test_name = "one-way ANOVA (equal variances)"
+        else:
+            aov = anova_oneway(tuple(samples), use_var="unequal", welch_correction=True)
+            test_name = "Welch's one-way ANOVA"
+        p_value = float(aov.pvalue)
+        stat_label, stat_value = "F statistic", float(aov.statistic)
+
+    elif test_family == "kruskal_wallis_test":
+        samples = [df[df[group_col] == gl][metric_col].dropna() for gl in group_labels]
+        if len(samples) < 2 or min(len(s) for s in samples) == 0:
+            if verbose:
+                print("❌ Kruskal–Wallis requires every listed group to have at least one observation.")
+            return None
+        h_stat, p_value = stats.kruskal(*samples)
+        p_value = float(p_value)
+        test_name = "Kruskal-Wallis H-test"
+        stat_label, stat_value = "H statistic", float(h_stat)
 
     # --- Chi-square ---
     elif test_family in ["chi_square_test"]:
@@ -198,9 +220,9 @@ def run_outcome_similarity_test(
         elif test_family == "chi_square_test":
             print(f"- H₀ (null)            : {metric_col} is independent of {group_col}.")
             print(f"- H₁ (alternative)     : {metric_col} depends on {group_col}.")
-        elif test_family in ["anova_test", "welch_anova_test"]:
-            print(f"- H₀ (null)            : Group means of {metric_col} are equal.")
-            print(f"- H₁ (alternative)     : At least one group mean of {metric_col} differs.")
+        elif test_family in ["anova_test", "welch_anova_test", "kruskal_wallis_test"]:
+            print(f"- H₀ (null)            : Group locations/means of {metric_col} are equal across {group_labels}.")
+            print(f"- H₁ (alternative)     : At least one group differs (omnibus test).")
         elif test_family == "mann_whitney_u_test":
             if hypothesis_type == "greater":
                 print(f"- H₀ (null)            : {metric_col} in {group_labels[1]} is less than or equal to {group_labels[0]} in stochastic order.")
@@ -278,10 +300,11 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]
 
-    # Continuous / non-parametric → histograms
+    # Continuous / non-parametric → histograms (all groups when k>2)
     if test_family in ['one_sample_t_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'anova_test', 'welch_anova_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test', 'kruskal_wallis_test']:
-        plt.hist(group1, bins=30, alpha=0.5, label=group_labels[0])
-        plt.hist(group2, bins=30, alpha=0.5, label=group_labels[1])
+        for gl in group_labels:
+            s = df[df[group_col] == gl][metric_col]
+            plt.hist(s, bins=30, alpha=0.4, label=gl)
         plt.title(f"A/A Test: {metric_col} Distribution")
         plt.xlabel(metric_col)
         plt.ylabel("Frequency")
