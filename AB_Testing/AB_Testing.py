@@ -510,22 +510,28 @@ test_config['baseline_std_dev'] = _b['baseline_std_dev']
 # This is NOT data-driven — it reflects the minimum improvement you care about detecting.
 # It should be small enough to catch valuable changes, but large enough to avoid inflating sample size.
 
-# Examples by Metric Type:
-# - Binary       : 0.02 → detect a 2% lift in conversion rate (e.g., from 10% to 12%)
-# - Categorical  : 0.05 → detect a 5% shift in plan preference (e.g., more users choosing 'premium' over 'basic')
-# - Continuous   : 3.0  → detect a 3-point gain in engagement score (e.g., from 50 to 53 avg. score)
+# - Binary:
+#   0 < mde < 1
+#   Represents absolute conversion lift
+#   Example: mde = 0.02 → detect conversion increase from 10% to 12%
+#   Valid: 0.02, 0.05
 #
-# Permitted MDE input values by setup:
-# - outcome_metric_datatype == 'binary'      : float in (0, 1), interpreted as absolute proportion lift
-# - outcome_metric_datatype == 'categorical' : float in (0, 1), interpreted as absolute share/ratio shift
-# - outcome_metric_datatype == 'continuous'  : positive float (> 0), interpreted in metric units
-# - Any setup                                : mde must be numeric and strictly > 0
+# - Categorical:
+#   0 < mde < 1
+#   Represents absolute share/preference shift
+#   Example: mde = 0.05 → detect 5% shift toward premium plan
+#   Valid: 0.03, 0.10
 #
-# Example valid inputs:
-# - binary      : mde = 0.02, 0.05
-# - categorical : mde = 0.03, 0.10
-# - continuous  : mde = 1.5, 3.0, 5
-# - invalid     : mde = 0, -1, 1.2 (invalid for binary/categorical), '5'
+# - Continuous:
+#   mde > 0
+#   Represents change in actual metric units
+#   Example: mde = 3.0 → detect engagement increase from 50 to 53
+#   Valid: 1.5, 3.0, 5
+#
+# Invalid examples:
+# - mde = 0, -1
+# - mde = 1.2 for binary/categorical
+# - mde = '5'
 
 mde = 5  # Change this based on business relevance
 
@@ -567,7 +573,6 @@ mde = 5  # Change this based on business relevance
 
 # %%
 test_config['family'] = determine_test_family(test_config)
-# test_config
 print_config_summary(test_config)
 
 print(f"✅ Selected test family: {test_config['family']}")
