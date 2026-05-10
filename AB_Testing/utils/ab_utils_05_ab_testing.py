@@ -13,11 +13,11 @@ def run_ab_test(
     metric_col,
     group_labels,
     test_family,
-    variant=None,
+    group_relationship=None,
     alpha=0.05
 ):
     """
-    Runs the correct statistical test based on test_family + variant combo.
+    Runs the correct statistical test based on test_family + group_relationship combo.
 
     Returns:
     - result dict with summary stats, test used, p-value, and test-specific values
@@ -28,7 +28,7 @@ def run_ab_test(
 
     result = {
         'test_family': test_family,
-        'variant': variant,
+        'group_relationship': group_relationship,
         'group_labels': group_labels,
         'alpha': alpha,
         'summary': {}
@@ -67,13 +67,13 @@ def run_ab_test(
     # --- Continuous (T-Test) ---
     elif test_family in ['t_test', 'paired_t_test']:
         if test_family == 'paired_t_test':
-            variant = 'paired'
-            result['variant'] = 'paired'
+            group_relationship = 'paired'
+            result['group_relationship'] = 'paired'
 
-        if variant == 'independent':
+        if group_relationship == 'independent':
             t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=False)
             result.update({'test': 'independent t-test', 't_stat': t_stat, 'p_value': p_value})
-        elif variant == 'paired':
+        elif group_relationship == 'paired':
             if len(data1) != len(data2):
                 min_n = min(len(data1), len(data2))
                 data1 = data1.iloc[:min_n]
@@ -84,7 +84,7 @@ def run_ab_test(
             t_stat, p_value = stats.ttest_rel(data1, data2)
             result.update({'test': 'paired t-test', 't_stat': t_stat, 'p_value': p_value})
         else:
-            raise ValueError("Missing or invalid variant for t-test.")
+            raise ValueError("Missing or invalid group_relationship for t-test.")
 
     # --- Continuous (Non-parametric) ---
     elif test_family == 'non_parametric':
@@ -93,7 +93,7 @@ def run_ab_test(
 
     # --- Mann-Whitney U (explicit test family) ---
     elif test_family == 'mann_whitney_u_test':
-        alternative = variant if variant in ('two-sided', 'less', 'greater') else 'two-sided'
+        alternative = group_relationship if group_relationship in ('two-sided', 'less', 'greater') else 'two-sided'
         u_stat, p_value = stats.mannwhitneyu(data1, data2, alternative=alternative)
         result.update({'test': 'Mann-Whitney U test', 'u_stat': u_stat, 'p_value': p_value})
 
@@ -105,8 +105,8 @@ def run_ab_test(
 
     # --- Paired Binary (McNemar) ---
     elif test_family == 'mcnemar_test':
-        variant = 'paired'
-        result['variant'] = 'paired'
+        group_relationship = 'paired'
+        result['group_relationship'] = 'paired'
 
         min_n = min(len(data1), len(data2))
         x = data1.iloc[:min_n].astype(int).to_numpy()
@@ -142,7 +142,7 @@ def summarize_ab_test_result(result):
     Prints A/B test results summary with statistical test outputs and lift analysis.
     """
     test_family = result['test_family']
-    variant = result.get('variant')
+    group_relationship = result.get('group_relationship')
     group1, group2 = result['group_labels']
     p_value = result.get('p_value')
     alpha = result.get('alpha', 0.05)
@@ -176,7 +176,7 @@ def summarize_ab_test_result(result):
     display(pd.DataFrame(result['summary']).T)
 
     # ---- Lift Analysis (for Z-test, T-test independent, or non-parametric / Mann-Whitney) ----
-    if test_family in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] and (variant == 'independent' or test_family in ['z_test', 'non_parametric', 'mann_whitney_u_test']):
+    if test_family in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test'] and (group_relationship == 'independent' or test_family in ['z_test', 'non_parametric', 'mann_whitney_u_test']):
         group1_mean = result['summary'][group1]['mean']
         group2_mean = result['summary'][group2]['mean']
         lift = group2_mean - group1_mean
@@ -212,7 +212,7 @@ def plot_ab_test_results(result):
     Plots A/B test results by group mean or distribution depending on test family.
     """
     test_family = result['test_family']
-    variant = result.get('variant')
+    group_relationship = result.get('group_relationship')
     group1, group2 = result['group_labels']
 
     print("\n📊 Visualization:")
@@ -248,14 +248,14 @@ def plot_confidence_intervals(result, z=1.96):
     Plot 95% confidence intervals for group means (conversion rate or continuous).
     """
     test_family = result['test_family']
-    variant = result.get('variant')
+    group_relationship = result.get('group_relationship')
     group1, group2 = result['group_labels']
     summary = result['summary']
 
     if test_family not in ['z_test', 't_test', 'paired_t_test', 'non_parametric', 'mann_whitney_u_test']:
         print(f"⚠️ CI plotting not supported for test family: {test_family}")
         return
-    if test_family in ['t_test', 'paired_t_test'] and variant != 'independent':
+    if test_family in ['t_test', 'paired_t_test'] and group_relationship != 'independent':
         print(f"⚠️ CI plotting only supported for independent t-tests.")
         return
 
@@ -292,7 +292,7 @@ def compute_lift_confidence_interval(result):
     Compute CI for lift in binary or continuous-independent tests.
     """
     test_family = result['test_family']
-    variant = result.get('variant')
+    group_relationship = result.get('group_relationship')
     group1, group2 = result['group_labels']
     alpha = result.get('alpha', 0.05)
     z = 1.96
@@ -301,7 +301,7 @@ def compute_lift_confidence_interval(result):
     print(f"📈 95% CI for Difference in Outcome [{test_family}]")
     print("="*45)
 
-    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and variant == 'independent'):
+    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and group_relationship == 'independent'):
         m1 = result['summary'][group1]['mean']
         m2 = result['summary'][group2]['mean']
         lift = m2 - m1
@@ -351,7 +351,7 @@ def compute_lift_confidence_interval(result):
         else:
             print("- Mann-Whitney U: CI for difference in means (summary std used).")
 
-    elif test_family in ['t_test', 'paired_t_test'] and variant == 'paired':
+    elif test_family in ['t_test', 'paired_t_test'] and group_relationship == 'paired':
         print("- Paired test: CI already accounted for in test logic.")
 
     elif test_family == 'mcnemar_test':
@@ -368,7 +368,7 @@ def print_final_ab_test_summary(result):
     Final wrap-up of results with summary stats and verdict.
     """
     test_family = result['test_family']
-    variant = result.get('variant')
+    group_relationship = result.get('group_relationship')
     group1, group2 = result['group_labels']
     p_value = result.get('p_value')
     alpha = result.get('alpha', 0.05)
@@ -377,7 +377,7 @@ def print_final_ab_test_summary(result):
     print("          📊 FINAL A/B TEST SUMMARY")
     print("="*40)
 
-    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and variant == 'independent'):
+    if test_family == 'z_test' or (test_family in ['t_test', 'paired_t_test'] and group_relationship == 'independent'):
         mean1 = result['summary'][group1]['mean']
         mean2 = result['summary'][group2]['mean']
         lift = mean2 - mean1
@@ -404,7 +404,7 @@ def print_final_ab_test_summary(result):
         print(f"📊  Percentage lift            :  {pct_lift:.2%}")
         print(f"🧪  P-value (from {test_name}):  {p_value:.4f}")
 
-    elif test_family in ['t_test', 'paired_t_test'] and variant == 'paired':
+    elif test_family in ['t_test', 'paired_t_test'] and group_relationship == 'paired':
         print("🧪 Paired T-Test was used to compare within-user outcomes.")
         print(f"🧪 P-value: {p_value:.4f}")
 
@@ -479,3 +479,4 @@ def estimate_test_duration(
         'longest_group_runtime': longest_group_runtime,
         'recommended_total_duration': total_with_buffer
     }
+

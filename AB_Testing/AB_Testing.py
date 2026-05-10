@@ -168,8 +168,8 @@ group_labels = ('control', 'treatment')
 # 3b. Number of groups in the experiment (e.g., 2 for A/B test, 3 for A/B/C test)
 group_count = len(group_labels)
 
-# 4. Experimental design variant: independent or paired
-variant = 'independent'  # Options: 'independent', 'paired'
+# 4. Experimental design group_relationship: independent or paired
+group_relationship = 'independent'  # Options: 'independent', 'paired'
 
 # Randomization method to assign users to groups
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
@@ -183,15 +183,17 @@ randomization_method = "simple"
 
 # %%
 test_config = {
-    # Core experiment setup
+    # Column Names
     'outcome_metric_col'     : outcome_metric_col,         # Main metric to analyze (e.g., 'engagement_score')
     'observation_id_col'     : observation_id_col,         # Unique identifier for each observation
     'pre_experiment_metric'  : pre_experiment_metric,      # Used for CUPED adjustment (if any)
+    'guardrail_metric_col'   : guardrail_metric_col,       # Optional: e.g. 'bounce_rate'; None to omit
+
+    # Experiment Design Parameters
     'outcome_metric_datatype': outcome_metric_datatype,    # One of: 'binary', 'continuous', 'categorical'
     'group_labels'           : group_labels,               # Tuple of (control, treatment) group names
     'group_count'            : group_count,                # Number of groups (usually 2 for A/B tests)
-    'variant'                : variant,                    # 'independent' or 'paired'
-    'guardrail_metric_col'   : guardrail_metric_col,       # Optional: e.g. 'bounce_rate'; None to omit
+    'group_relationship'     : group_relationship,         # 'independent' or 'paired'
 
     # Diagnostic results — filled after EDA/assumptions check
     'normality'              : None,  # Will be set based on Shapiro-Wilk or visual tests
@@ -208,8 +210,9 @@ print_config_summary(test_config)
 # %%
 observations_count = 1000
 df = create_dummy_ab_data(observations_count, seed=my_seed, outcome_metric_col=outcome_metric_col, guardrail_metric_col=guardrail_metric_col)
-historical_df = create_historical_df(df, outcome_metric_col, guardrail_metric_col, seed=my_seed)
 df
+
+historical_df = create_historical_df(df, outcome_metric_col, guardrail_metric_col, seed=my_seed)
 historical_df
 
 # %% [markdown]
@@ -292,7 +295,7 @@ historical_df
 #   <li><code>group_labels</code>: The names of the experimental groups (e.g., <code>'control'</code>, <code>'treatment'</code>).</li>
 #   <li><code>metric_col</code>: Outcome metric column you're analyzing.</li>
 #   <li><code>test_family</code>: Chosen statistical test (e.g., <code>'t_test'</code>, <code>'z_test'</code>, <code>'chi_square'</code>) based on assumptions.</li>
-#   <li><code>variant</code>: Experimental design structure — <code>'independent'</code> or <code>'paired'</code>.</li>
+#   <li><code>group_relationship</code>: Experimental design structure — <code>'independent'</code> or <code>'paired'</code>.</li>
 # </ul>
 #
 # <p>These inputs drive sample size estimation, test choice, and downstream analysis logic.</p>
@@ -452,7 +455,7 @@ print(f"✅ Selected test family: {test_config['family']}")
 # %%
 required_sample_size = calculate_power_sample_size(
     test_family=test_config['family'],
-    variant=test_config.get('variant'),
+    group_relationship=test_config.get('group_relationship'),
     alpha=alpha,
     power=power,
     baseline_rate=test_config.get('baseline_rate'),
@@ -469,7 +472,7 @@ print(f"👥 Total sample size: {required_sample_size * 2}")
 # %%
 print_power_summary(
     test_family=test_config['family'],
-    variant=test_config.get('variant'),
+    group_relationship=test_config.get('group_relationship'),
     alpha=alpha,
     power=power,
     baseline_rate=test_config.get('baseline_rate'),
@@ -885,7 +888,7 @@ _ = run_outcome_similarity_test(
     group_col='group',
     metric_col=test_config['outcome_metric_col'],
     test_family=test_config['family'],
-    variant=test_config.get('variant'),
+    group_relationship=test_config.get('group_relationship'),
     group_labels=test_config['group_labels'],
     alpha=0.05,
     verbose=True
@@ -903,7 +906,7 @@ visualize_aa_distribution(
     metric_col=test_config['outcome_metric_col'],
     test_family=test_config['family'],
     group_labels=test_config['group_labels'],
-    variant=test_config.get('variant')
+    group_relationship=test_config.get('group_relationship')
 )
 
 
@@ -954,7 +957,7 @@ _ = simulate_aa_type1_error_rate(
     metric_col=test_config['outcome_metric_col'],
     group_labels=test_config['group_labels'],
     test_family=test_config['family'],
-    variant=test_config.get('variant'),
+    group_relationship=test_config.get('group_relationship'),
     runs=100,
     alpha=0.05
 )
@@ -1042,7 +1045,7 @@ result = run_ab_test(
     metric_col=test_config['outcome_metric_col'],
     group_labels=test_config['group_labels'],
     test_family=test_config['family'],
-    variant=test_config.get('variant'),
+    group_relationship=test_config.get('group_relationship'),
     alpha=0.05
 )
 print_config_summary(result)
@@ -1493,7 +1496,7 @@ result_cuped = run_ab_test(
     metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
     group_labels=test_config['group_labels'],
     test_family=test_config['family'],
-    variant=test_config.get('variant')
+    group_relationship=test_config.get('group_relationship')
 )
 
 summarize_ab_test_result(result_cuped)
@@ -1636,7 +1639,7 @@ plot_adjusted_pvalues(df_pvalues, alpha=0.05)
 #
 # <details><summary><strong>📖 When First = Best (Click to Expand)</strong></summary>
 #
-# Sometimes, the **position** of a variant or option can distort results — especially if it's shown **first**. This is called the **primacy effect**, a type of cognitive bias.
+# Sometimes, the **position** of a group_relationship or option can distort results — especially if it's shown **first**. This is called the **primacy effect**, a type of cognitive bias.
 #
 # It often shows up in:
 # - Feed ranking or content ordering experiments
@@ -1741,3 +1744,4 @@ simulate_rollout_impact(
 # [Back to the top](#table-of-contents)
 # ___
 #
+

@@ -1,4 +1,4 @@
-datatype,variant,randomization_method,group_labels,status,reason,selected_family,runner_family,p_value,n_total
+datatype,group_relationship,randomization_method,group_labels,status,reason,selected_family,runner_family,p_value,n_total
 continuous,independent,simple,"('control', 'treatment')",pass,,two_sample_t_test,t_test,6.991692366175834e-12,600
 continuous,independent,stratified,"('control', 'treatment')",pass,,two_sample_t_test,t_test,5.8318536722853986e-05,600
 continuous,independent,block,"('control', 'treatment')",pass,,two_sample_t_test,t_test,1.117359097981672e-05,600

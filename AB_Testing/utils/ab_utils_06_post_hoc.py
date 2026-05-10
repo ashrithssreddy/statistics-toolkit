@@ -127,7 +127,7 @@ def analyze_segment_lift(
     group1, group2 = test_config['group_labels']
     metric_col = test_config['outcome_metric_col']
     outcome_type = test_config['outcome_metric_datatype']
-    variant = test_config['variant']
+    group_relationship = test_config['group_relationship']
     test_family = test_config['family']
 
     for segment in segment_cols:
@@ -155,9 +155,9 @@ def analyze_segment_lift(
                 p_value = 2 * (1 - stats.norm.cdf(abs((p2 - p1) / se)))
 
             elif test_family == 't_test':
-                if variant == 'independent':
+                if group_relationship == 'independent':
                     _, p_value = stats.ttest_ind(g1, g2)
-                elif variant == 'paired':
+                elif group_relationship == 'paired':
                     print(f"⚠️ Paired test not supported in segmented lift — skipped '{val}' under '{segment}'.")
                     lift, p_value = np.nan, None
 
@@ -207,7 +207,7 @@ def evaluate_guardrail_metric(
 
     Parameters:
     - df : pd.DataFrame — experiment dataset
-    - test_config : dict — contains group info, variant, etc.
+    - test_config : dict — contains group info, group_relationship, etc.
     - guardrail_metric_col : str — column name of guardrail metric
     - alpha : float — significance level (default 0.05)
 
@@ -319,3 +319,4 @@ def plot_adjusted_pvalues(df_pvalues, alpha=0.05):
     plt.legend()
     plt.tight_layout()
     plt.show()
+

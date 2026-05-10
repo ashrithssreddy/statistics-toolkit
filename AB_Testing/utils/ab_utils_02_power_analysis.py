@@ -28,14 +28,14 @@ def determine_test_family(test_config):
     Decision factors:
     - outcome_metric_datatype: binary / continuous / categorical / count
     - group_count: number of variants
-    - variant: independent or paired
+    - group_relationship: independent or paired
     - normality: whether normality assumption holds
     - variance_equal: whether group variances are assumed equal
     """
 
     data_type = test_config.get("outcome_metric_datatype")
     group_count = test_config.get("group_count")
-    variant = test_config.get("variant", "independent")
+    group_relationship = test_config.get("group_relationship", "independent")
     normality = test_config.get("normality", True)
     variance_equal = test_config.get("variance_equal", True)
 
@@ -44,7 +44,7 @@ def determine_test_family(test_config):
     # -------------------------
     if data_type == "binary":
 
-        if variant == "paired":
+        if group_relationship == "paired":
             return "mcnemar_test"
 
         if group_count == 2:
@@ -58,7 +58,7 @@ def determine_test_family(test_config):
     # -------------------------
     elif data_type == "continuous":
 
-        if variant == "paired":
+        if group_relationship == "paired":
 
             if normality:
                 return "paired_t_test"
@@ -151,7 +151,7 @@ def compute_baseline_from_data(df, test_config, verbose=True):
 
 def calculate_power_sample_size(
     test_family,
-    variant=None,
+    group_relationship=None,
     alpha=0.05,
     power=0.80,
     baseline_rate=None,
@@ -218,7 +218,7 @@ def calculate_power_sample_size(
             effect_size = mde / std_dev  # Cohen's d
 
 
-        if variant == "paired":
+        if group_relationship == "paired":
             analysis = TTestPower()
         else:
             analysis = TTestIndPower()
@@ -239,7 +239,7 @@ def calculate_power_sample_size(
 
 def print_power_summary(
     test_family,
-    variant,
+    group_relationship,
     alpha,
     power,
     baseline_rate=None,
@@ -249,7 +249,7 @@ def print_power_summary(
 ):
 
     print("📈 Power Analysis Summary")
-    print(f"- Test: {test_family.upper()}{' (' + variant + ')' if variant else ''}")
+    print(f"- Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}")
     print(f"- Significance level (α): {alpha}")
     print(f"- Statistical power (1 - β): {power}")
 
@@ -293,3 +293,4 @@ def print_power_summary(
         print("\n⚠️ Summary not specialized for this test.")
         print(f"Required sample size per group: {required_sample_size}")
         print(f"Total sample size: {required_sample_size * 2}")
+

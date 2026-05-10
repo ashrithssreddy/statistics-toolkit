@@ -53,7 +53,7 @@ def normalize_family_for_runner(family: str) -> str:
 @dataclass(frozen=True)
 class Scenario:
     datatype: str
-    variant: str
+    group_relationship: str
     randomization_method: str
     group_labels: tuple[str, str]
     pre_experiment_metric: str | None
@@ -114,7 +114,7 @@ def run_one_scenario(s: Scenario) -> dict[str, Any]:
 
     record: dict[str, Any] = {
         "datatype": s.datatype,
-        "variant": s.variant,
+        "group_relationship": s.group_relationship,
         "randomization_method": s.randomization_method,
         "group_labels": s.group_labels,
         "status": "pass",
@@ -148,7 +148,7 @@ def run_one_scenario(s: Scenario) -> dict[str, Any]:
         cfg = {
             "outcome_metric_datatype": s.datatype,
             "group_count": len(s.group_labels),
-            "variant": s.variant,
+            "group_relationship": s.group_relationship,
             "normality": True if s.datatype == "continuous" else None,
             "variance_equal": True if s.datatype == "continuous" else None,
         }
@@ -170,7 +170,7 @@ def run_one_scenario(s: Scenario) -> dict[str, Any]:
             metric_col=outcome_metric_col,
             group_labels=s.group_labels,
             test_family=runner_family,
-            variant=s.variant,
+            group_relationship=s.group_relationship,
             alpha=0.05,
         )
 
@@ -194,11 +194,11 @@ def build_scenarios() -> list[Scenario]:
     variants = ["independent", "paired"]
     randomization_methods = ["simple", "stratified", "block", "matched_pair", "cluster"]
     scenarios = []
-    for datatype, variant, randomization_method in product(datatypes, variants, randomization_methods):
+    for datatype, group_relationship, randomization_method in product(datatypes, variants, randomization_methods):
         scenarios.append(
             Scenario(
                 datatype=datatype,
-                variant=variant,
+                group_relationship=group_relationship,
                 randomization_method=randomization_method,
                 group_labels=("control", "treatment"),
                 pre_experiment_metric="past_purchase_count",
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     report = run_combo_matrix()
     cols = [
         "datatype",
-        "variant",
+        "group_relationship",
         "randomization_method",
         "selected_family",
         "runner_family",
@@ -249,3 +249,4 @@ if __name__ == "__main__":
         print(f"Opened report: {out_abs}")
     except Exception as exc:  # noqa: BLE001
         print(f"Could not auto-open report: {exc}")
+

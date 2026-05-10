@@ -10,20 +10,20 @@ def run_outcome_similarity_test(
     group_col,
     metric_col,
     test_family,
-    variant=None,
+    group_relationship=None,
     group_labels=('control', 'treatment'),
     alpha=0.05,
     verbose=True
 ):
     """
-    Runs a similarity test between two groups based on test_family and variant.
+    Runs a similarity test between two groups based on test_family and group_relationship.
 
     Parameters:
     - df: pandas DataFrame
     - group_col: column with group assignment
     - metric_col: outcome metric
     - test_family: one of ['z_test', 't_test', 'chi_square', 'anova', 'non_parametric']
-    - variant: 'independent' or 'paired' (required for t-test)
+    - group_relationship: 'independent' or 'paired' (required for t-test)
     - group_labels: tuple of (control, treatment)
     - alpha: significance threshold
     - verbose: print detailed interpretation
@@ -128,16 +128,16 @@ def run_aa_testing_generalized(
     metric_col,
     group_labels,
     test_family,
-    variant=None,
+    group_relationship=None,
     alpha=0.05,
     visualize=True
 ):
     """
     Runs A/A test: outcome similarity test + optional visualization.
     SRM (Sample Ratio Mismatch) is checked separately in the Randomization section.
-    All logic routed by test_family + variant (no experiment_type).
+    All logic routed by test_family + group_relationship (no experiment_type).
     """
-    print(f"\n📊 A/A Test Summary for metric: '{metric_col}' [{test_family}, {variant}]\n")
+    print(f"\n📊 A/A Test Summary for metric: '{metric_col}' [{test_family}, {group_relationship}]\n")
 
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]
@@ -147,16 +147,16 @@ def run_aa_testing_generalized(
         group_col=group_col,
         metric_col=metric_col,
         test_family=test_family,
-        variant=variant,
+        group_relationship=group_relationship,
         group_labels=group_labels,
         alpha=alpha
     )
 
     if visualize and p_value is not None:
-        visualize_aa_distribution(df, group_col=group_col, metric_col=metric_col, test_family=test_family, group_labels=group_labels, variant=variant)
+        visualize_aa_distribution(df, group_col=group_col, metric_col=metric_col, test_family=test_family, group_labels=group_labels, group_relationship=group_relationship)
 
 
-def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labels=('control', 'treatment'), variant=None):
+def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labels=('control', 'treatment'), group_relationship=None):
     """Plot A/A outcome distribution by group. group1/group2 are derived from df inside."""
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]
@@ -198,7 +198,7 @@ def simulate_aa_type1_error_rate(
     metric_col,
     group_labels,
     test_family,
-    variant=None,
+    group_relationship=None,
     runs=100,
     alpha=0.05,
     seed=42,
@@ -222,7 +222,7 @@ def simulate_aa_type1_error_rate(
             group_col='group',
             metric_col=metric_col,
             test_family=test_family,
-            variant=variant,
+            group_relationship=group_relationship,
             group_labels=group_labels,
             alpha=alpha,
             verbose=False
@@ -244,7 +244,7 @@ def simulate_aa_type1_error_rate(
             🧠 Summary Interpretation:
             We simulated {runs} A/A experiments using random group assignment (no actual treatment).
 
-            Test: {test_family.upper()}{' (' + variant + ')' if variant else ''}
+            Test: {test_family.upper()}{' (' + group_relationship + ')' if group_relationship else ''}
             Metric: {metric_col}
             Alpha: {alpha}
 
@@ -270,3 +270,4 @@ def plot_p_value_distribution(p_values, alpha=0.05):
     plt.legend()
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     plt.show()
+
