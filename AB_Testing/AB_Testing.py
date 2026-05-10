@@ -275,79 +275,132 @@ historical_df
 # <details><summary><strong>📖 Click to Expand (Formula) </strong></summary>
 #
 # 1. **One-sample t-test (continuous, normal)**
-# $$
-# n \approx \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
-# $$
-# Terms: $n$ = required sample size, $z_{1-\alpha/2}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $\sigma$ = metric variability (SD), $\Delta$ = minimum business-relevant mean shift.
+#    $$
+#    n \approx \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
+#    $$
+#
+# * $n$ = required sample size
+# * $z_{1-\alpha/2}$ = z-score threshold used for statistical significance (example: for $\alpha = 0.05$, $z \approx 1.96$)
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
+# * $\sigma$ = standard deviation estimated from historical/pre-experiment outcome data
+# * $\Delta$ = minimum detectable mean difference (MDE)
 #
 # 2. **Two-sample t-test (continuous, normal, independent)**
-# $$
-# n_{\text{per-group}} \approx
-# 2\left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
-# $$
-# Terms: $n_{\text{per-group}}$ = required users in each group, $z_{1-\alpha/2}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $\sigma$ = pooled metric SD, $\Delta$ = minimum mean difference to detect.
+#    $$
+#    n_{\text{per-group}} \approx
+#    2\left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma}{\Delta}\right)^2
+#    $$
+#
+# * $n_{\text{per-group}}$ = required sample size in each group
+# * $z_{1-\alpha/2}$ = z-score threshold used for statistical significance (example: for $\alpha = 0.05$, $z \approx 1.96$)
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
+# * $\sigma$ = pooled standard deviation estimated from historical/pre-experiment data across both groups
+# * $\Delta$ = minimum detectable difference between group means
 #
 # 3. **Paired t-test (continuous, normal, paired)**
-# $$
-# n_{\text{pairs}} \approx
-# \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma_d}{\Delta}\right)^2
-# $$
-# Terms: $n_{\text{pairs}}$ = required matched pairs, $z_{1-\alpha/2}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $\sigma_d$ = SD of within-pair differences, $\Delta$ = minimum paired mean difference.
+#    $$
+#    n_{\text{pairs}} \approx
+#    \left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\sigma_d}{\Delta}\right)^2
+#    $$
+#
+# * $n_{\text{pairs}}$ = required number of matched pairs
+# * $z_{1-\alpha/2}$ = z-score threshold used for statistical significance (example: for $\alpha = 0.05$, $z \approx 1.96$)
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
+# * $\sigma_d$ = standard deviation of paired differences estimated from historical/pre-experiment paired observations
+# * $\Delta$ = minimum detectable paired mean difference
 #
 # 4. **ANOVA (continuous, normal, 3+ groups)**
-# $$
-# N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{f^2}
-# $$
-# Terms: $N_{\text{total}}$ = total required sample, $z_{1-\alpha}$ = significance cutoff, $z_{1-\beta}$ = power cutoff, $f$ = ANOVA effect size (between-group signal strength).
+#    $$
+#    N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{f^2}
+#    $$
+#
+# * $N_{\text{total}}$ = total required sample size across all groups
+# * $z_{1-\alpha}$ = z-score threshold tied to chosen significance level
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
+# * $f$ = ANOVA effect size measuring between-group separation
 #
 # 5. **Wilcoxon signed-rank (one-sample, non-normal)**
-# No stable closed-form $n$ used here; use power simulation/normal-approx methods.
-# Terms: no single closed-form symbols in this notebook; sample size comes from simulation assumptions on median shift and spread.
+#    No stable closed-form $n$ used here; use simulation-based or normal-approximation methods.
+#
+# * Sample size estimation depends on assumed median shift and spread of paired differences
+# * Typically estimated through simulation or asymptotic approximations
 #
 # 6. **Mann-Whitney U (two-sample, non-normal, independent)**
-# No single canonical closed-form in this notebook; use rank-based power methods/simulation.
-# Terms: no single closed-form symbols in this notebook; sample size depends on assumed distribution shift between groups.
+#    No single canonical closed-form formula used here; use rank-based power approximations or simulation.
+#
+# * Sample size depends on expected rank separation between groups
+# * Commonly estimated using simulation or asymptotic rank-based methods
 #
 # 7. **Wilcoxon signed-rank (two-sample, non-normal, paired)**
-# No stable closed-form $n$ used here; use simulation/normal-approx methods.
-# Terms: no single closed-form symbols in this notebook; sample size depends on assumed paired-difference distribution.
+#    No stable closed-form $n$ used here; use simulation-based or normal-approximation methods.
+#
+# * Sample size depends on the distribution of paired differences
+# * Usually estimated through simulation or asymptotic approximations
 #
 # 8. **Kruskal-Wallis (non-normal, 3+ groups)**
-# No single closed-form used here; use simulation or asymptotic power methods.
-# Terms: no single closed-form symbols in this notebook; sample size depends on expected rank separation across groups.
+#    No single closed-form formula used here; use simulation or asymptotic power methods.
+#
+# * Sample size depends on expected rank separation across groups
+# * Usually estimated using simulation or rank-based approximations
 #
 # 9. **One-proportion z-test (binary, one-sample)**
-# $$
-# n \approx \frac{\left(z_{1-\alpha/2}\sqrt{p_0(1-p_0)} + z_{1-\beta}\sqrt{p_1(1-p_1)}\right)^2}{(p_1-p_0)^2}
-# $$
-# Terms: $n$ = required sample size, $p_0$ = baseline/null conversion rate, $p_1$ = expected conversion under lift, $(p_1-p_0)$ = absolute lift to detect, $z_{1-\alpha/2}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#    $$
+#    n \approx \frac{\left(z_{1-\alpha/2}\sqrt{p_0(1-p_0)} + z_{1-\beta}\sqrt{p_1(1-p_1)}\right)^2}{(p_1-p_0)^2}
+#    $$
+#
+# * $n$ = required sample size
+# * $p_0$ = historical/pre-experiment baseline conversion rate before treatment
+# * $p_1$ = expected conversion rate after applying treatment (example: baseline 10% → expected 12%)
+# * $(p_1-p_0)$ = minimum detectable lift in conversion rate
+# * $z_{1-\alpha/2}$ = z-score threshold used for statistical significance (example: for $\alpha = 0.05$, $z \approx 1.96$)
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
 #
 # 10. **Two-proportion z-test (binary, two-sample, independent)**
-# $$
-# n_{\text{per-group}} \approx
-# \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,[p_1(1-p_1)+p_2(1-p_2)]}{(p_2-p_1)^2}
-# $$
-# Terms: $n_{\text{per-group}}$ = required users per arm, $p_1$ = control rate, $p_2$ = treatment rate, $(p_2-p_1)$ = absolute lift, $z_{1-\alpha/2}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#     $$
+#     n_{\text{per-group}} \approx
+#     \frac{(z_{1-\alpha/2}+z_{1-\beta})^2[p_1(1-p_1)+p_2(1-p_2)]}{(p_2-p_1)^2}
+#     $$
+#
+# * $n_{\text{per-group}}$ = required sample size per group
+# * $p_1$ = historical baseline conversion rate for the control group
+# * $p_2$ = expected conversion rate for the treatment group after applying treatment
+# * $(p_2-p_1)$ = minimum detectable lift between groups
+# * $z_{1-\alpha/2}$ = z-score threshold used for statistical significance (example: for $\alpha = 0.05$, $z \approx 1.96$)
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
 #
 # 11. **McNemar (binary, two-sample, paired)**
-# $$
-# n_{\text{pairs}} \approx
-# \frac{(z_{1-\alpha/2}+z_{1-\beta})^2\,(p_{01}+p_{10})}{(p_{10}-p_{01})^2}
-# $$
-# Terms: $n_{\text{pairs}}$ = required matched pairs, $p_{01}$ = probability of 0→1 switch, $p_{10}$ = probability of 1→0 switch, $(p_{10}-p_{01})$ = net directional change, $z_{1-\alpha/2}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#     $$
+#     n_{\text{pairs}} \approx
+#     \frac{(z_{1-\alpha/2}+z_{1-\beta})^2(p_{01}+p_{10})}{(p_{10}-p_{01})^2}
+#     $$
+#
+# * $n_{\text{pairs}}$ = required number of matched pairs
+# * $p_{01}$ = probability of changing from 0 → 1
+# * $p_{10}$ = probability of changing from 1 → 0
+# * $(p_{10}-p_{01})$ = expected directional treatment effect
+# * $z_{1-\alpha/2}$ = z-score threshold used for statistical significance (example: for $\alpha = 0.05$, $z \approx 1.96$)
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
 #
 # 12. **Chi-square (categorical, multi-sample)**
-# $$
-# N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{w^2}
-# $$
-# Terms: $N_{\text{total}}$ = total required sample, $w$ = chi-square effect size (association strength), $z_{1-\alpha}$ and $z_{1-\beta}$ = significance/power cutoffs.
+#     $$
+#     N_{\text{total}} \approx \frac{(z_{1-\alpha}+z_{1-\beta})^2}{w^2}
+#     $$
+#
+# * $N_{\text{total}}$ = total required sample size
+# * $z_{1-\alpha}$ = z-score threshold tied to chosen significance level
+# * $z_{1-\beta}$ = z-score tied to desired statistical power (example: for 80% power, $z \approx 0.84$)
+# * $w$ = chi-square effect size representing association strength
 #
 # 13. **Count models (Poisson / Negative Binomial)**
-# Model-based power; no one-line universal $n$ formula in this notebook.
-# Terms: no single closed-form symbols in this notebook; power uses baseline event rate, exposure, target rate ratio, and dispersion.
+#     Model-based power analysis; no universal one-line closed-form formula used here.
+#
+# * Power depends on baseline event rate
+# * Exposure duration or traffic volume
+# * Expected rate ratio between groups
+# * Dispersion parameter (especially for Negative Binomial models)
 #
 # **Sizing convention:** if a formula returns per-group size, use
-# $N_{\text{total}} = n \times \text{group\_count}$.
+# $N_{\text{total}} = n \times \text{group count}$.
 #
 # </details>
 #
@@ -952,9 +1005,8 @@ df.head()
 # </ul>
 #
 # </details>
-#
 
-# Outcome similarity test only.
+# %%
 _ = run_outcome_similarity_test(
     df=df,
     group_col='group',
@@ -1816,6 +1868,6 @@ simulate_rollout_impact(
 # [Back to the top](#table-of-contents)
 # ___
 #
-
-
+#
+#
 
