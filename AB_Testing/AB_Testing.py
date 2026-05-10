@@ -173,7 +173,7 @@ group_count = len(group_labels)
 group_relationship = 'independent'  # Options: 'independent', 'paired'
 
 # 4b. Hypothesis direction for applicable tests
-hypothesis_type = "two_sided"  # Options: "two_sided", "greater", "less"
+hypothesis_type = "less"  # Options: "two_sided", "greater", "less"
 
 # Randomization method to assign users to groups
 # Options: 'simple', 'stratified', 'block', 'matched_pair', 'cluster'
@@ -181,8 +181,6 @@ randomization_method = "simple"
 
 # Historical-data shape control for continuous outcomes: 'normal' or 'non_normal'
 historical_normality = 'normal'
-
-# TODO: 1 sided vs 2 sided test? For now, we'll default to 2-sided for all tests, but this can be made configurable in the future.
 
 # %% [markdown]
 # <a id="central-control-panel"></a>

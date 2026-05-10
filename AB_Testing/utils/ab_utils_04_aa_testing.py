@@ -112,28 +112,34 @@ def run_outcome_similarity_test(
         print(f"- Hypothesis type      : {hypothesis_type}")
 
         if test_family in ["one_proportion_z_test", "two_proportion_z_test"]:
-            print(f"- H₀ (null)            : Conversion rates are equal between {group_labels[0]} and {group_labels[1]}.")
             if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Conversion rate in {group_labels[1]} is less than or equal to {group_labels[0]}.")
                 print(f"- H₁ (alternative)     : Conversion rate in {group_labels[1]} is greater than {group_labels[0]}.")
             elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : Conversion rate in {group_labels[1]} is greater than or equal to {group_labels[0]}.")
                 print(f"- H₁ (alternative)     : Conversion rate in {group_labels[1]} is less than {group_labels[0]}.")
             else:
+                print(f"- H₀ (null)            : Conversion rates are equal between {group_labels[0]} and {group_labels[1]}.")
                 print(f"- H₁ (alternative)     : Conversion rates differ between {group_labels[0]} and {group_labels[1]}.")
         elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
-            print(f"- H₀ (null)            : Mean {metric_col} is equal between {group_labels[0]} and {group_labels[1]}.")
             if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Mean {metric_col} in {group_labels[1]} is less than or equal to {group_labels[0]}.")
                 print(f"- H₁ (alternative)     : Mean {metric_col} in {group_labels[1]} is greater than {group_labels[0]}.")
             elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : Mean {metric_col} in {group_labels[1]} is greater than or equal to {group_labels[0]}.")
                 print(f"- H₁ (alternative)     : Mean {metric_col} in {group_labels[1]} is less than {group_labels[0]}.")
             else:
+                print(f"- H₀ (null)            : Mean {metric_col} is equal between {group_labels[0]} and {group_labels[1]}.")
                 print(f"- H₁ (alternative)     : Mean {metric_col} differs between {group_labels[0]} and {group_labels[1]}.")
         elif test_family == "paired_t_test":
-            print(f"- H₀ (null)            : Mean paired difference in {metric_col} is 0.")
             if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Mean paired difference in {metric_col} is less than or equal to 0.")
                 print(f"- H₁ (alternative)     : Mean paired difference in {metric_col} is > 0.")
             elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : Mean paired difference in {metric_col} is greater than or equal to 0.")
                 print(f"- H₁ (alternative)     : Mean paired difference in {metric_col} is < 0.")
             else:
+                print(f"- H₀ (null)            : Mean paired difference in {metric_col} is 0.")
                 print(f"- H₁ (alternative)     : Mean paired difference in {metric_col} is not 0.")
         elif test_family == "chi_square_test":
             print(f"- H₀ (null)            : {metric_col} is independent of {group_col}.")
@@ -142,12 +148,14 @@ def run_outcome_similarity_test(
             print(f"- H₀ (null)            : Group means of {metric_col} are equal.")
             print(f"- H₁ (alternative)     : At least one group mean of {metric_col} differs.")
         elif test_family == "mann_whitney_u_test":
-            print(f"- H₀ (null)            : Distributions of {metric_col} are identical across groups.")
             if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : {metric_col} in {group_labels[1]} is less than or equal to {group_labels[0]} in stochastic order.")
                 print(f"- H₁ (alternative)     : {metric_col} in {group_labels[1]} tends to be greater than {group_labels[0]}.")
             elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : {metric_col} in {group_labels[1]} is greater than or equal to {group_labels[0]} in stochastic order.")
                 print(f"- H₁ (alternative)     : {metric_col} in {group_labels[1]} tends to be less than {group_labels[0]}.")
             else:
+                print(f"- H₀ (null)            : Distributions of {metric_col} are identical across groups.")
                 print(f"- H₁ (alternative)     : Distributions of {metric_col} differ across groups.")
 
         if stat_label is not None:
