@@ -321,23 +321,27 @@ for combo_row, combo in combo_space[
     # ------------------------------------------------------------------
     run_guardrail_analysis(df, test_config, group_col="group", alpha=0.05)
 
-    df = apply_cuped(
-        df=df,
-        pre_metric="past_purchase_revenue",
-        outcome_metric_col=test_config["outcome_metric_col"],
-        group_col="group",
-        group_labels=test_config["group_labels"],
-    )
+    # CUPED is a linear adjustment on numeric outcomes; categorical strings break OLS.
+    if outcome_metric_datatype == "continuous":
+        df = apply_cuped(
+            df=df,
+            pre_metric="past_purchase_revenue",
+            outcome_metric_col=test_config["outcome_metric_col"],
+            group_col="group",
+            group_labels=test_config["group_labels"],
+        )
 
-    result_cuped = run_ab_test(
-        df=df,
-        group_col="group",
-        metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
-        group_labels=test_config["group_labels"],
-        test_family=test_config["family"],
-        group_relationship=test_config.get("group_relationship"),
-        hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
-    )
+        result_cuped = run_ab_test(
+            df=df,
+            group_col="group",
+            metric_col=f"{test_config['outcome_metric_col']}_cuped_adjusted",
+            group_labels=test_config["group_labels"],
+            test_family=test_config["family"],
+            group_relationship=test_config.get("group_relationship"),
+            hypothesis_type=test_config.get("hypothesis_type", "two_sided"),
+        )
+    else:
+        result_cuped = {}
 
     rows.append(
         {
@@ -353,7 +357,7 @@ for combo_row, combo in combo_space[
             "n_required": n_required,
             "aa_p_value": aa_result.get("p_value") if isinstance(aa_result, dict) else None,
             "ab_p_value": result.get("p_value"),
-            "cuped_p_value": result_cuped.get("p_value"),
+            "cuped_p_value": (result_cuped or {}).get("p_value"),
         }
     )
 

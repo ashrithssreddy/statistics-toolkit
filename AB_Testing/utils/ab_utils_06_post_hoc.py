@@ -55,6 +55,16 @@ def apply_cuped(
     """
     np.random.seed(seed)
 
+    if not pd.api.types.is_numeric_dtype(df[outcome_metric_col]):
+        raise TypeError(
+            f"CUPED needs a numeric outcome; {outcome_metric_col!r} is {df[outcome_metric_col].dtype}. "
+            "Use CUPED only for continuous (or binary-encoded numeric) metrics."
+        )
+    if not pd.api.types.is_numeric_dtype(df[pre_metric]):
+        raise TypeError(
+            f"CUPED needs a numeric pre-experiment covariate; {pre_metric!r} is {df[pre_metric].dtype}."
+        )
+
     # Step 1: Use actual observed experiment outcome
     y = df[outcome_metric_col].values
 
