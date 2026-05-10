@@ -1180,7 +1180,7 @@ df = add_outcome_metrics(df, group_col=group_col, group_labels=test_config['grou
 df.head()
 
 # %%
-# TODO: Use equal variance to determine if test needs to switch.
+# TODO: Use equal variance and experiment normality to determine if test needs to switch.
 
 # %%
 result = run_ab_test(
@@ -1267,6 +1267,8 @@ compute_lift_confidence_interval(result)
 
 # %%
 print_final_ab_test_summary(result)
+
+# TODO: redundant 
 
 # %% [markdown]
 # <a id="how-long"></a>

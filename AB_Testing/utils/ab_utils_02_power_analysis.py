@@ -81,9 +81,9 @@ def determine_test_family(test_config):
             return "mcnemar_test"
 
         if group_count == 2:
-            return "two_proportion_z_test"
+            return "z_test"
 
-        return "chi_square_test"
+        return "chi_square"
 
 
     # -------------------------
@@ -103,17 +103,17 @@ def determine_test_family(test_config):
             if group_count == 2:
 
                 if normality:
-                    return "two_sample_t_test"
+                    return "t_test"
 
                 else:
-                    return "mann_whitney_u_test"
+                    return "non_parametric"
 
             else:  # 3+ groups
 
                 if normality:
                     return "anova"
                 else:
-                    return "kruskal_wallis_test"
+                    return "non_parametric"
 
 
     # -------------------------
@@ -121,7 +121,7 @@ def determine_test_family(test_config):
     # -------------------------
     elif data_type == "categorical":
 
-        return "chi_square_test"
+        return "chi_square"
 
 
     # -------------------------
@@ -205,7 +205,8 @@ def calculate_power_sample_size(
     if test_family in [
         "two_proportion_z_test",
         "z_test",
-        "chi_square_test"
+        "chi_square_test",
+        "chi_square"
     ]:
 
         if baseline_rate is None or mde is None:
@@ -236,9 +237,11 @@ def calculate_power_sample_size(
     # Continuous tests
     # -------------------------
     elif test_family in [
+        "t_test",
         "two_sample_t_test",
         "welch_t_test",
         "paired_t_test",
+        "non_parametric",
         "mann_whitney_u_test",
         "wilcoxon_signed_rank_test",
         "anova",
