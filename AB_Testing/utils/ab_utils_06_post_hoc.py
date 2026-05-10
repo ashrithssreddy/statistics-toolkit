@@ -32,7 +32,7 @@ def apply_cuped(
     df : pandas.DataFrame
         Input DataFrame containing experiment data.
     pre_metric : str
-        Column name of the pre-experiment covariate (e.g., 'past_purchase_count').
+        Column name of the pre-experiment covariate (e.g., 'past_purchase_revenue').
         This is the variable used to compute the adjustment factor (theta).
     outcome_metric_col : str
         Column name of the original observed outcome (e.g., 'engagement_score')
@@ -319,4 +319,5 @@ def plot_adjusted_pvalues(df_pvalues, alpha=0.05):
     plt.legend()
     plt.tight_layout()
     plt.show()
+
 

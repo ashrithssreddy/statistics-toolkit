@@ -9,12 +9,12 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
     """Generate user population with attributes and pre-experiment variables only.
     Outcome and guardrail metrics are not generated here; they are created after randomization.
     If outcome_metric_col or guardrail_metric_col is provided, a placeholder column (NaN) is added so column order
-    puts must-haves (user_id, outcome_metric_col, guardrail_metric_col, past_purchase_count) on the left."""
+    puts must-haves (user_id, outcome_metric_col, guardrail_metric_col, past_purchase_revenue) on the left."""
     np.random.seed(seed)
     users = pd.DataFrame({
         # required (from experiment setup / central control panel): identifier, pre-experiment metric, placeholders
         'user_id': range(1, observations_count + 1),
-        'past_purchase_count': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
+        'past_purchase_revenue': np.random.normal(loc=50, scale=10, size=observations_count).clip(0),
         # optional: segmentation (retained for stratified / segment analysis)
         'platform': np.random.choice(['iOS', 'Android'], size=observations_count, p=[0.6, 0.4]),
         'device_type': np.random.choice(['mobile', 'desktop'], size=observations_count, p=[0.7, 0.3]),
@@ -35,7 +35,7 @@ def create_dummy_ab_data(observations_count=1000, seed=1995, outcome_metric_col=
         must_have.append(outcome_metric_col)
     if guardrail_metric_col:
         must_have.append(guardrail_metric_col)
-    must_have.append('past_purchase_count')
+    must_have.append('past_purchase_revenue')
     extras = [c for c in users.columns if c not in must_have]
     users = users[must_have + extras]
     return users
@@ -91,3 +91,4 @@ def add_outcome_metrics(df, group_col='group', group_labels=('control', 'treatme
         )
         df[guardrail_metric_col] = df[guardrail_metric_col].clip(0, 1)
     return df
+

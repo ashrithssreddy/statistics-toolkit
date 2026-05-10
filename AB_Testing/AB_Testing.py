@@ -151,7 +151,7 @@ outcome_metric_col = 'engagement_score'
 observation_id_col = 'user_id'
 
 # 6. Optional: Pre-experiment metric for CUPED, if used
-pre_experiment_metric = 'past_purchase_count'  # Can be None
+pre_experiment_metric_col = 'past_purchase_revenue'  # Can be None
 
 # Optional: guardrail metric column for simulated outcome data. Set to None to omit.
 guardrail_metric_col = 'bounce_rate'
@@ -186,7 +186,7 @@ test_config = {
     # Column Names
     'outcome_metric_col'     : outcome_metric_col,         # Main metric to analyze (e.g., 'engagement_score')
     'observation_id_col'     : observation_id_col,         # Unique identifier for each observation
-    'pre_experiment_metric'  : pre_experiment_metric,      # Used for CUPED adjustment (if any)
+    'pre_experiment_metric_col'  : pre_experiment_metric_col,      # Used for CUPED adjustment (if any)
     'guardrail_metric_col'   : guardrail_metric_col,       # Optional: e.g. 'bounce_rate'; None to omit
 
     # Experiment Design Parameters
@@ -683,7 +683,7 @@ elif randomization_method == "block":
     df = apply_block_randomization(df, observation_id_col='user_id', group_col=group_col, block_size=10, seed=my_seed)
 
 elif randomization_method == "matched_pair":
-    df = apply_matched_pair_randomization(df, sort_col=pre_experiment_metric, group_col=group_col, group_labels=test_config['group_labels'])
+    df = apply_matched_pair_randomization(df, sort_col=pre_experiment_metric_col, group_col=group_col, group_labels=test_config['group_labels'])
 
 elif randomization_method == "cluster":
     df = apply_cluster_randomization(df, cluster_col='city', group_col=group_col, seed=my_seed)
@@ -1481,7 +1481,7 @@ run_guardrail_analysis(df, test_config, group_col='group', alpha=0.05)
 # %%
 df = apply_cuped(
     df=df,
-    pre_metric='past_purchase_count',
+    pre_metric='past_purchase_revenue',
     outcome_metric_col=test_config['outcome_metric_col'],
     group_col='group',
     group_labels=test_config['group_labels']
@@ -1744,4 +1744,6 @@ simulate_rollout_impact(
 # [Back to the top](#table-of-contents)
 # ___
 #
+
+
 

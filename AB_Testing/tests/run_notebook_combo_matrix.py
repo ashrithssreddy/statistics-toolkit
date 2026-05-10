@@ -56,7 +56,7 @@ class Scenario:
     group_relationship: str
     randomization_method: str
     group_labels: tuple[str, str]
-    pre_experiment_metric: str | None
+    pre_experiment_metric_col: str | None
     guardrail_metric_col: str | None
 
 
@@ -77,7 +77,7 @@ def _apply_randomization(df: pd.DataFrame, s: Scenario, group_col: str) -> pd.Da
             seed=1995,
         )
     if s.randomization_method == "matched_pair":
-        sort_col = s.pre_experiment_metric or "past_purchase_count"
+        sort_col = s.pre_experiment_metric_col or "past_purchase_revenue"
         return apply_matched_pair_randomization(
             df, sort_col=sort_col, group_col=group_col, group_labels=s.group_labels
         )
@@ -201,7 +201,7 @@ def build_scenarios() -> list[Scenario]:
                 group_relationship=group_relationship,
                 randomization_method=randomization_method,
                 group_labels=("control", "treatment"),
-                pre_experiment_metric="past_purchase_count",
+                pre_experiment_metric_col="past_purchase_revenue",
                 guardrail_metric_col="bounce_rate",
             )
         )
@@ -249,4 +249,6 @@ if __name__ == "__main__":
         print(f"Opened report: {out_abs}")
     except Exception as exc:  # noqa: BLE001
         print(f"Could not auto-open report: {exc}")
+
+
 
