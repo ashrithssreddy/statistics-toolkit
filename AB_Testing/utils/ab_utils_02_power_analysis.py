@@ -186,10 +186,25 @@ def compute_baseline_from_data(df, test_config, verbose=True):
 
     result = {'baseline_rate': None, 'baseline_mean': None, 'baseline_std_dev': None}
 
-    if family in ['one_proportion_z_test', 'two_proportion_z_test']:
+    if data_type == 'binary' or family in ['one_proportion_z_test', 'two_proportion_z_test']:
         result['baseline_rate'] = df[metric_col].mean()
         if verbose:
             print(f"📊 Baseline conversion rate (full sample): {result['baseline_rate']:.2%}")
+        return result
+
+    # Categorical → chi-square power in this module uses the same proportion-style heuristic as
+    # binary z-tests; use dominant-category share as reference proportion.
+    if data_type == 'categorical':
+        col = df[metric_col].dropna()
+        if col.empty:
+            result['baseline_rate'] = 1.0 / 3.0
+        else:
+            result['baseline_rate'] = float(col.value_counts(normalize=True).iloc[0])
+        if verbose:
+            print(
+                f"📊 Baseline dominant category share (categorical, full sample): "
+                f"{result['baseline_rate']:.2%}"
+            )
         return result
 
     if family in ['two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'anova_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test', 'kruskal_wallis_test'] or data_type == 'continuous':
@@ -236,6 +251,7 @@ def calculate_power_sample_size(
     - 'welch_anova_test'
     - 'kruskal_wallis_test'
     - 'chi_square_test'
+    - 'mcnemar_test' (paired binary; returns n paired subjects per sequence / per arm)
     """
 
     # -------------------------
@@ -278,6 +294,47 @@ def calculate_power_sample_size(
             print(f"you need {n} users per group → total {n * num_groups} users.")
         return n
 
+    elif test_family == "mcnemar_test":
+        # Paired binary (McNemar): planning uses discordant cell rates under a default
+        # independence copula for (control, treatment) outcomes (same marginal MDE as independent z-test).
+        # Sample size: Dupont (1988), Statistics in Medicine — normal approximation.
+        if baseline_rate is None or mde is None:
+            raise ValueError("baseline_rate and mde required for McNemar test")
+
+        p_c = float(baseline_rate)
+        p_t = float(np.clip(p_c + mde, 0.0, 1.0))
+        p01 = (1.0 - p_c) * p_t  # (0,1) discordant
+        p10 = p_c * (1.0 - p_t)  # (1,0) discordant
+        delta = p01 - p10
+        if abs(delta) < 1e-12:
+            raise ValueError(
+                "Cannot compute McNemar sample size: zero discordant difference under planning assumptions"
+            )
+
+        p_bar = (p01 + p10) / 2.0
+        z_beta = stats.norm.ppf(power)
+        if hypothesis_type == "two_sided":
+            z_a = stats.norm.ppf(1 - alpha / 2)
+        else:
+            z_a = stats.norm.ppf(1 - alpha)
+
+        term0 = z_a * np.sqrt(2.0 * p_bar * (1.0 - p_bar))
+        term1 = z_beta * np.sqrt(max(p01 + p10 - delta**2, 1e-12))
+        n = int(np.ceil(((term0 + term1) ** 2) / (delta**2)))
+
+        if verbose:
+            print("📈 Power Analysis Summary")
+            print(f"- Test: MCNEMAR_TEST (paired binary)")
+            print(f"- Hypothesis type: {hypothesis_type}")
+            print(f"- Significance level (α): {alpha}")
+            print(f"- Statistical power (1 - β): {power}")
+            print(f"- Baseline conversion rate (control margin): {p_c:.2%}")
+            print(f"- MDE (marginal): {mde:.2%} → treatment margin {p_t:.2%}")
+            print(
+                f"\n✅ To detect that marginal shift with McNemar (independence planning prior),"
+                f"\n   you need ~{n} paired subjects per arm → total {n * num_groups} subject rows."
+            )
+        return n
 
     # -------------------------
     # Continuous tests

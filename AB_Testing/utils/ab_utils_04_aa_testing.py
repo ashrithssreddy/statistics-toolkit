@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
+from statsmodels.stats.contingency_tables import mcnemar
+from statsmodels.stats.oneway import anova_oneway
 
 
 def run_outcome_similarity_test(
@@ -66,6 +68,39 @@ def run_outcome_similarity_test(
         test_name = "z-test for proportions"
         stat_label, stat_value = "Z statistic", z_score
 
+    elif test_family == "mcnemar_test":
+        # Paired binary: same discordant logic as run_ab_test (ab_utils_05_ab_testing).
+        if len(group1) != len(group2):
+            if verbose:
+                print("❌ McNemar test requires equal-length paired samples.")
+            return None
+        min_n = min(len(group1), len(group2))
+        x = group1.iloc[:min_n].astype(int).to_numpy()
+        y = group2.iloc[:min_n].astype(int).to_numpy()
+        x = np.where(x > 0, 1, 0)
+        y = np.where(y > 0, 1, 0)
+        table = np.zeros((2, 2), dtype=int)
+        table[0, 0] = int(np.sum((x == 0) & (y == 0)))
+        table[0, 1] = int(np.sum((x == 0) & (y == 1)))
+        table[1, 0] = int(np.sum((x == 1) & (y == 0)))
+        table[1, 1] = int(np.sum((x == 1) & (y == 1)))
+        b = table[0, 1]
+        c = table[1, 0]
+        mc = mcnemar(table, exact=True, correction=False)
+        if hypothesis_type == "two_sided":
+            p_value = float(mc.pvalue)
+        else:
+            disc_n = int(b + c)
+            if disc_n == 0:
+                p_value = 1.0
+            else:
+                alt = "greater" if hypothesis_type == "greater" else "less"
+                p_value = float(
+                    stats.binomtest(int(b), n=disc_n, p=0.5, alternative=alt).pvalue
+                )
+        test_name = "McNemar test (paired binary similarity)"
+        stat_label, stat_value = "McNemar statistic", float(mc.statistic)
+
     # --- T-tests ---
     elif test_family in ["two_sample_t_test", "welch_two_sample_t_test"]:
         t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=(test_family == "two_sample_t_test"), alternative=scipy_alt)
@@ -89,11 +124,41 @@ def run_outcome_similarity_test(
         test_name = "Mann-Whitney U test"
         stat_label, stat_value = "U statistic", u_stat
 
-    # --- ANOVA ---
+    elif test_family == "wilcoxon_signed_rank_test":
+        if len(group1) != len(group2):
+            if verbose:
+                print("❌ Wilcoxon signed-rank test requires equal-length samples.")
+            return None
+        w_stat, p_value = stats.wilcoxon(group1, group2, alternative=scipy_alt)
+        test_name = "Wilcoxon signed-rank test"
+        stat_label, stat_value = "W statistic", w_stat
+
+    # --- ANOVA / Kruskal–Wallis (all arms in group_labels) ---
     elif test_family in ["anova_test", "welch_anova_test"]:
-        f_stat, p_value = stats.f_oneway(group1, group2)
-        test_name = "ANOVA"
-        stat_label, stat_value = "F statistic", f_stat
+        samples = [df[df[group_col] == gl][metric_col].dropna() for gl in group_labels]
+        if len(samples) < 2 or min(len(s) for s in samples) == 0:
+            if verbose:
+                print("❌ ANOVA requires every listed group to have at least one observation.")
+            return None
+        if test_family == "anova_test":
+            aov = anova_oneway(tuple(samples), use_var="equal")
+            test_name = "one-way ANOVA (equal variances)"
+        else:
+            aov = anova_oneway(tuple(samples), use_var="unequal", welch_correction=True)
+            test_name = "Welch's one-way ANOVA"
+        p_value = float(aov.pvalue)
+        stat_label, stat_value = "F statistic", float(aov.statistic)
+
+    elif test_family == "kruskal_wallis_test":
+        samples = [df[df[group_col] == gl][metric_col].dropna() for gl in group_labels]
+        if len(samples) < 2 or min(len(s) for s in samples) == 0:
+            if verbose:
+                print("❌ Kruskal–Wallis requires every listed group to have at least one observation.")
+            return None
+        h_stat, p_value = stats.kruskal(*samples)
+        p_value = float(p_value)
+        test_name = "Kruskal-Wallis H-test"
+        stat_label, stat_value = "H statistic", float(h_stat)
 
     # --- Chi-square ---
     elif test_family in ["chi_square_test"]:
@@ -141,12 +206,23 @@ def run_outcome_similarity_test(
             else:
                 print(f"- H₀ (null)            : Mean paired difference in {metric_col} is 0.")
                 print(f"- H₁ (alternative)     : Mean paired difference in {metric_col} is not 0.")
+        elif test_family == "mcnemar_test":
+            g0, g1 = group_labels[0], group_labels[1]
+            if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Paired discordant probability P({g1}=1,{g0}=0) <= P({g0}=1,{g1}=0).")
+                print(f"- H₁ (alternative)     : P({g1}=1,{g0}=0) > P({g0}=1,{g1}=0).")
+            elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : P({g1}=1,{g0}=0) >= P({g0}=1,{g1}=0).")
+                print(f"- H₁ (alternative)     : P({g1}=1,{g0}=0) < P({g0}=1,{g1}=0).")
+            else:
+                print("- H₀ (null)            : Marginal disagreement is symmetric (McNemar null).")
+                print("- H₁ (alternative)     : Asymmetric discordant pairs for paired binary outcomes.")
         elif test_family == "chi_square_test":
             print(f"- H₀ (null)            : {metric_col} is independent of {group_col}.")
             print(f"- H₁ (alternative)     : {metric_col} depends on {group_col}.")
-        elif test_family in ["anova_test", "welch_anova_test"]:
-            print(f"- H₀ (null)            : Group means of {metric_col} are equal.")
-            print(f"- H₁ (alternative)     : At least one group mean of {metric_col} differs.")
+        elif test_family in ["anova_test", "welch_anova_test", "kruskal_wallis_test"]:
+            print(f"- H₀ (null)            : Group locations/means of {metric_col} are equal across {group_labels}.")
+            print(f"- H₁ (alternative)     : At least one group differs (omnibus test).")
         elif test_family == "mann_whitney_u_test":
             if hypothesis_type == "greater":
                 print(f"- H₀ (null)            : {metric_col} in {group_labels[1]} is less than or equal to {group_labels[0]} in stochastic order.")
@@ -157,6 +233,16 @@ def run_outcome_similarity_test(
             else:
                 print(f"- H₀ (null)            : Distributions of {metric_col} are identical across groups.")
                 print(f"- H₁ (alternative)     : Distributions of {metric_col} differ across groups.")
+        elif test_family == "wilcoxon_signed_rank_test":
+            if hypothesis_type == "greater":
+                print(f"- H₀ (null)            : Median paired difference in {metric_col} is less than or equal to 0.")
+                print(f"- H₁ (alternative)     : Median paired difference in {metric_col} is > 0.")
+            elif hypothesis_type == "less":
+                print(f"- H₀ (null)            : Median paired difference in {metric_col} is greater than or equal to 0.")
+                print(f"- H₁ (alternative)     : Median paired difference in {metric_col} is < 0.")
+            else:
+                print(f"- H₀ (null)            : Median paired difference in {metric_col} is 0.")
+                print(f"- H₁ (alternative)     : Median paired difference in {metric_col} is not 0.")
 
         if stat_label is not None:
             print(f"- {stat_label:<20}: {stat_value:.4f}")
@@ -214,17 +300,18 @@ def visualize_aa_distribution(df, group_col, metric_col, test_family, group_labe
     group1 = df[df[group_col] == group_labels[0]][metric_col]
     group2 = df[df[group_col] == group_labels[1]][metric_col]
 
-    # Continuous / non-parametric → histograms
+    # Continuous / non-parametric → histograms (all groups when k>2)
     if test_family in ['one_sample_t_test', 'two_sample_t_test', 'welch_two_sample_t_test', 'paired_t_test', 'anova_test', 'welch_anova_test', 'mann_whitney_u_test', 'wilcoxon_signed_rank_test', 'kruskal_wallis_test']:
-        plt.hist(group1, bins=30, alpha=0.5, label=group_labels[0])
-        plt.hist(group2, bins=30, alpha=0.5, label=group_labels[1])
+        for gl in group_labels:
+            s = df[df[group_col] == gl][metric_col]
+            plt.hist(s, bins=30, alpha=0.4, label=gl)
         plt.title(f"A/A Test: {metric_col} Distribution")
         plt.xlabel(metric_col)
         plt.ylabel("Frequency")
         plt.legend()
         plt.show()
 
-    elif test_family in ['one_proportion_z_test', 'two_proportion_z_test']:
+    elif test_family in ['one_proportion_z_test', 'two_proportion_z_test', 'mcnemar_test']:
         rates = [group1.mean(), group2.mean()]
         plt.bar(group_labels, rates)
         for i, rate in enumerate(rates):
