@@ -1,42 +1,51 @@
-graph TD
-    Bernoulli["Bernoulli(p)<br/>p = success prob<br/>E[X]=p<br/>Var=p(1-p)<br/>E[X^2]=p"]
-    Binomial["Binomial(n,p)<br/>n = trials, p = success prob<br/>E[X]=np<br/>Var=np(1-p)<br/>E[X^2]=np(1-p)+(np)^2"]
-    NegBinomial["Negative Binomial(r,p)<br/>r = target successes, p = success prob<br/>E[X]=r/p<br/>Var=r(1-p)/p^2<br/>E[X^2]=Var+E[X]^2"]
-    Geometric["Geometric(p)<br/>p = success prob<br/>E[X]=1/p<br/>Var=(1-p)/p^2<br/>E[X^2]=Var+E[X]^2"]
-    Multinomial["Multinomial(n,p1..pk)<br/>n = trials, pi = category probs<br/>E[Xi]=n*pi<br/>Var(Xi)=n*pi(1-pi)<br/>Cov(Xi,Xj)=-n*pi*pj"]
-    Hypergeometric["Hypergeometric(N,K,n)<br/>N=pop size, K=success states, n=draws<br/>E[X]=n*K/N<br/>Var=n*(K/N)*(1-K/N)*(N-n)/(N-1)<br/>E[X^2]=Var+E[X]^2"]
-    DiscreteUniform["Discrete Uniform(a,b)<br/>a,b = min and max integer<br/>E[X]=(a+b)/2<br/>Var=((b-a+1)^2-1)/12<br/>E[X^2]=Var+E[X]^2"]
-    Poisson["Poisson(lambda)<br/>lambda = rate of events<br/>E[X]=lambda<br/>Var=lambda<br/>E[X^2]=lambda+lambda^2"]
-    Normal["Normal(mu,sigma2)<br/>mu = mean, sigma2 = variance<br/>E[X]=mu<br/>Var=sigma2<br/>E[X^2]=sigma2+mu^2"]
-    Lognormal["Lognormal(mu,sigma2)<br/>mu,sigma2 = mean/var of logX<br/>E[X]=exp(mu+sigma2/2)<br/>Var=(exp(sigma2)-1)*exp(2mu+sigma2)<br/>E[X^2]=Var+E[X]^2"]
-    Exponential["Exponential(lambda)<br/>lambda = rate<br/>E[X]=1/lambda<br/>Var=1/lambda^2<br/>E[X^2]=2/lambda^2"]
-    Gamma["Gamma(k,theta)<br/>k = shape, theta = scale<br/>E[X]=k*theta<br/>Var=k*theta^2<br/>E[X^2]=Var+E[X]^2"]
-    Beta["Beta(alpha,beta)<br/>alpha,beta = shape params<br/>E[X]=alpha/(alpha+beta)<br/>Var=alpha*beta/((alpha+beta)^2*(alpha+beta+1))<br/>E[X^2]=Var+E[X]^2"]
-    Uniform["Uniform(a,b)<br/>a,b = min and max<br/>E[X]=(a+b)/2<br/>Var=(b-a)^2/12<br/>E[X^2]=Var+E[X]^2"]
-    ChiSquare["Chi-square(nu)<br/>nu = degrees of freedom<br/>E[X]=nu<br/>Var=2*nu<br/>E[X^2]=Var+E[X]^2"]
-    F["F(d1,d2)<br/>d1,d2 = degrees of freedom<br/>E[X]=d2/(d2-2), d2>2<br/>Var=complex, depends on d1,d2<br/>E[X^2]=Var+E[X]^2"]
-    T["Student t(nu)<br/>nu = degrees of freedom<br/>E[X]=0, nu>1<br/>Var=nu/(nu-2), nu>2<br/>E[X^2]=Var"]
+flowchart LR
+    Bernoulli["[H] Bernoulli(p)<br/>E[X] = p<br/>Var(X) = p(1-p)"]
+    Binomial["[H] Binomial(n,p)<br/>E[X] = np<br/>Var(X) = np(1-p)"]
+    NegBinomial["[M] Negative Binomial(r,p)<br/>X = trials until r successes<br/>E[X] = r/p<br/>Var(X) = r(1-p)/p²"]
+    Geometric["[M] Geometric(p)<br/>X = trials until first success<br/>E[X] = 1/p<br/>Var(X) = (1-p)/p²"]
+    Multinomial["[M] Multinomial(n,p₁…pₖ)<br/>E[Xᵢ] = npᵢ<br/>Var(Xᵢ) = npᵢ(1-pᵢ)<br/>Cov(Xᵢ,Xⱼ) = -npᵢpⱼ"]
+    Hypergeometric["[M] Hypergeometric(N,K,n)<br/>E[X] = nK/N<br/>Var(X) = n(K/N)(1-K/N)(N-n)/(N-1)"]
+    DiscreteUniform["[L] Discrete Uniform(a,b)<br/>E[X] = (a+b)/2<br/>Var(X) = ((b-a+1)²-1)/12"]
+    Poisson["[H] Poisson(λ)<br/>E[X] = λ<br/>Var(X) = λ"]
+    Normal["[H] Normal(μ,σ²)<br/>E[X] = μ<br/>Var(X) = σ²"]
+    Lognormal["[L] Lognormal(μ,σ²)<br/>log X ~ Normal(μ,σ²)<br/>E[X] = exp(μ+σ²/2)<br/>Var(X) = (exp(σ²)-1)exp(2μ+σ²)"]
+    Exponential["[M] Exponential(λ)<br/>E[X] = 1/λ<br/>Var(X) = 1/λ²"]
+    Gamma["[L] Gamma(k,θ)<br/>E[X] = kθ<br/>Var(X) = kθ²"]
+    Beta["[L] Beta(α,β)<br/>E[X] = α/(α+β)<br/>Var(X) = αβ/((α+β)²(α+β+1))"]
+    Uniform["[H] Uniform(a,b)<br/>E[X] = (a+b)/2<br/>Var(X) = (b-a)²/12"]
+    ChiSquare["[H] Chi-square(ν)<br/>E[X] = ν<br/>Var(X) = 2ν"]
+    F["[H] F(d₁,d₂)<br/>E[X] = d₂/(d₂-2), d₂&gt;2<br/>Var(X) = 2d₂²(d₁+d₂-2)/(d₁(d₂-2)²(d₂-4))"]
+    T["[H] Student t(ν)<br/>E[X] = 0, ν&gt;1<br/>Var(X) = ν/(ν-2), ν&gt;2"]
 
-    Bernoulli -->|"sum of n iid Bernoullis = count of successes"| Binomial
-    Bernoulli -->|"count trials until the r-th success"| NegBinomial
-    NegBinomial -->|"special case where r = 1"| Geometric
-    Bernoulli -->|"generalize from 2 outcomes to k outcomes"| Multinomial
-    Binomial -->|"same setup but sampling without replacement"| Hypergeometric
+    Bernoulli -->|"sum of n independent trials"| Binomial
+    Bernoulli -->|"trials until r-th success"| NegBinomial
+    NegBinomial -->|"r = 1"| Geometric
 
-    Binomial -->|"n large, p small, n*p fixed = rare event limit"| Poisson
-    Binomial -->|"n large, CLT kicks in, shape becomes bell curve"| Normal
+    Binomial -->|"generalize 2 categories to k"| Multinomial
+    Binomial -.->|"without-replacement analogue"| Hypergeometric
+    Binomial -->|"rare-event limit"| Poisson
+    Binomial -->|"large-n normal approximation"| Normal
 
-    Geometric -->|"discrete waiting time becomes continuous waiting time"| Exponential
-    Poisson -->|"time between Poisson events is exponential"| Exponential
-    Exponential -->|"sum of k iid exponential waiting times"| Gamma
+    Geometric -->|"scaled continuous-time limit"| Exponential
+    Poisson -->|"interarrival time in same Poisson process"| Exponential
+    Exponential -->|"sum of k independent waiting times"| Gamma
 
-    Gamma -->|"ratio of two independent gammas with shared scale"| Beta
-    Beta -->|"alpha = beta = 1 flattens it into a flat line"| Uniform
-    DiscreteUniform -->|"as the number of outcomes goes to infinity"| Uniform
+    Gamma -->|"X/(X+Y), independent Gammas with same scale"| Beta
+    Beta -->|"α = β = 1"| Uniform
+    DiscreteUniform -->|"rescaled increasingly fine grid"| Uniform
 
-    Normal -->|"sum of nu squared standard normals"| ChiSquare
-    Gamma -->|"special case where k = nu/2, theta = 2"| ChiSquare
-    ChiSquare -->|"ratio of two independent chi-squares, each over its df"| F
-    Normal -->|"Z divided by sqrt of a chi-square over its df"| T
-    ChiSquare -->|"supplies the denominator in the t-statistic"| T
-    Normal -->|"exponentiate a normal random variable"| Lognormal
+    Normal -->|"exponentiate"| Lognormal
+    Normal -->|"sum of ν squared standard Normals"| ChiSquare
+    Gamma -->|"k = ν/2, θ = 2"| ChiSquare
+
+    ChiSquare -->|"ratio of two independent scaled Chi-squares"| F
+    Normal -->|"supplies numerator Z"| T
+    ChiSquare -->|"supplies denominator √(U/ν)"| T
+
+    classDef high fill:#d9f2d9,stroke:#248f24,stroke-width:2px,color:#000;
+    classDef medium fill:#fff2cc,stroke:#bf9000,stroke-width:2px,color:#000;
+    classDef low fill:#f4cccc,stroke:#a61c00,stroke-width:2px,color:#000;
+
+    class Bernoulli,Binomial,Poisson,Normal,Uniform,ChiSquare,F,T high;
+    class NegBinomial,Geometric,Multinomial,Hypergeometric,Exponential medium;
+    class DiscreteUniform,Lognormal,Gamma,Beta low;
