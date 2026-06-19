@@ -1,0 +1,42 @@
+graph TD
+    Bernoulli["Bernoulli(p)<br/>p = success prob<br/>E[X]=p<br/>Var=p(1-p)<br/>E[X^2]=p"]
+    Binomial["Binomial(n,p)<br/>n = trials, p = success prob<br/>E[X]=np<br/>Var=np(1-p)<br/>E[X^2]=np(1-p)+(np)^2"]
+    NegBinomial["Negative Binomial(r,p)<br/>r = target successes, p = success prob<br/>E[X]=r/p<br/>Var=r(1-p)/p^2<br/>E[X^2]=Var+E[X]^2"]
+    Geometric["Geometric(p)<br/>p = success prob<br/>E[X]=1/p<br/>Var=(1-p)/p^2<br/>E[X^2]=Var+E[X]^2"]
+    Multinomial["Multinomial(n,p1..pk)<br/>n = trials, pi = category probs<br/>E[Xi]=n*pi<br/>Var(Xi)=n*pi(1-pi)<br/>Cov(Xi,Xj)=-n*pi*pj"]
+    Hypergeometric["Hypergeometric(N,K,n)<br/>N=pop size, K=success states, n=draws<br/>E[X]=n*K/N<br/>Var=n*(K/N)*(1-K/N)*(N-n)/(N-1)<br/>E[X^2]=Var+E[X]^2"]
+    DiscreteUniform["Discrete Uniform(a,b)<br/>a,b = min and max integer<br/>E[X]=(a+b)/2<br/>Var=((b-a+1)^2-1)/12<br/>E[X^2]=Var+E[X]^2"]
+    Poisson["Poisson(lambda)<br/>lambda = rate of events<br/>E[X]=lambda<br/>Var=lambda<br/>E[X^2]=lambda+lambda^2"]
+    Normal["Normal(mu,sigma2)<br/>mu = mean, sigma2 = variance<br/>E[X]=mu<br/>Var=sigma2<br/>E[X^2]=sigma2+mu^2"]
+    Lognormal["Lognormal(mu,sigma2)<br/>mu,sigma2 = mean/var of logX<br/>E[X]=exp(mu+sigma2/2)<br/>Var=(exp(sigma2)-1)*exp(2mu+sigma2)<br/>E[X^2]=Var+E[X]^2"]
+    Exponential["Exponential(lambda)<br/>lambda = rate<br/>E[X]=1/lambda<br/>Var=1/lambda^2<br/>E[X^2]=2/lambda^2"]
+    Gamma["Gamma(k,theta)<br/>k = shape, theta = scale<br/>E[X]=k*theta<br/>Var=k*theta^2<br/>E[X^2]=Var+E[X]^2"]
+    Beta["Beta(alpha,beta)<br/>alpha,beta = shape params<br/>E[X]=alpha/(alpha+beta)<br/>Var=alpha*beta/((alpha+beta)^2*(alpha+beta+1))<br/>E[X^2]=Var+E[X]^2"]
+    Uniform["Uniform(a,b)<br/>a,b = min and max<br/>E[X]=(a+b)/2<br/>Var=(b-a)^2/12<br/>E[X^2]=Var+E[X]^2"]
+    ChiSquare["Chi-square(nu)<br/>nu = degrees of freedom<br/>E[X]=nu<br/>Var=2*nu<br/>E[X^2]=Var+E[X]^2"]
+    F["F(d1,d2)<br/>d1,d2 = degrees of freedom<br/>E[X]=d2/(d2-2), d2>2<br/>Var=complex, depends on d1,d2<br/>E[X^2]=Var+E[X]^2"]
+    T["Student t(nu)<br/>nu = degrees of freedom<br/>E[X]=0, nu>1<br/>Var=nu/(nu-2), nu>2<br/>E[X^2]=Var"]
+
+    Bernoulli -->|"sum of n iid Bernoullis = count of successes"| Binomial
+    Bernoulli -->|"count trials until the r-th success"| NegBinomial
+    NegBinomial -->|"special case where r = 1"| Geometric
+    Bernoulli -->|"generalize from 2 outcomes to k outcomes"| Multinomial
+    Binomial -->|"same setup but sampling without replacement"| Hypergeometric
+
+    Binomial -->|"n large, p small, n*p fixed = rare event limit"| Poisson
+    Binomial -->|"n large, CLT kicks in, shape becomes bell curve"| Normal
+
+    Geometric -->|"discrete waiting time becomes continuous waiting time"| Exponential
+    Poisson -->|"time between Poisson events is exponential"| Exponential
+    Exponential -->|"sum of k iid exponential waiting times"| Gamma
+
+    Gamma -->|"ratio of two independent gammas with shared scale"| Beta
+    Beta -->|"alpha = beta = 1 flattens it into a flat line"| Uniform
+    DiscreteUniform -->|"as the number of outcomes goes to infinity"| Uniform
+
+    Normal -->|"sum of nu squared standard normals"| ChiSquare
+    Gamma -->|"special case where k = nu/2, theta = 2"| ChiSquare
+    ChiSquare -->|"ratio of two independent chi-squares, each over its df"| F
+    Normal -->|"Z divided by sqrt of a chi-square over its df"| T
+    ChiSquare -->|"supplies the denominator in the t-statistic"| T
+    Normal -->|"exponentiate a normal random variable"| Lognormal
