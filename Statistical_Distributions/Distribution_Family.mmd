@@ -1,21 +1,21 @@
 flowchart LR
-    Bernoulli["[H] Bernoulli(p)<br/>E[X] = p<br/>Var(X) = p(1-p)"]
-    Binomial["[H] Binomial(n,p)<br/>E[X] = np<br/>Var(X) = np(1-p)"]
-    NegBinomial["[M] Negative Binomial(r,p)<br/>X = trials until r successes<br/>E[X] = r/p<br/>Var(X) = r(1-p)/p²"]
-    Geometric["[M] Geometric(p)<br/>X = trials until first success<br/>E[X] = 1/p<br/>Var(X) = (1-p)/p²"]
-    Multinomial["[M] Multinomial(n,p₁…pₖ)<br/>E[Xᵢ] = npᵢ<br/>Var(Xᵢ) = npᵢ(1-pᵢ)<br/>Cov(Xᵢ,Xⱼ) = -npᵢpⱼ"]
-    Hypergeometric["[M] Hypergeometric(N,K,n)<br/>E[X] = nK/N<br/>Var(X) = n(K/N)(1-K/N)(N-n)/(N-1)"]
-    DiscreteUniform["[L] Discrete Uniform(a,b)<br/>E[X] = (a+b)/2<br/>Var(X) = ((b-a+1)²-1)/12"]
-    Poisson["[H] Poisson(λ)<br/>E[X] = λ<br/>Var(X) = λ"]
-    Normal["[H] Normal(μ,σ²)<br/>E[X] = μ<br/>Var(X) = σ²"]
-    Lognormal["[L] Lognormal(μ,σ²)<br/>log X ~ Normal(μ,σ²)<br/>E[X] = exp(μ+σ²/2)<br/>Var(X) = (exp(σ²)-1)exp(2μ+σ²)"]
-    Exponential["[M] Exponential(λ)<br/>E[X] = 1/λ<br/>Var(X) = 1/λ²"]
-    Gamma["[L] Gamma(k,θ)<br/>E[X] = kθ<br/>Var(X) = kθ²"]
-    Beta["[L] Beta(α,β)<br/>E[X] = α/(α+β)<br/>Var(X) = αβ/((α+β)²(α+β+1))"]
-    Uniform["[H] Uniform(a,b)<br/>E[X] = (a+b)/2<br/>Var(X) = (b-a)²/12"]
-    ChiSquare["[H] Chi-square(ν)<br/>E[X] = ν<br/>Var(X) = 2ν"]
-    F["[H] F(d₁,d₂)<br/>E[X] = d₂/(d₂-2), d₂&gt;2<br/>Var(X) = 2d₂²(d₁+d₂-2)/(d₁(d₂-2)²(d₂-4))"]
-    T["[H] Student t(ν)<br/>E[X] = 0, ν&gt;1<br/>Var(X) = ν/(ν-2), ν&gt;2"]
+    Bernoulli["[D] Bernoulli(p)<br/>E[X] = p<br/>Var(X) = p(1-p)"]
+    Binomial["[D] Binomial(n,p)<br/>E[X] = np<br/>Var(X) = np(1-p)"]
+    NegBinomial["[D] Negative Binomial(r,p)<br/>X = trials until r successes<br/>E[X] = r/p<br/>Var(X) = r(1-p)/p²"]
+    Geometric["[D] Geometric(p)<br/>X = trials until first success<br/>E[X] = 1/p<br/>Var(X) = (1-p)/p²"]
+    Multinomial["[D] Multinomial(n,p₁…pₖ)<br/>E[Xᵢ] = npᵢ<br/>Var(Xᵢ) = npᵢ(1-pᵢ)<br/>Cov(Xᵢ,Xⱼ) = -npᵢpⱼ"]
+    Hypergeometric["[D] Hypergeometric(N,K,n)<br/>E[X] = nK/N<br/>Var(X) = n(K/N)(1-K/N)(N-n)/(N-1)"]
+    DiscreteUniform["[D] Discrete Uniform(a,b)<br/>E[X] = (a+b)/2<br/>Var(X) = ((b-a+1)²-1)/12"]
+    Poisson["[D] Poisson(λ)<br/>E[X] = λ<br/>Var(X) = λ"]
+    Normal["[C] Normal(μ,σ²)<br/>E[X] = μ<br/>Var(X) = σ²"]
+    Lognormal["[C] Lognormal(μ,σ²)<br/>log X ~ Normal(μ,σ²)<br/>E[X] = exp(μ+σ²/2)<br/>Var(X) = (exp(σ²)-1)exp(2μ+σ²)"]
+    Exponential["[C] Exponential(λ)<br/>E[X] = 1/λ<br/>Var(X) = 1/λ²"]
+    Gamma["[C] Gamma(k,θ)<br/>E[X] = kθ<br/>Var(X) = kθ²"]
+    Beta["[C] Beta(α,β)<br/>E[X] = α/(α+β)<br/>Var(X) = αβ/((α+β)²(α+β+1))"]
+    Uniform["[C] Uniform(a,b)<br/>E[X] = (a+b)/2<br/>Var(X) = (b-a)²/12"]
+    ChiSquare["[C] Chi-square(ν)<br/>E[X] = ν<br/>Var(X) = 2ν"]
+    F["[C] F(d₁,d₂)<br/>E[X] = d₂/(d₂-2), d₂&gt;2<br/>Var(X) = 2d₂²(d₁+d₂-2)/(d₁(d₂-2)²(d₂-4))"]
+    T["[C] Student t(ν)<br/>E[X] = 0, ν&gt;1<br/>Var(X) = ν/(ν-2), ν&gt;2"]
 
     Bernoulli -->|"sum of n independent trials"| Binomial
     Bernoulli -->|"trials until r-th success"| NegBinomial
@@ -42,10 +42,9 @@ flowchart LR
     Normal -->|"supplies numerator Z"| T
     ChiSquare -->|"supplies denominator √(U/ν)"| T
 
-    classDef high fill:#d9f2d9,stroke:#248f24,stroke-width:2px,color:#000;
-    classDef medium fill:#fff2cc,stroke:#bf9000,stroke-width:2px,color:#000;
-    classDef low fill:#f4cccc,stroke:#a61c00,stroke-width:2px,color:#000;
+    classDef discrete fill:#d9f2d9,stroke:#248f24,stroke-width:2px,color:#000;
+    classDef continuous fill:#fff2cc,stroke:#bf9000,stroke-width:2px,color:#000;
+    classDef both fill:#f4cccc,stroke:#a61c00,stroke-width:2px,color:#000;
 
-    class Bernoulli,Binomial,Poisson,Normal,Uniform,ChiSquare,F,T high;
-    class NegBinomial,Geometric,Multinomial,Hypergeometric,Exponential medium;
-    class DiscreteUniform,Lognormal,Gamma,Beta low;
+    class Bernoulli,Binomial,NegBinomial,Geometric,Multinomial,Hypergeometric,DiscreteUniform,Poisson discrete;
+    class Normal,Lognormal,Exponential,Gamma,Beta,Uniform,ChiSquare,F,T continuous;
